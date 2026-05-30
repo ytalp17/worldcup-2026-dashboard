@@ -7,20 +7,18 @@ from src.data.match_calendar import MatchCalendar
 CALENDAR_ID = "match-calendar"
 
 
-def build_match_calendar(calendar: MatchCalendar) -> dmc.MiniCalendar:
-    """Compact header calendar spanning today → the final day.
+CALENDAR_DAYS = 10
 
-    Match-days blink via the ``wcMatchDay`` client-side function (registered in
-    assets/dmc_functions.js, fed by ``window.WC_MATCH_DATES``). The selected
-    ``value`` drives the map highlight callback in app.py.
-    """
+
+def build_match_calendar(calendar: MatchCalendar) -> dmc.MiniCalendar:
+    """Compact header calendar spanning today → the final day. Selecting a date
+    drives the map highlight callback in app.py (active stadiums pulse)."""
     return dmc.MiniCalendar(
         id=CALENDAR_ID,
         value=calendar.start.isoformat(),
         defaultDate=calendar.start.isoformat(),
         minDate=calendar.start.isoformat(),
         maxDate=calendar.end.isoformat(),
-        numberOfDays=5,
-        getDayProps={"function": "wcMatchDay"},
+        numberOfDays=CALENDAR_DAYS,
         persistence=True,
     )

@@ -10,7 +10,7 @@ class _FakeCalendar:
     end = date(2026, 7, 19)
 
 
-def test_minicalendar_has_range_value_and_blink_hook():
+def test_minicalendar_has_range_value_and_window():
     mc = build_match_calendar(_FakeCalendar())
     assert isinstance(mc, dmc.MiniCalendar)
     assert mc.id == CALENDAR_ID
@@ -18,5 +18,5 @@ def test_minicalendar_has_range_value_and_blink_hook():
     assert mc.value == "2026-05-30"
     assert mc.minDate == "2026-05-30"
     assert mc.maxDate == "2026-07-19"
-    # Match-days blink via the registered client-side function.
-    assert mc.getDayProps == {"function": "wcMatchDay"}
+    # Shows a 10-day window.
+    assert mc.numberOfDays == 10

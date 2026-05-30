@@ -104,8 +104,9 @@ def test_header_contains_match_calendar_when_provided():
 def test_layout_contains_map_with_marker_per_venue():
     maps = [n for n in _walk(build_layout(VENUES)) if isinstance(n, dl.Map)]
     assert len(maps) == 1
+    # Venue markers now live inside the "venue-layer" LayerGroup.
     markers = [
-        c for c in maps[0].children
+        c for c in _walk(maps[0])
         if isinstance(c, dl.DivMarker) and isinstance(getattr(c, "id", None), dict)
     ]
     assert len(markers) == len(VENUES)

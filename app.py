@@ -4,6 +4,7 @@ import json
 from datetime import date
 from pathlib import Path
 
+import dash
 from dash import ALL, Dash, Input, Output, callback, clientside_callback, ctx, no_update
 
 from src.components.detail_panel import stadium_detail
@@ -11,7 +12,7 @@ from src.components.filter_panel import legend
 from src.components.flow_layer import flows_for
 from src.components.header_calendar import build_match_calendar
 from src.components.layout import build_layout
-from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE
+from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, pulse_markers
 from src.data.altitudes import AltitudeRepository
 from src.data.distances import DistanceRepository
 from src.data.flows import build_team_flows
@@ -21,6 +22,12 @@ from src.data.matches import MatchRepository, matches_by_stadium
 from src.data.stadiums import StadiumRepository
 from src.data.team_continents import grouped_team_options
 from src.data.venues import build_venues
+
+# dash-mantine-components 2.x is built on Mantine 8 / React 18 (e.g. useId).
+# The runtime (conda base) pairs it with Dash 2.18, which still defaults to
+# React 16, so we must opt into React 18 or the UI fails with
+# "(0 , r.useId) is not a function".
+dash._dash_renderer._set_react_version("18.2.0")
 
 DATA_DIR = Path(__file__).parent / "assets" / "data"
 IMAGE_DIR = Path(__file__).parent / "assets" / "stadiums"
@@ -40,7 +47,6 @@ TEAM_OPTIONS = grouped_team_options(sorted(TEAM_FLOWS))
 
 STADIUM_TO_CITY = {v.stadium_name: v.city for v in VENUES}
 MATCH_CALENDAR = MatchCalendar(MATCHES, STADIUM_TO_CITY, today=date.today())
-MATCH_DATES_JSON = json.dumps(sorted(d.isoformat() for d in MATCH_CALENDAR.match_dates))
 
 
 def flow_children(selected):
@@ -60,7 +66,6 @@ app.index_string = f"""<!DOCTYPE html>
         {{%metas%}}
         <title>{{%title%}}</title>
         <link rel="icon" type="image/svg+xml" href="{_FAVICON}">
-        <script>window.WC_MATCH_DATES = {MATCH_DATES_JSON};</script>
         {{%css%}}
     </head>
     <body>
@@ -124,6 +129,26 @@ def open_filter_drawer(n_clicks):
 )
 def update_flows(selected):
     return flow_children(selected), legend(selected, TEAM_FLOWS)
+
+
+def pulses_for_date(selected_date: str | None):
+    """Pulsing overlay rings for stadiums hosting a match on the selected date."""
+    active: set[str] = set()
+    if selected_date:
+        try:
+            day = date.fromisoformat(str(selected_date)[:10])
+            active = MATCH_CALENDAR.active_cities(day)
+        except ValueError:
+            active = set()
+    return pulse_markers(VENUES, active)
+
+
+@callback(
+    Output("pulse-layer", "children"),
+    Input("match-calendar", "value"),
+)
+def highlight_active_stadiums(selected_date):
+    return pulses_for_date(selected_date)
 
 
 # Toggling the switch flips both the Mantine color scheme and the base map

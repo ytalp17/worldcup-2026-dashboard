@@ -54,6 +54,9 @@ MARKER_SIZE = 16  # px
 
 
 def _marker(venue: Venue) -> dl.DivMarker:
+    # Static, clickable base dot. The pulse for "active today" stadiums is drawn
+    # by a separate overlay (see pulse_markers) because dash-leaflet does not
+    # refresh a DivMarker's icon HTML when the same marker id is re-rendered.
     return dl.DivMarker(
         id={"type": MARKER_TYPE, "index": venue.city},
         position=[venue.lat, venue.lon],
@@ -67,11 +70,40 @@ def _marker(venue: Venue) -> dl.DivMarker:
     )
 
 
+def venue_markers(venues: list[Venue]) -> list[dl.DivMarker]:
+    """The static, clickable base markers (one per venue)."""
+    return [_marker(v) for v in venues]
+
+
+def pulse_markers(venues: list[Venue], active_cities: set[str]) -> list[dl.DivMarker]:
+    """Non-interactive pulsing rings over stadiums hosting a match on the
+    selected day. Lives in its own layer that is rebuilt per date (empty →
+    populated), which dash-leaflet renders reliably."""
+    rings: list[dl.DivMarker] = []
+    for v in venues:
+        if v.city not in active_cities:
+            continue
+        rings.append(
+            dl.DivMarker(
+                id={"type": "venue-pulse", "index": v.city},
+                position=[v.lat, v.lon],
+                iconOptions={
+                    "html": '<div class="venue-pulse-ring"></div>',
+                    "className": "venue-pulse-icon",
+                    "iconSize": [MARKER_SIZE, MARKER_SIZE],
+                    "iconAnchor": [MARKER_SIZE / 2, MARKER_SIZE / 2],
+                },
+            )
+        )
+    return rings
+
+
 def build_map(venues: list[Venue]) -> dl.Map:
     return dl.Map(
         children=[
             dl.TileLayer(id="base-tiles", url=DARK_TILE, attribution=TILE_ATTRIBUTION),
-            *[_marker(v) for v in venues],
+            dl.LayerGroup(id="venue-layer", children=venue_markers(venues)),
+            dl.LayerGroup(id="pulse-layer"),
             dl.LayerGroup(id="flow-layer"),
             _filter_pin(),
         ],

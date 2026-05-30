@@ -40,17 +40,57 @@ def _children(m):
     return m.children if isinstance(m.children, list) else [m.children]
 
 
+def _walk(node):
+    yield node
+    children = getattr(node, "children", None)
+    if isinstance(children, (list, tuple)):
+        for c in children:
+            yield from _walk(c)
+    elif children is not None:
+        yield from _walk(children)
+
+
 def _markers(m):
-    # Venue markers carry a pattern-matching dict id; the filter pin uses a
-    # plain string id and is excluded here.
+    # Venue markers carry a pattern-matching dict id and now live inside the
+    # "venue-layer" LayerGroup; the filter pin uses a plain string id.
     return [
-        c for c in _children(m)
+        c for c in _walk(m)
         if isinstance(c, dl.DivMarker) and isinstance(getattr(c, "id", None), dict)
     ]
 
 
 def test_build_map_returns_dl_map():
     assert isinstance(build_map(VENUES), dl.Map)
+
+
+def test_pulse_markers_only_for_active_cities():
+    from src.components.map_view import pulse_markers
+
+    rings = pulse_markers(VENUES, active_cities={"Mexico City"})
+    assert len(rings) == 1
+    assert rings[0].id == {"type": "venue-pulse", "index": "Mexico City"}
+    assert "venue-pulse-ring" in rings[0].iconOptions["html"]
+
+
+def test_pulse_markers_empty_when_no_active_cities():
+    from src.components.map_view import pulse_markers
+
+    assert pulse_markers(VENUES, active_cities=set()) == []
+
+
+def test_map_has_static_base_markers_and_pulse_layer():
+    m = build_map(VENUES)
+    venue_layer = next(
+        c for c in _children(m)
+        if isinstance(c, dl.LayerGroup) and getattr(c, "id", None) == "venue-layer"
+    )
+    assert len(venue_layer.children) == len(VENUES)
+    # The pulse overlay layer exists (filled per selected date by a callback).
+    pulse_layer = [
+        c for c in _children(m)
+        if isinstance(c, dl.LayerGroup) and getattr(c, "id", None) == "pulse-layer"
+    ]
+    assert len(pulse_layer) == 1
 
 
 def test_map_has_one_marker_per_venue():

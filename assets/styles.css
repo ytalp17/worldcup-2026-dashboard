@@ -52,13 +52,26 @@ body,
     --marker-rgb: 225, 29, 72; /* rose-600 */
 }
 
-.venue-marker::after {
-    content: "";
-    position: absolute;
-    inset: 0;
+/* Pulse overlay: a ring drawn over stadiums hosting a match on the selected
+   day. Non-interactive so clicks reach the base marker underneath. Themed to
+   match the marker accent (cyan on dark, rose on light). */
+.venue-pulse-icon {
+    background: transparent;
+    border: none;
+    pointer-events: none;
+}
+
+.venue-pulse-ring {
+    --marker-rgb: 56, 189, 248;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    border: 2px solid rgba(var(--marker-rgb), 0.6);
+    border: 2px solid rgba(var(--marker-rgb), 0.7);
     animation: venue-pulse 2s ease-out infinite;
+}
+
+[data-mantine-color-scheme="light"] .venue-pulse-ring {
+    --marker-rgb: 225, 29, 72;
 }
 
 /* Yellow plane control pin that opens the team-filter drawer. */
@@ -106,29 +119,4 @@ body,
 
 [data-mantine-color-scheme="dark"] .filter-drawer-frosted {
     background-color: rgba(26, 27, 30, 0.8);
-}
-
-/* Calendar match-days blink with the same pulse as the venue markers: a small
-   accent dot under the day number that expands and fades. */
-.calendar-match-day {
-    position: relative;
-    font-weight: 700;
-}
-
-.calendar-match-day::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: 3px;
-    width: 5px;
-    height: 5px;
-    margin-left: -2.5px;
-    border-radius: 50%;
-    background: rgb(56, 189, 248);
-    animation: venue-pulse 1.8s ease-out infinite;
-    pointer-events: none;
-}
-
-[data-mantine-color-scheme="light"] .calendar-match-day::after {
-    background: rgb(225, 29, 72);
 }
