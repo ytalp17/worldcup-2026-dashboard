@@ -16,13 +16,13 @@ def _walk(node):
         yield from _walk(children)
 
 
-def test_filter_drawer_is_left_and_non_blocking():
+def test_filter_drawer_is_right_and_non_blocking():
     drawer = build_filter_drawer(
         [{"group": "Europe", "items": [{"value": "France", "label": "France"}]}]
     )
     assert isinstance(drawer, dmc.Drawer)
     assert drawer.id == "filter-drawer"
-    assert drawer.position == "left"
+    assert drawer.position == "right"
     assert drawer.withOverlay is False
 
 
