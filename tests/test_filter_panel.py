@@ -26,6 +26,14 @@ def test_filter_drawer_is_left_and_non_blocking():
     assert drawer.withOverlay is False
 
 
+def test_multiselect_dropdown_floats_above_the_drawer():
+    # The dropdown is portaled and must out-stack the drawer (zIndex 2500),
+    # otherwise the drawer paints over the options and clicks are intercepted.
+    drawer = build_filter_drawer([])
+    select = next(n for n in _walk(drawer) if isinstance(n, dmc.MultiSelect))
+    assert select.comboboxProps["zIndex"] > drawer.zIndex
+
+
 def test_filter_drawer_has_multiselect_with_grouped_data():
     options = [{"group": "Europe", "items": [{"value": "France", "label": "France"}]}]
     drawer = build_filter_drawer(options)
