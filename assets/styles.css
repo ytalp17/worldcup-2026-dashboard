@@ -37,9 +37,9 @@ body,
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: rgba(var(--marker-rgb), 0.45);
-    box-shadow: 0 0 0 1px rgba(var(--marker-rgb), 0.4);
-    filter: brightness(0.7);
+    background: rgba(var(--marker-rgb), 0.6);
+    box-shadow: 0 0 0 1px rgba(var(--marker-rgb), 0.5);
+    filter: brightness(0.85);
     position: relative;
     cursor: pointer;
 }
