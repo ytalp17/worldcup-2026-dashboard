@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from collections.abc import Mapping
 from pathlib import Path
 
 from src.data.host_cities import HostCity
@@ -27,6 +28,7 @@ class Venue:
     has_image: bool
     timezone: str  # IANA name, e.g. "America/Chicago"
     tz_label: str  # friendly label, e.g. "Central Time"
+    altitude_m: int | None = None  # stadium altitude in metres, if known
 
     @property
     def image_src(self) -> str:
@@ -41,13 +43,16 @@ def build_venues(
     cities: list[HostCity],
     stadiums: list[Stadium],
     image_dir: str | Path,
+    altitudes: Mapping[str, int] | None = None,
 ) -> list[Venue]:
     """Join host cities to stadium details by matching the host-city name
     against the stadium name (each stadium name embeds its host city).
+    Optionally attach altitude (metres) per city from ``altitudes``.
 
     Raises ValueError if any city matches zero or more than one stadium.
     """
     image_dir = Path(image_dir)
+    altitudes = altitudes or {}
     normalized = [(_normalize(s.name), s) for s in stadiums]
 
     venues: list[Venue] = []
@@ -77,6 +82,7 @@ def build_venues(
                 has_image=(image_dir / stadium.image_filename).exists(),
                 timezone=iana,
                 tz_label=tz_label,
+                altitude_m=altitudes.get(city.city),
             )
         )
     return venues

@@ -1,3 +1,4 @@
+import dataclasses
 from datetime import date
 
 import dash_mantine_components as dmc
@@ -93,6 +94,20 @@ def test_detail_shows_timezone():
     text = _all_text(content)
     assert "Central Time" in text       # friendly label
     assert "America/Chicago" in text    # IANA name
+
+
+def test_detail_shows_altitude_badge_when_known():
+    venue = dataclasses.replace(_venue(has_image=True), altitude_m=2240)
+    content = dmc.Box(stadium_detail(venue))
+    text = _all_text(content)
+    assert "Altitude" in text
+    assert "2,240 m" in text          # metres, thousands-separated
+
+
+def test_detail_no_altitude_badge_when_unknown():
+    venue = dataclasses.replace(_venue(has_image=True), altitude_m=None)
+    content = dmc.Box(stadium_detail(venue))
+    assert "Altitude" not in _all_text(content)
 
 
 def _timelines(node):

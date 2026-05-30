@@ -49,6 +49,18 @@ def _image_block(venue: Venue):
     )
 
 
+def _stat_badges(venue: Venue):
+    badges = [
+        dmc.Badge(f"Capacity {venue.capacity:,}", variant="light", color="blue"),
+        dmc.Badge(f"Opened {venue.opened}", variant="light", color="teal"),
+    ]
+    if venue.altitude_m is not None:
+        badges.append(
+            dmc.Badge(f"Altitude {venue.altitude_m:,} m", variant="light", color="orange")
+        )
+    return badges
+
+
 def _match_label(match: Match) -> str:
     """Group name for group-stage matches, otherwise the stage name."""
     return match.group or match.stage
@@ -103,13 +115,7 @@ def stadium_detail(venue: Venue, matches: Sequence[Match] = ()):
         [
             _image_block(venue),
             dmc.Text(venue.location, size="sm", c="dimmed"),
-            dmc.Group(
-                [
-                    dmc.Badge(f"Capacity {venue.capacity:,}", variant="light", color="blue"),
-                    dmc.Badge(f"Opened {venue.opened}", variant="light", color="teal"),
-                ],
-                gap="sm",
-            ),
+            dmc.Group(_stat_badges(venue), gap="sm"),
             dmc.Group(
                 [
                     DashIconify(icon="tabler:clock-hour-4", width=16),
