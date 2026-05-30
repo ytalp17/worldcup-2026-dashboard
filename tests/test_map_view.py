@@ -86,6 +86,10 @@ def test_map_is_not_draggable():
     assert m.keyboard is False
 
 
+def test_map_hides_zoom_control():
+    assert build_map(VENUES).zoomControl is False
+
+
 def test_markers_positioned_at_venue_coordinates():
     positions = {tuple(mk.position) for mk in _markers(build_map(VENUES))}
     assert (19.3029, -99.1505) in positions
