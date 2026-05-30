@@ -23,7 +23,7 @@ MARKER_TYPE = "venue-marker"
 
 # Fixed control pin pushed to the far lower-left corner of the static view; it
 # opens the filter drawer. Kept at the edge to leave room for more control pins.
-FILTER_PIN = [19.5, -131.0]
+FILTER_PIN = [19.5, -137.0]
 
 
 def _filter_pin() -> dl.DivMarker:
