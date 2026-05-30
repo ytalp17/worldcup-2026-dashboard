@@ -19,6 +19,14 @@ def _group_stage_teams():
     return set(pd.concat([gs["home_team"], gs["away_team"]]))
 
 
+def test_mapping_is_sourced_from_csv():
+    csv_path = Path(__file__).parent.parent / "assets" / "data" / "team_continents.csv"
+    df = pd.read_csv(csv_path)
+    assert set(df.columns) >= {"team", "continent"}
+    from_csv = {str(r["team"]): str(r["continent"]) for _, r in df.iterrows()}
+    assert TEAM_CONTINENT == from_csv
+
+
 def test_all_group_stage_teams_have_a_continent():
     teams = _group_stage_teams()
     assert len(teams) == 48
