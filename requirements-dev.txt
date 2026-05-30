@@ -1,0 +1,4 @@
+# Optional tooling for local verification (not needed to run the app).
+# scripts/download_stadium_images.py uses certifi (also in requirements.txt).
+# scripts/e2e_check.py drives a headless browser:
+playwright

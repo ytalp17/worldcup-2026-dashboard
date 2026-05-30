@@ -1,0 +1,4 @@
+-- Leaflet updates
+- use light and dark themes for leaflet map which is responsive to dark and light buttons preference make it change accoridngly as well
+- add boundary to the leaflet in away that it doesnt show enywhere except mexico canada and usa.
+- make timezones visible on the map if it s possible
