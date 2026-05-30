@@ -5,7 +5,7 @@ import dash_mantine_components as dmc
 from src.data.flows import TeamFlow, format_distance, rank_by_distance
 
 
-def _leaderboard_section(title: str, flows: list[TeamFlow]) -> dmc.Stack:
+def _leaderboard_section(title: str, flows: list[TeamFlow]) -> dmc.Card:
     rows = [
         dmc.Group(
             [
@@ -25,9 +25,15 @@ def _leaderboard_section(title: str, flows: list[TeamFlow]) -> dmc.Stack:
         )
         for f in flows
     ]
-    return dmc.Stack(
-        [dmc.Text(title, size="sm", fw=600), *rows],
-        gap=4,
+    return dmc.Card(
+        children=dmc.Stack(
+            [dmc.Text(title, size="sm", fw=600), *rows],
+            gap=4,
+        ),
+        withBorder=True,
+        radius="md",
+        shadow="sm",
+        padding="sm",
     )
 
 

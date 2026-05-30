@@ -89,6 +89,18 @@ def test_drawer_renders_longest_and_shortest_leaderboard():
     assert "9,000 km" in joined
 
 
+def test_leaderboard_sections_are_wrapped_in_cards():
+    drawer = build_filter_drawer([], _flows_for_leaderboard())
+    cards = [n for n in _walk(drawer) if isinstance(n, dmc.Card)]
+    # One card per section: Longest journeys + Shortest journeys.
+    assert len(cards) == 2
+    for card in cards:
+        assert card.withBorder is True
+        # Each card still carries its section's content.
+        card_texts = [n.children for n in _walk(card) if isinstance(n, dmc.Text)]
+        assert any(isinstance(t, str) and "journeys" in t for t in card_texts)
+
+
 def test_build_filter_drawer_without_flows_still_builds():
     drawer = build_filter_drawer([])
     assert isinstance(drawer, dmc.Drawer)
