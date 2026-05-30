@@ -1,0 +1,6 @@
+dash==2.18.2
+dash-leaflet==1.0.15
+dash-mantine-components==0.15.1
+dash-iconify==0.1.2
+pandas==2.2.3
+pytest==8.3.4
