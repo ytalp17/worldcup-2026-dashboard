@@ -18,6 +18,7 @@ class Venue:
     lat: float
     lon: float
     official_name: str  # real stadium name, e.g. "AT&T Stadium"
+    stadium_name: str  # generic FIFA name, e.g. "Dallas Stadium" (match-join key)
     location: str
     capacity: int
     opened: int
@@ -67,6 +68,7 @@ def build_venues(
                 lat=city.lat,
                 lon=city.lon,
                 official_name=city.stadium,
+                stadium_name=stadium.name,
                 location=stadium.location,
                 capacity=stadium.capacity,
                 opened=stadium.opened,

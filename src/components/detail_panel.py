@@ -1,14 +1,17 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 
+from src.data.matches import Match
 from src.data.venues import Venue
 
 PLACEHOLDER_TEXT = "Photo unavailable"
+NO_MATCHES_TEXT = "No matches scheduled"
 IMAGE_HEIGHT = 200
 
 
@@ -46,24 +49,52 @@ def _image_block(venue: Venue):
     )
 
 
-def stadium_detail(venue: Venue):
-    """Drawer body for a venue: photo, location, key stats, and info blurb."""
+def _match_label(match: Match) -> str:
+    """Group name for group-stage matches, otherwise the stage name."""
+    return match.group or match.stage
+
+
+def _match_item(match: Match) -> dmc.TimelineItem:
+    title = f"{match.date.strftime('%b')} {match.date.day} · {_match_label(match)}"
+    return dmc.TimelineItem(
+        title=title,
+        bullet=DashIconify(icon="tabler:ball-football", width=12),
+        children=[dmc.Text(f"{match.home} vs {match.away}", size="sm", c="dimmed")],
+    )
+
+
+def _matches_section(matches: Sequence[Match]):
+    header = dmc.Group(
+        [
+            dmc.Text("Matches", fw=600),
+            dmc.Badge(str(len(matches)), variant="light", color="grape", size="sm"),
+        ],
+        gap="xs",
+        align="center",
+    )
+    if not matches:
+        body = dmc.Text(NO_MATCHES_TEXT, size="sm", c="dimmed")
+    else:
+        body = dmc.Timeline(
+            [_match_item(m) for m in matches],
+            active=len(matches),
+            bulletSize=20,
+            lineWidth=2,
+        )
+    return dmc.Stack([header, body], gap="sm")
+
+
+def stadium_detail(venue: Venue, matches: Sequence[Match] = ()):
+    """Drawer body: photo, location, key stats, timezone, info, and the
+    schedule of matches at this stadium."""
     return dmc.Stack(
         [
             _image_block(venue),
             dmc.Text(venue.location, size="sm", c="dimmed"),
             dmc.Group(
                 [
-                    dmc.Badge(
-                        f"Capacity {venue.capacity:,}",
-                        variant="light",
-                        color="blue",
-                    ),
-                    dmc.Badge(
-                        f"Opened {venue.opened}",
-                        variant="light",
-                        color="teal",
-                    ),
+                    dmc.Badge(f"Capacity {venue.capacity:,}", variant="light", color="blue"),
+                    dmc.Badge(f"Opened {venue.opened}", variant="light", color="teal"),
                 ],
                 gap="sm",
             ),
@@ -76,12 +107,9 @@ def stadium_detail(venue: Venue):
                 align="center",
                 wrap="nowrap",
             ),
-            dmc.ScrollArea(
-                dmc.Text(venue.info, size="sm"),
-                h=240,
-                type="auto",
-                offsetScrollbars=True,
-            ),
+            dmc.Text(venue.info, size="sm"),
+            dmc.Divider(),
+            _matches_section(matches),
         ],
         gap="md",
     )

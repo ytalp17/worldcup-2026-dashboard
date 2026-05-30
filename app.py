@@ -10,6 +10,7 @@ from src.components.detail_panel import stadium_detail
 from src.components.layout import build_layout
 from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE
 from src.data.host_cities import HostCityRepository
+from src.data.matches import MatchRepository, matches_by_stadium
 from src.data.stadiums import StadiumRepository
 from src.data.venues import build_venues
 
@@ -26,6 +27,9 @@ CITIES = HostCityRepository(DATA_DIR / "fifa_2026_host_cities.csv").load()
 STADIUMS = StadiumRepository(DATA_DIR / "fifa_wc2026_stadiums.csv").load()
 VENUES = build_venues(CITIES, STADIUMS, IMAGE_DIR)
 VENUES_BY_CITY = {v.city: v for v in VENUES}
+
+MATCHES = MatchRepository(DATA_DIR / "wc2026_matches.csv").load()
+MATCHES_BY_STADIUM = matches_by_stadium(MATCHES)
 
 app = Dash(__name__)
 app.title = "FIFA World Cup 2026"
@@ -60,7 +64,8 @@ def drawer_for_city(city: str | None):
     venue = VENUES_BY_CITY.get(city) if city else None
     if venue is None:
         return False, no_update, no_update
-    return True, venue.official_name, stadium_detail(venue)
+    matches = MATCHES_BY_STADIUM.get(venue.stadium_name, [])
+    return True, venue.official_name, stadium_detail(venue, matches)
 
 
 @callback(
