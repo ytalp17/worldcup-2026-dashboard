@@ -71,7 +71,7 @@ def build_filter_drawer(
         children.append(_leaderboard(team_flows))
     return dmc.Drawer(
         id="filter-drawer",
-        title="Flow lines by team",
+        title="Team Travel Map",
         position="right",
         size="md",
         padding="md",
