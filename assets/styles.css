@@ -21,3 +21,53 @@ body,
     flex: 1;
     min-height: 0;
 }
+
+/* ---- Modern venue markers: a glowing dot with a pulsing ring ---- */
+/* className on the divIcon avoids Leaflet's default white box. */
+.venue-marker-icon {
+    background: transparent;
+    border: none;
+}
+
+/* Accent recolours with the Mantine color scheme (set on <html> by the
+   theme toggle): cyan on dark tiles, rose on light tiles. */
+.venue-marker {
+    --marker-rgb: 56, 189, 248; /* fallback (sky) */
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgb(var(--marker-rgb));
+    box-shadow:
+        0 0 0 2px rgba(var(--marker-rgb), 0.35),
+        0 0 10px 2px rgba(var(--marker-rgb), 0.75);
+    position: relative;
+    cursor: pointer;
+}
+
+[data-mantine-color-scheme="dark"] .venue-marker {
+    --marker-rgb: 56, 189, 248; /* sky-400 */
+}
+
+[data-mantine-color-scheme="light"] .venue-marker {
+    --marker-rgb: 225, 29, 72; /* rose-600 */
+}
+
+.venue-marker::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(var(--marker-rgb), 0.6);
+    animation: venue-pulse 2s ease-out infinite;
+}
+
+@keyframes venue-pulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(2.6);
+        opacity: 0;
+    }
+}

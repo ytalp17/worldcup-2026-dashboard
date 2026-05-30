@@ -82,5 +82,5 @@ def test_header_has_contrast_logos_before_title():
 def test_layout_contains_map_with_marker_per_venue():
     maps = [n for n in _walk(build_layout(VENUES)) if isinstance(n, dl.Map)]
     assert len(maps) == 1
-    markers = [c for c in maps[0].children if isinstance(c, dl.Marker)]
+    markers = [c for c in maps[0].children if isinstance(c, dl.DivMarker)]
     assert len(markers) == len(VENUES)

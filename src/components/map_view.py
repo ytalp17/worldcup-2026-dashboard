@@ -11,21 +11,30 @@ DARK_TILE = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
 TILE_ATTRIBUTION = "© OpenStreetMap contributors © CARTO"
 
 # SW and NE corners of a box snug to USA, Mexico, and Canada.
-NA_BOUNDS = [[12.0, -172.0], [74.0, -50.0]]
+NA_BOUNDS = [[14.0, -145.0], [55.0, -50.0]]
 
 NA_CENTER = [40.0, -100.0]
-NA_ZOOM = 3
-NA_MIN_ZOOM = 3
+NA_ZOOM = 5
+NA_MIN_ZOOM = 5
 
 # Pattern-matching id type for venue markers; the app callback listens to all
 # markers of this type and opens the detail drawer for the clicked one.
 MARKER_TYPE = "venue-marker"
 
 
-def _marker(venue: Venue) -> dl.Marker:
-    return dl.Marker(
+MARKER_SIZE = 16  # px
+
+
+def _marker(venue: Venue) -> dl.DivMarker:
+    return dl.DivMarker(
         id={"type": MARKER_TYPE, "index": venue.city},
         position=[venue.lat, venue.lon],
+        iconOptions={
+            "html": '<div class="venue-marker"></div>',
+            "className": "venue-marker-icon",
+            "iconSize": [MARKER_SIZE, MARKER_SIZE],
+            "iconAnchor": [MARKER_SIZE / 2, MARKER_SIZE / 2],
+        },
         children=[dl.Tooltip(f"{venue.city} — {venue.official_name}")],
     )
 
