@@ -7,12 +7,16 @@ import dash
 from dash import ALL, Dash, Input, Output, callback, clientside_callback, ctx, no_update
 
 from src.components.detail_panel import stadium_detail
+from src.components.filter_panel import legend
+from src.components.flow_layer import flows_for
 from src.components.layout import build_layout
 from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE
 from src.data.altitudes import AltitudeRepository
+from src.data.flows import build_team_flows
 from src.data.host_cities import HostCityRepository
 from src.data.matches import MatchRepository, matches_by_stadium
 from src.data.stadiums import StadiumRepository
+from src.data.team_continents import grouped_team_options
 from src.data.venues import build_venues
 
 # dash-mantine-components 0.15.x is built on Mantine 7 / React 18 and uses
@@ -33,9 +37,16 @@ VENUES_BY_CITY = {v.city: v for v in VENUES}
 MATCHES = MatchRepository(DATA_DIR / "wc2026_matches.csv").load()
 MATCHES_BY_STADIUM = matches_by_stadium(MATCHES)
 
+TEAM_FLOWS = build_team_flows(MATCHES, VENUES)
+TEAM_OPTIONS = grouped_team_options(sorted(TEAM_FLOWS))
+
+
+def flow_children(selected):
+    return flows_for(selected, TEAM_FLOWS)
+
 app = Dash(__name__)
 app.title = "FIFA World Cup 2026"
-app.layout = build_layout(VENUES)
+app.layout = build_layout(VENUES, TEAM_OPTIONS)
 
 # Use the white FIFA logo as the browser tab icon (SVG favicon, modern browsers).
 _FAVICON = app.get_asset_url("logos/fifa_logo_white.cc.svg")
@@ -74,16 +85,40 @@ def drawer_for_city(city: str | None):
     Output("stadium-drawer", "opened"),
     Output("stadium-drawer", "title"),
     Output("stadium-drawer", "children"),
+    Output("filter-drawer", "opened", allow_duplicate=True),
     Input({"type": MARKER_TYPE, "index": ALL}, "n_clicks"),
     prevent_initial_call=True,
 )
 def open_stadium_drawer(n_clicks):
     # Ignore the callback firing when markers mount with n_clicks=None.
     if not any(n_clicks):
-        return no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update
     triggered = ctx.triggered_id
     city = triggered.get("index") if isinstance(triggered, dict) else None
-    return drawer_for_city(city)
+    opened, title, children = drawer_for_city(city)
+    # Opening the stadium drawer closes the filter drawer (both are left-side).
+    return opened, title, children, (False if opened else no_update)
+
+
+@callback(
+    Output("filter-drawer", "opened"),
+    Output("stadium-drawer", "opened", allow_duplicate=True),
+    Input("filter-pin", "n_clicks"),
+    prevent_initial_call=True,
+)
+def open_filter_drawer(n_clicks):
+    if not n_clicks:
+        return no_update, no_update
+    return True, False  # open the filter drawer, close the stadium drawer
+
+
+@callback(
+    Output("flow-layer", "children"),
+    Output("filter-legend", "children"),
+    Input("team-filter", "value"),
+)
+def update_flows(selected):
+    return flow_children(selected), legend(selected, TEAM_FLOWS)
 
 
 # Toggling the switch flips both the Mantine color scheme and the base map

@@ -34,3 +34,21 @@ def test_favicon_uses_white_fifa_logo():
     index = app.app.index_string
     assert 'rel="icon"' in index
     assert "fifa_logo_white.cc.svg" in index
+
+
+def test_app_builds_team_flows_and_options():
+    import app
+
+    assert len(app.TEAM_FLOWS) == 48
+    groups = [g["group"] for g in app.TEAM_OPTIONS]
+    assert "South America" in groups
+
+
+def test_app_flow_layer_children_for_selection():
+    import dash_leaflet as dl
+
+    import app
+
+    children = app.flow_children(["Brazil"])
+    assert any(isinstance(c, dl.Polyline) for c in children)
+    assert app.flow_children([]) == []
