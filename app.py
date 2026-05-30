@@ -2,10 +2,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import dash
 from dash import Dash, Input, Output, clientside_callback
 
 from src.components.layout import build_layout
 from src.data.host_cities import HostCityRepository
+
+
+dash._dash_renderer._set_react_version("18.2.0")
 
 CSV_PATH = Path(__file__).parent / "assets" / "data" / "fifa_2026_host_cities.csv"
 

@@ -21,7 +21,7 @@ def test_build_map_returns_dl_map():
 
 def test_map_has_one_marker_per_city():
     m = build_map(CITIES)
-    markers = [c for c in _children(build_map(CITIES)) if isinstance(c, dl.Marker)]
+    markers = [c for c in _children(m) if isinstance(c, dl.Marker)]
     assert len(markers) == len(CITIES)
 
 

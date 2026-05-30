@@ -15,7 +15,7 @@ theme_toggle = dmc.Switch(
     onLabel=DashIconify(icon="radix-icons:moon", width=15),
     checked=True,
     persistence=True,
-    color="grey",
+    color="gray",
 )
 
 
