@@ -5,7 +5,7 @@ import pytest
 
 from src.data.host_cities import HostCity, HostCityRepository
 
-CSV_PATH = Path("assets/data/fifa_2026_host_cities.csv")
+CSV_PATH = Path(__file__).parent.parent / "assets" / "data" / "fifa_2026_host_cities.csv"
 
 
 def test_loads_all_sixteen_cities():
@@ -47,7 +47,7 @@ def test_coordinates_within_valid_ranges():
 
 def test_hostcity_is_frozen():
     city = HostCity("X", "USA", "Y", 1, 0.0, 0.0)
-    with pytest.raises(Exception):
+    with pytest.raises(AttributeError):
         city.capacity = 2
 
 
@@ -73,6 +73,16 @@ def test_non_numeric_capacity_raises(tmp_path):
     bad.write_text(
         "City,Country,Stadium,Capacity,Latitude,Longitude\n"
         "A,USA,S,notanumber,10.0,10.0\n"
+    )
+    with pytest.raises(ValueError):
+        HostCityRepository(bad).load()
+
+
+def test_blank_city_raises(tmp_path):
+    bad = tmp_path / "bad.csv"
+    bad.write_text(
+        "City,Country,Stadium,Capacity,Latitude,Longitude\n"
+        ",USA,S,1,10.0,10.0\n"
     )
     with pytest.raises(ValueError):
         HostCityRepository(bad).load()

@@ -31,8 +31,21 @@ class HostCityRepository:
         if missing:
             raise ValueError(f"Missing expected columns: {missing}")
 
+        def _require_str(value: object, column: str) -> str:
+            """Return stripped string or raise ValueError for blank/NaN values."""
+            if pd.isna(value):
+                raise ValueError(f"Missing value in column '{column}'")
+            text = str(value).strip()
+            if not text:
+                raise ValueError(f"Blank value in column '{column}'")
+            return text
+
         cities: list[HostCity] = []
         for _, row in df.iterrows():
+            city = _require_str(row["City"], "City")
+            country = _require_str(row["Country"], "Country")
+            stadium = _require_str(row["Stadium"], "Stadium")
+
             try:
                 capacity = int(row["Capacity"])
                 lat = float(row["Latitude"])
@@ -47,9 +60,9 @@ class HostCityRepository:
 
             cities.append(
                 HostCity(
-                    city=str(row["City"]),
-                    country=str(row["Country"]),
-                    stadium=str(row["Stadium"]),
+                    city=city,
+                    country=country,
+                    stadium=stadium,
                     capacity=capacity,
                     lat=lat,
                     lon=lon,
