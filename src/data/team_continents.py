@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from pathlib import Path
+
+import pandas as pd
+
 CONTINENT_ORDER = [
     "North America",
     "South America",
@@ -9,29 +13,19 @@ CONTINENT_ORDER = [
     "Oceania",
 ]
 
-TEAM_CONTINENT: dict[str, str] = {
-    # North America
-    "Canada": "North America", "Curaçao": "North America", "Haiti": "North America",
-    "Mexico": "North America", "Panama": "North America", "USA": "North America",
-    # South America
-    "Argentina": "South America", "Brazil": "South America", "Colombia": "South America",
-    "Ecuador": "South America", "Paraguay": "South America", "Uruguay": "South America",
-    # Europe
-    "Austria": "Europe", "Belgium": "Europe", "Bosnia and Herzegovina": "Europe",
-    "Croatia": "Europe", "Czechia": "Europe", "England": "Europe", "France": "Europe",
-    "Germany": "Europe", "Netherlands": "Europe", "Norway": "Europe", "Portugal": "Europe",
-    "Scotland": "Europe", "Spain": "Europe", "Sweden": "Europe", "Switzerland": "Europe",
-    "Türkiye": "Europe",
-    # Africa
-    "Algeria": "Africa", "Cabo Verde": "Africa", "Congo DR": "Africa",
-    "Côte d'Ivoire": "Africa", "Egypt": "Africa", "Ghana": "Africa", "Morocco": "Africa",
-    "Senegal": "Africa", "South Africa": "Africa", "Tunisia": "Africa",
-    # Asia
-    "IR Iran": "Asia", "Iraq": "Asia", "Japan": "Asia", "Jordan": "Asia",
-    "Korea Republic": "Asia", "Qatar": "Asia", "Saudi Arabia": "Asia", "Uzbekistan": "Asia",
-    # Oceania
-    "Australia": "Oceania", "New Zealand": "Oceania",
-}
+_CSV_PATH = Path(__file__).resolve().parents[2] / "assets" / "data" / "team_continents.csv"
+
+
+def _load_team_continents(csv_path: Path = _CSV_PATH) -> dict[str, str]:
+    df = pd.read_csv(csv_path)
+    missing = [c for c in ("team", "continent") if c not in df.columns]
+    if missing:
+        raise ValueError(f"Missing expected columns: {missing}")
+    return {str(row["team"]): str(row["continent"]) for _, row in df.iterrows()}
+
+
+# Team -> continent, sourced from assets/data/team_continents.csv.
+TEAM_CONTINENT: dict[str, str] = _load_team_continents()
 
 
 def continent_for(team: str) -> str:
