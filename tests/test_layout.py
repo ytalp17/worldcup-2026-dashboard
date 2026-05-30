@@ -1,7 +1,7 @@
 import dash_leaflet as dl
 import dash_mantine_components as dmc
 
-from src.components.layout import build_layout
+from src.components.layout import DRAWER_Z_INDEX, build_layout
 from src.data.venues import Venue
 
 
@@ -44,6 +44,14 @@ def test_layout_contains_stadium_drawer():
     drawers = [n for n in _walk(build_layout(VENUES)) if isinstance(n, dmc.Drawer)]
     assert len(drawers) == 1
     assert drawers[0].id == "stadium-drawer"
+
+
+def test_drawer_opens_from_left_and_above_leaflet():
+    drawer = next(n for n in _walk(build_layout(VENUES)) if isinstance(n, dmc.Drawer))
+    assert drawer.position == "left"
+    # Leaflet panes/controls go up to ~1000; the drawer must sit above them.
+    assert DRAWER_Z_INDEX > 1000
+    assert drawer.zIndex == DRAWER_Z_INDEX
 
 
 def test_layout_contains_map_with_marker_per_venue():

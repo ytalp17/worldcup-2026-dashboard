@@ -9,6 +9,10 @@ from src.data.venues import Venue
 
 DEFAULT_COLOR_SCHEME = "dark"
 
+# Leaflet map panes and controls use z-indexes up to ~1000; the drawer must
+# render above them so it is actually visible over the map.
+DRAWER_Z_INDEX = 2000
+
 theme_toggle = dmc.Switch(
     id="color-scheme-toggle",
     offLabel=DashIconify(icon="radix-icons:sun", width=15),
@@ -48,11 +52,12 @@ def build_layout(venues: list[Venue]) -> dmc.MantineProvider:
     # marker-click callback in app.py.
     drawer = dmc.Drawer(
         id="stadium-drawer",
-        position="right",
+        position="left",
         size="md",
         padding="md",
         opened=False,
         withCloseButton=True,
+        zIndex=DRAWER_Z_INDEX,
     )
 
     return dmc.MantineProvider(
