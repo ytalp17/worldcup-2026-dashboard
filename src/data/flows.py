@@ -99,3 +99,13 @@ def build_team_flows(
             distances.get(team, 0.0),
         )
     return flows
+
+
+def rank_by_distance(
+    team_flows: dict[str, TeamFlow], n: int = 5
+) -> tuple[list[TeamFlow], list[TeamFlow]]:
+    """Return (n longest, n shortest) flows by distance_km."""
+    ordered = sorted(team_flows.values(), key=lambda f: f.distance_km, reverse=True)
+    longest = ordered[:n]
+    shortest = list(reversed(ordered[-n:])) if ordered else []
+    return longest, shortest

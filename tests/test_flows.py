@@ -114,3 +114,29 @@ def test_format_distance_km_and_miles():
 def test_format_distance_small_value():
     # 500 km -> 311 mi
     assert format_distance(500.0) == "500 km / 311 mi"
+
+
+from src.data.flows import rank_by_distance
+
+
+def _flow_with(team, km):
+    return TeamFlow(team, "Europe", "#fff", (), km)
+
+
+def test_rank_by_distance_longest_and_shortest():
+    flows = {
+        "A": _flow_with("A", 100.0),
+        "B": _flow_with("B", 500.0),
+        "C": _flow_with("C", 300.0),
+        "D": _flow_with("D", 50.0),
+    }
+    longest, shortest = rank_by_distance(flows, n=2)
+    assert [f.team for f in longest] == ["B", "C"]
+    assert [f.team for f in shortest] == ["D", "A"]
+
+
+def test_rank_by_distance_caps_at_available():
+    flows = {"A": _flow_with("A", 100.0)}
+    longest, shortest = rank_by_distance(flows, n=5)
+    assert [f.team for f in longest] == ["A"]
+    assert [f.team for f in shortest] == ["A"]
