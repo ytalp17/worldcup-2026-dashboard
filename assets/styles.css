@@ -91,3 +91,19 @@ body,
         opacity: 0;
     }
 }
+
+/* Frosted-glass filter drawer: translucent + blurred so the map shows through
+   while the leaderboard/legend stays legible. Scoped to the filter drawer only. */
+.filter-drawer-frosted {
+    background-color: rgba(255, 255, 255, 0.8);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.filter-drawer-frosted-header {
+    background-color: transparent;
+}
+
+[data-mantine-color-scheme="dark"] .filter-drawer-frosted {
+    background-color: rgba(26, 27, 30, 0.8);
+}

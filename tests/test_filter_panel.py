@@ -101,6 +101,13 @@ def test_leaderboard_sections_are_wrapped_in_cards():
         assert any(isinstance(t, str) and "journeys" in t for t in card_texts)
 
 
+def test_filter_drawer_content_is_frosted():
+    drawer = build_filter_drawer([])
+    # The content panel gets a frosted-glass class so the map shows through.
+    assert drawer.classNames["content"] == "filter-drawer-frosted"
+    assert drawer.classNames["header"] == "filter-drawer-frosted-header"
+
+
 def test_build_filter_drawer_without_flows_still_builds():
     drawer = build_filter_drawer([])
     assert isinstance(drawer, dmc.Drawer)

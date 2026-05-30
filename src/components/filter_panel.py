@@ -80,6 +80,12 @@ def build_filter_drawer(
         withOverlay=False,
         lockScroll=False,
         zIndex=2500,
+        # Frosted-glass panel: translucent + blurred so the map shows through
+        # while the leaderboard/legend text stays legible (see assets/styles.css).
+        classNames={
+            "content": "filter-drawer-frosted",
+            "header": "filter-drawer-frosted-header",
+        },
         children=children,
     )
 
