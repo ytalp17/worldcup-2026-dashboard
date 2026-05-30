@@ -46,7 +46,7 @@ def _filter_pin() -> dl.DivMarker:
             "iconSize": [34, 34],
             "iconAnchor": [17, 17],
         },
-        children=[dl.Tooltip("Filter teams")],
+        children=[dl.Tooltip("Team Travel Map")],
     )
 
 
