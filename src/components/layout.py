@@ -13,6 +13,24 @@ DEFAULT_COLOR_SCHEME = "dark"
 # render above them so it is actually visible over the map.
 DRAWER_Z_INDEX = 2000
 
+LOGO_BLACK = "/assets/logos/fifa_logo_black.cc.svg"
+LOGO_WHITE = "/assets/logos/fifa_logo_white.cc.svg"
+LOGO_HEIGHT = 34
+
+
+def _brand() -> dmc.Group:
+    return dmc.Group(
+        [
+            # Contrast-aware: black logo in light mode, white logo in dark mode.
+            dmc.Image(src=LOGO_BLACK, h=LOGO_HEIGHT, w="auto", alt="FIFA", darkHidden=True),
+            dmc.Image(src=LOGO_WHITE, h=LOGO_HEIGHT, w="auto", alt="FIFA", lightHidden=True),
+            dmc.Title("FIFA World Cup 2026", order=3),
+        ],
+        gap="sm",
+        align="center",
+        wrap="nowrap",
+    )
+
 theme_toggle = dmc.Switch(
     id="color-scheme-toggle",
     offLabel=DashIconify(icon="radix-icons:sun", width=15),
@@ -27,7 +45,7 @@ def build_layout(venues: list[Venue]) -> dmc.MantineProvider:
     header = dmc.AppShellHeader(
         dmc.Group(
             [
-                dmc.Title("FIFA World Cup 2026", order=3),
+                _brand(),
                 theme_toggle,
             ],
             justify="space-between",
