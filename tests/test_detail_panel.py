@@ -17,6 +17,8 @@ def _venue(has_image: bool) -> Venue:
         info="Dallas Stadium is a jaw-dropping example of stadium architecture.",
         image_filename="Dallas_Stadium.jpg",
         has_image=has_image,
+        timezone="America/Chicago",
+        tz_label="Central Time",
     )
 
 
@@ -59,3 +61,10 @@ def test_detail_shows_key_stats_and_info():
     assert "2009" in text            # year opened
     assert "Arlington, Texas, USA" in text  # location
     assert "jaw-dropping" in text    # info blurb
+
+
+def test_detail_shows_timezone():
+    content = dmc.Box(stadium_detail(_venue(has_image=True)))
+    text = _all_text(content)
+    assert "Central Time" in text       # friendly label
+    assert "America/Chicago" in text    # IANA name

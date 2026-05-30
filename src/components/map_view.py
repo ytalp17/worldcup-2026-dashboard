@@ -4,11 +4,14 @@ import dash_leaflet as dl
 
 from src.data.venues import Venue
 
-OSM_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-OSM_ATTRIBUTION = "© OpenStreetMap contributors"
+# Themed base tiles (keyless CartoDB). The app swaps the TileLayer url between
+# these via the theme clientside callback in app.py.
+LIGHT_TILE = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+DARK_TILE = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+TILE_ATTRIBUTION = "© OpenStreetMap contributors © CARTO"
 
-# SW and NE corners of a box covering USA, Mexico, and Canada.
-NA_BOUNDS = [[14.0, -168.0], [72.0, -52.0]]
+# SW and NE corners of a box snug to USA, Mexico, and Canada.
+NA_BOUNDS = [[12.0, -172.0], [74.0, -50.0]]
 
 NA_CENTER = [40.0, -100.0]
 NA_ZOOM = 3
@@ -30,12 +33,13 @@ def _marker(venue: Venue) -> dl.Marker:
 def build_map(venues: list[Venue]) -> dl.Map:
     return dl.Map(
         children=[
-            dl.TileLayer(url=OSM_URL, attribution=OSM_ATTRIBUTION),
+            dl.TileLayer(id="base-tiles", url=DARK_TILE, attribution=TILE_ATTRIBUTION),
             *[_marker(v) for v in venues],
         ],
         center=NA_CENTER,
         zoom=NA_ZOOM,
         minZoom=NA_MIN_ZOOM,
         maxBounds=NA_BOUNDS,
+        maxBoundsViscosity=1.0,
         style={"height": "100%", "width": "100%"},
     )

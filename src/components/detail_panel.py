@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 
@@ -7,6 +10,13 @@ from src.data.venues import Venue
 
 PLACEHOLDER_TEXT = "Photo unavailable"
 IMAGE_HEIGHT = 200
+
+
+def _timezone_text(venue: Venue) -> str:
+    """e.g. 'Central Time · UTC-05:00 · America/Chicago'."""
+    offset = datetime.now(ZoneInfo(venue.timezone)).strftime("%z")
+    pretty = f"UTC{offset[:3]}:{offset[3:]}" if offset else "UTC"
+    return f"{venue.tz_label} · {pretty} · {venue.timezone}"
 
 
 def _image_block(venue: Venue):
@@ -57,9 +67,18 @@ def stadium_detail(venue: Venue):
                 ],
                 gap="sm",
             ),
+            dmc.Group(
+                [
+                    DashIconify(icon="tabler:clock-hour-4", width=16),
+                    dmc.Text(_timezone_text(venue), size="sm", c="dimmed"),
+                ],
+                gap="xs",
+                align="center",
+                wrap="nowrap",
+            ),
             dmc.ScrollArea(
                 dmc.Text(venue.info, size="sm"),
-                h=260,
+                h=240,
                 type="auto",
                 offsetScrollbars=True,
             ),
