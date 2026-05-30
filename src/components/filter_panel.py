@@ -9,7 +9,7 @@ def build_filter_drawer(options: list[dict]) -> dmc.Drawer:
     return dmc.Drawer(
         id="filter-drawer",
         title="Flow lines by team",
-        position="left",
+        position="right",
         size="md",
         padding="md",
         opened=False,

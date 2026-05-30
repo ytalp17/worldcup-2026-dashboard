@@ -21,8 +21,8 @@ NA_MIN_ZOOM = 5
 # markers of this type and opens the detail drawer for the clicked one.
 MARKER_TYPE = "venue-marker"
 
-# Fixed control pin (right-middle, over the Atlantic) that opens the filter drawer.
-FILTER_PIN = [37.5, -71.0]
+# Fixed control pin (lower-left of the static view) that opens the filter drawer.
+FILTER_PIN = [25.5, -118.0]
 
 
 def _filter_pin() -> dl.DivMarker:
