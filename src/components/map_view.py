@@ -50,5 +50,9 @@ def build_map(venues: list[Venue]) -> dl.Map:
         minZoom=NA_MIN_ZOOM,
         maxBounds=NA_BOUNDS,
         maxBoundsViscosity=1.0,
+        # Static position: zoomable but not pannable.
+        dragging=False,
+        boxZoom=False,
+        keyboard=False,
         style={"height": "100%", "width": "100%"},
     )

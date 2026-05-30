@@ -78,6 +78,14 @@ def test_map_fixed_initial_view_no_zoom_out():
     assert m.minZoom == 5
 
 
+def test_map_is_not_draggable():
+    m = build_map(VENUES)
+    # Static position: no panning via drag, box-zoom drag, or keyboard arrows.
+    assert m.dragging is False
+    assert m.boxZoom is False
+    assert m.keyboard is False
+
+
 def test_markers_positioned_at_venue_coordinates():
     positions = {tuple(mk.position) for mk in _markers(build_map(VENUES))}
     assert (19.3029, -99.1505) in positions
