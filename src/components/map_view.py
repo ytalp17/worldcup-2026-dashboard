@@ -87,6 +87,9 @@ def pulse_markers(venues: list[Venue], active_cities: set[str]) -> list[dl.DivMa
             dl.DivMarker(
                 id={"type": "venue-pulse", "index": v.city},
                 position=[v.lat, v.lon],
+                # Non-interactive so the click falls through to the base marker
+                # underneath (which opens the stadium drawer).
+                interactive=False,
                 iconOptions={
                     "html": '<div class="venue-pulse-ring"></div>',
                     "className": "venue-pulse-icon",
