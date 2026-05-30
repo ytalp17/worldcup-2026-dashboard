@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from src.data.matches import Match, MatchRepository, matches_by_stadium
+from src.data.matches import Match, MatchRepository, is_placeholder, matches_by_stadium
 
 CSV_PATH = Path(__file__).parent.parent / "assets" / "data" / "wc2026_matches.csv"
 
@@ -49,6 +49,22 @@ def test_bad_date_raises(tmp_path):
     )
     with pytest.raises(ValueError):
         MatchRepository(bad).load()
+
+
+def test_is_placeholder_detects_tbd_teams():
+    for tbd in [
+        "Winner Match 74",
+        "Runner-up Match 101",
+        "Group A winners",
+        "Group B runners-up",
+        "Group A/B/C/D/F third place",
+    ]:
+        assert is_placeholder(tbd) is True
+
+
+def test_is_placeholder_false_for_real_teams():
+    for team in ["Mexico", "South Africa", "Korea Republic", "Bosnia and Herzegovina"]:
+        assert is_placeholder(team) is False
 
 
 def test_matches_by_stadium_groups_and_sorts():

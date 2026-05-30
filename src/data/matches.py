@@ -64,6 +64,18 @@ class MatchRepository:
         return matches
 
 
+def is_placeholder(team: str) -> bool:
+    """True for not-yet-decided knockout slots (e.g. 'Winner Match 74',
+    'Group A runners-up') rather than a confirmed national team."""
+    low = team.strip().lower()
+    return (
+        low.startswith("group ")
+        or "winner" in low
+        or "runner" in low
+        or "third place" in low
+    )
+
+
 def matches_by_stadium(matches: list[Match]) -> dict[str, list[Match]]:
     """Group matches by their (generic) stadium name, each list sorted by
     date then match number."""

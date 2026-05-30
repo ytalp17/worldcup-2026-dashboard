@@ -11,7 +11,7 @@ DARK_TILE = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
 TILE_ATTRIBUTION = "© OpenStreetMap contributors © CARTO"
 
 # SW and NE corners of a box snug to USA, Mexico, and Canada.
-NA_BOUNDS = [[14.0, -145.0], [55.0, -50.0]]
+NA_BOUNDS = [[18.0, -145.0], [55.0, -50.0]]
 
 NA_CENTER = [36.0, -95.0]
 NA_ZOOM = 5
