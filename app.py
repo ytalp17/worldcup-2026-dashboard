@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import dash
 from dash import ALL, Dash, Input, Output, callback, clientside_callback, ctx, no_update
 
 from src.components.detail_panel import stadium_detail
@@ -19,12 +18,6 @@ from src.data.matches import MatchRepository, matches_by_stadium
 from src.data.stadiums import StadiumRepository
 from src.data.team_continents import grouped_team_options
 from src.data.venues import build_venues
-
-# dash-mantine-components 0.15.x is built on Mantine 7 / React 18 and uses
-# React 18-only APIs (e.g. useId). Dash still defaults to React 16, so we must
-# opt into React 18 before the app is created or the UI fails to render with
-# "(0 , r.useId) is not a function".
-dash._dash_renderer._set_react_version("18.2.0")
 
 DATA_DIR = Path(__file__).parent / "assets" / "data"
 IMAGE_DIR = Path(__file__).parent / "assets" / "stadiums"
