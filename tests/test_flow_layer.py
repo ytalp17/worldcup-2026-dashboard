@@ -12,7 +12,7 @@ def _flow():
         FlowStop(39.9, -75.1, "Philadelphia Stadium", date(2026, 6, 19), 40),
         FlowStop(25.9, -80.2, "Miami Stadium", date(2026, 6, 24), 60),
     )
-    return TeamFlow("Brazil", "South America", "#22c55e", stops)
+    return TeamFlow("Brazil", "South America", "#22c55e", stops, 1839.7)
 
 
 def test_render_flow_has_polyline_decorator_and_dots():
@@ -35,3 +35,12 @@ def test_flows_for_empty_selection_is_empty():
 def test_flows_for_selected_team_includes_its_polyline():
     comps = flows_for(["Brazil"], {"Brazil": _flow()})
     assert any(isinstance(c, dl.Polyline) and c.color == "#22c55e" for c in comps)
+
+
+def test_polyline_has_distance_tooltip():
+    comps = render_flow(_flow())
+    polyline = next(c for c in comps if isinstance(c, dl.Polyline))
+    tooltips = [c for c in (polyline.children or []) if isinstance(c, dl.Tooltip)]
+    assert len(tooltips) == 1
+    assert "1,840 km / 1,143 mi" in tooltips[0].children
+    assert "Brazil" in tooltips[0].children

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dash_leaflet as dl
 
-from src.data.flows import TeamFlow
+from src.data.flows import TeamFlow, format_distance
 
 
 def render_flow(flow: TeamFlow) -> list:
@@ -19,7 +19,12 @@ def render_flow(flow: TeamFlow) -> list:
         },
     }
     comps: list = [
-        dl.Polyline(positions=positions, color=flow.color, weight=3),
+        dl.Polyline(
+            positions=positions,
+            color=flow.color,
+            weight=3,
+            children=[dl.Tooltip(f"{flow.team}: {format_distance(flow.distance_km)}")],
+        ),
         dl.PolylineDecorator(positions=positions, patterns=[arrow]),
     ]
     for s in flow.stops:
