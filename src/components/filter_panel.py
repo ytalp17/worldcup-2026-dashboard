@@ -25,6 +25,9 @@ def build_filter_drawer(options: list[dict]) -> dmc.Drawer:
                 clearable=True,
                 placeholder="Select teams…",
                 maxDropdownHeight=320,
+                # Float the dropdown above the drawer (zIndex 2500); otherwise the
+                # drawer paints over the options and intercepts clicks.
+                comboboxProps={"zIndex": 3000},
             ),
             dmc.Stack(id="filter-legend", gap="xs", mt="md"),
         ],
