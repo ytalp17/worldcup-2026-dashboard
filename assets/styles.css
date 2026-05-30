@@ -29,27 +29,25 @@ body,
     border: none;
 }
 
-/* Accent recolours with the Mantine color scheme (set on <html> by the
-   theme toggle): cyan on dark tiles, rose on light tiles. */
+/* Base markers are matte, muted dots so the vivid pulse on active (match-day)
+   stadiums clearly stands out. The accent colour lives on the pulse ring only. */
 .venue-marker {
-    --marker-rgb: 56, 189, 248; /* fallback (sky) */
+    --matte-rgb: 148, 163, 184; /* slate-400 */
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: rgb(var(--marker-rgb));
-    box-shadow:
-        0 0 0 2px rgba(var(--marker-rgb), 0.35),
-        0 0 10px 2px rgba(var(--marker-rgb), 0.75);
+    background: rgba(var(--matte-rgb), 0.5);
+    box-shadow: 0 0 0 1px rgba(var(--matte-rgb), 0.7);
     position: relative;
     cursor: pointer;
 }
 
 [data-mantine-color-scheme="dark"] .venue-marker {
-    --marker-rgb: 56, 189, 248; /* sky-400 */
+    --matte-rgb: 203, 213, 225; /* slate-300, legible on dark tiles */
 }
 
 [data-mantine-color-scheme="light"] .venue-marker {
-    --marker-rgb: 225, 29, 72; /* rose-600 */
+    --matte-rgb: 71, 85, 105; /* slate-600, legible on light tiles */
 }
 
 /* Pulse overlay: a ring drawn over stadiums hosting a match on the selected

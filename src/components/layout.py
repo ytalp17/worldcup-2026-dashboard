@@ -48,24 +48,24 @@ def build_layout(
     team_flows: dict | None = None,
     match_calendar=None,
 ) -> dmc.MantineProvider:
-    # Centre zone holds the match calendar (when provided); it flexes to fill
-    # the space between the brand (left) and the theme toggle (right).
+    # Three equal-flex zones so the calendar sits at the true centre of the
+    # header regardless of the brand / toggle widths: left and right grow
+    # equally and push the centre to the middle.
+    left = dmc.Box(_brand(), style={"flex": "1 1 0", "display": "flex", "justifyContent": "flex-start"})
     center = dmc.Box(
         match_calendar,
-        style={"flex": "1 1 auto", "display": "flex", "justifyContent": "center"},
+        style={"flex": "0 0 auto", "display": "flex", "justifyContent": "center"},
     )
+    right = dmc.Box(theme_toggle, style={"flex": "1 1 0", "display": "flex", "justifyContent": "flex-end"})
     header = dmc.AppShellHeader(
         dmc.Group(
-            [
-                _brand(),
-                center,
-                theme_toggle,
-            ],
+            [left, center, right],
             justify="space-between",
             align="center",
             h="100%",
             px="md",
             wrap="nowrap",
+            gap="sm",
         )
     )
 
