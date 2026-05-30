@@ -70,6 +70,14 @@ def test_map_bounds_are_a_hard_wall():
     assert build_map(VENUES).maxBoundsViscosity == 1.0
 
 
+def test_map_fixed_initial_view_no_zoom_out():
+    m = build_map(VENUES)
+    assert m.center == [36.0, -95.0]
+    assert m.zoom == 5
+    # minZoom equals the initial zoom, so the user can zoom in but not out.
+    assert m.minZoom == 5
+
+
 def test_markers_positioned_at_venue_coordinates():
     positions = {tuple(mk.position) for mk in _markers(build_map(VENUES))}
     assert (19.3029, -99.1505) in positions
