@@ -1,7 +1,22 @@
+from datetime import date
+
 import dash_mantine_components as dmc
 
-from src.components.detail_panel import PLACEHOLDER_TEXT, stadium_detail
+from src.components.detail_panel import NO_MATCHES_TEXT, PLACEHOLDER_TEXT, stadium_detail
+from src.data.matches import Match
 from src.data.venues import Venue
+
+
+def _match(number, home, away, group, stage, day):
+    return Match(
+        number=number,
+        home=home,
+        away=away,
+        group=group,
+        stage=stage,
+        stadium="Dallas Stadium",
+        date=date(2026, 6, day),
+    )
 
 
 def _venue(has_image: bool) -> Venue:
@@ -11,6 +26,7 @@ def _venue(has_image: bool) -> Venue:
         lat=32.7473,
         lon=-97.0945,
         official_name="AT&T Stadium",
+        stadium_name="Dallas Stadium",
         location="Arlington, Texas, USA",
         capacity=94000,
         opened=2009,
@@ -34,7 +50,16 @@ def _walk(node):
 
 
 def _all_text(node) -> str:
-    return " ".join(n for n in _walk(node) if isinstance(n, str))
+    parts = []
+    for n in _walk(node):
+        if isinstance(n, str):
+            parts.append(n)
+        else:
+            # Some visible text (e.g. TimelineItem) lives in the `title` prop.
+            title = getattr(n, "title", None)
+            if isinstance(title, str):
+                parts.append(title)
+    return " ".join(parts)
 
 
 def _images(node):
@@ -68,3 +93,32 @@ def test_detail_shows_timezone():
     text = _all_text(content)
     assert "Central Time" in text       # friendly label
     assert "America/Chicago" in text    # IANA name
+
+
+def _timelines(node):
+    return [n for n in _walk(node) if isinstance(n, dmc.Timeline)]
+
+
+def _timeline_items(node):
+    return [n for n in _walk(node) if isinstance(n, dmc.TimelineItem)]
+
+
+def test_detail_renders_matches_timeline():
+    matches = [
+        _match(1, "Mexico", "South Africa", "Group A", "Group Stage", 11),
+        _match(89, "Winner 74", "Winner 77", "", "Round of 16", 30),
+    ]
+    content = dmc.Box(stadium_detail(_venue(has_image=True), matches))
+    assert len(_timelines(content)) == 1
+    assert len(_timeline_items(content)) == 2
+    text = _all_text(content)
+    assert "Mexico vs South Africa" in text
+    assert "Jun 11" in text          # formatted date
+    assert "Group A" in text         # group label for group stage
+    assert "Round of 16" in text     # stage label for knockout
+
+
+def test_detail_without_matches_shows_placeholder():
+    content = dmc.Box(stadium_detail(_venue(has_image=True), []))
+    assert _timelines(content) == []
+    assert NO_MATCHES_TEXT in _all_text(content)

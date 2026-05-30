@@ -34,6 +34,13 @@ def test_every_venue_carries_a_timezone():
     assert dallas.tz_label == "Central Time"
 
 
+def test_venue_carries_generic_stadium_name_for_match_join():
+    cities, stadiums = _real_inputs()
+    venues = build_venues(cities, stadiums, IMAGE_DIR)
+    dallas = next(v for v in venues if v.city == "Dallas")
+    assert dallas.stadium_name == "Dallas Stadium"
+
+
 def test_venue_combines_coords_and_detail():
     cities, stadiums = _real_inputs()
     venues = build_venues(cities, stadiums, IMAGE_DIR)

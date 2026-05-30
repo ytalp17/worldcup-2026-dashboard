@@ -17,6 +17,7 @@ def _venue(city, official_name, lat, lon):
         lat=lat,
         lon=lon,
         official_name=official_name,
+        stadium_name=f"{city} Stadium",
         location="Somewhere",
         capacity=50000,
         opened=2000,

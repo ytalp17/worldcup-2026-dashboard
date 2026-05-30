@@ -1,0 +1,63 @@
+from datetime import date
+from pathlib import Path
+
+import pytest
+
+from src.data.matches import Match, MatchRepository, matches_by_stadium
+
+CSV_PATH = Path(__file__).parent.parent / "assets" / "data" / "wc2026_matches.csv"
+
+
+def _load():
+    return MatchRepository(CSV_PATH).load()
+
+
+def test_loads_all_matches():
+    assert len(_load()) == 104
+
+
+def test_match_types_and_known_row():
+    matches = _load()
+    m1 = next(m for m in matches if m.number == 1)
+    assert isinstance(m1, Match)
+    assert m1.home == "Mexico"
+    assert m1.away == "South Africa"
+    assert m1.group == "Group A"
+    assert m1.stage == "Group Stage"
+    assert m1.stadium == "Mexico City Stadium"
+    assert m1.date == date(2026, 6, 11)
+    assert isinstance(m1.date, date)
+
+
+def test_knockout_match_has_empty_group():
+    final = next(m for m in _load() if m.stage == "Final")
+    assert final.group == ""
+
+
+def test_missing_column_raises(tmp_path):
+    bad = tmp_path / "bad.csv"
+    bad.write_text("match_number,home_team,away_team,group,stage,stadium\n1,A,B,Group A,Group Stage,X\n")
+    with pytest.raises(ValueError):
+        MatchRepository(bad).load()
+
+
+def test_bad_date_raises(tmp_path):
+    bad = tmp_path / "bad.csv"
+    bad.write_text(
+        "match_number,home_team,away_team,group,stage,stadium,match_date\n"
+        "1,A,B,Group A,Group Stage,X,not-a-date\n"
+    )
+    with pytest.raises(ValueError):
+        MatchRepository(bad).load()
+
+
+def test_matches_by_stadium_groups_and_sorts():
+    grouped = matches_by_stadium(_load())
+    assert "Dallas Stadium" in grouped
+    dallas = grouped["Dallas Stadium"]
+    assert len(dallas) == 9
+    # Sorted by (date, number) ascending.
+    keys = [(m.date, m.number) for m in dallas]
+    assert keys == sorted(keys)
+    # Every match in a bucket really belongs to that stadium.
+    assert all(m.stadium == "Dallas Stadium" for m in dallas)
