@@ -41,7 +41,12 @@ def _children(m):
 
 
 def _markers(m):
-    return [c for c in _children(m) if isinstance(c, dl.DivMarker)]
+    # Venue markers carry a pattern-matching dict id; the filter pin uses a
+    # plain string id and is excluded here.
+    return [
+        c for c in _children(m)
+        if isinstance(c, dl.DivMarker) and isinstance(getattr(c, "id", None), dict)
+    ]
 
 
 def test_build_map_returns_dl_map():
@@ -88,6 +93,20 @@ def test_map_is_not_draggable():
 
 def test_map_hides_zoom_control():
     assert build_map(VENUES).zoomControl is False
+
+
+def test_map_has_flow_layer_and_filter_pin():
+    from src.components.map_view import FILTER_PIN
+    m = build_map(VENUES)
+    children = m.children if isinstance(m.children, list) else [m.children]
+    layer_ids = [getattr(c, "id", None) for c in children]
+    assert "flow-layer" in layer_ids
+    pins = [
+        c for c in children
+        if isinstance(c, dl.DivMarker) and getattr(c, "id", None) == "filter-pin"
+    ]
+    assert len(pins) == 1
+    assert pins[0].position == FILTER_PIN
 
 
 def test_markers_positioned_at_venue_coordinates():
