@@ -109,6 +109,16 @@ def test_map_has_flow_layer_and_filter_pin():
     assert pins[0].position == FILTER_PIN
 
 
+def test_filter_pin_uses_a_plane_icon():
+    m = build_map(VENUES)
+    children = m.children if isinstance(m.children, list) else [m.children]
+    pin = next(c for c in children if getattr(c, "id", None) == "filter-pin")
+    html = pin.iconOptions["html"]
+    assert 'data-icon="plane"' in html
+    # The old funnel polygon should be gone.
+    assert "22 3 2 3 10 12.46" not in html
+
+
 def test_markers_positioned_at_venue_coordinates():
     positions = {tuple(mk.position) for mk in _markers(build_map(VENUES))}
     assert (19.3029, -99.1505) in positions
