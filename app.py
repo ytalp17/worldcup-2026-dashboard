@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import dash
@@ -7,7 +8,7 @@ from dash import ALL, Dash, Input, Output, callback, clientside_callback, ctx, n
 
 from src.components.detail_panel import stadium_detail
 from src.components.layout import build_layout
-from src.components.map_view import MARKER_TYPE
+from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE
 from src.data.host_cities import HostCityRepository
 from src.data.stadiums import StadiumRepository
 from src.data.venues import build_venues
@@ -78,17 +79,22 @@ def open_stadium_drawer(n_clicks):
     return drawer_for_city(city)
 
 
-# Flip the document color scheme when the switch toggles (checked => dark).
+# Toggling the switch flips both the Mantine color scheme and the base map
+# tiles in one clientside callback (checked => dark). The tile URLs contain
+# Leaflet's {s}/{z}/{x}/{y} placeholders, so inject them via json.dumps rather
+# than an f-string.
+_THEME_JS = """
+(checked) => {
+    document.documentElement.setAttribute(
+        'data-mantine-color-scheme', checked ? 'dark' : 'light'
+    );
+    return checked ? __DARK__ : __LIGHT__;
+}
+""".replace("__DARK__", json.dumps(DARK_TILE)).replace("__LIGHT__", json.dumps(LIGHT_TILE))
+
 clientside_callback(
-    """
-    (checked) => {
-        document.documentElement.setAttribute(
-            'data-mantine-color-scheme', checked ? 'dark' : 'light'
-        );
-        return window.dash_clientside.no_update;
-    }
-    """,
-    Output("color-scheme-toggle", "id"),
+    _THEME_JS,
+    Output("base-tiles", "url"),
     Input("color-scheme-toggle", "checked"),
 )
 

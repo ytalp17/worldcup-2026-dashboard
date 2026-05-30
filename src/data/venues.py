@@ -6,6 +6,7 @@ from pathlib import Path
 
 from src.data.host_cities import HostCity
 from src.data.stadiums import Stadium
+from src.data.timezones import timezone_for
 
 
 @dataclass(frozen=True)
@@ -23,6 +24,8 @@ class Venue:
     info: str
     image_filename: str
     has_image: bool
+    timezone: str  # IANA name, e.g. "America/Chicago"
+    tz_label: str  # friendly label, e.g. "Central Time"
 
     @property
     def image_src(self) -> str:
@@ -56,6 +59,7 @@ def build_venues(
                 f"found {len(matches)}"
             )
         stadium = matches[0]
+        iana, tz_label = timezone_for(city.city)
         venues.append(
             Venue(
                 city=city.city,
@@ -69,6 +73,8 @@ def build_venues(
                 info=stadium.info,
                 image_filename=stadium.image_filename,
                 has_image=(image_dir / stadium.image_filename).exists(),
+                timezone=iana,
+                tz_label=tz_label,
             )
         )
     return venues

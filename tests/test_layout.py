@@ -18,6 +18,8 @@ def _venue(city):
         info="info",
         image_filename=f"{city}.jpg",
         has_image=True,
+        timezone="America/Chicago",
+        tz_label="Central Time",
     )
 
 

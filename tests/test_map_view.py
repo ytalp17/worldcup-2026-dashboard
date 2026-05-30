@@ -1,6 +1,12 @@
 import dash_leaflet as dl
 
-from src.components.map_view import build_map, MARKER_TYPE, NA_BOUNDS, OSM_URL
+from src.components.map_view import (
+    build_map,
+    DARK_TILE,
+    LIGHT_TILE,
+    MARKER_TYPE,
+    NA_BOUNDS,
+)
 from src.data.venues import Venue
 
 
@@ -17,6 +23,8 @@ def _venue(city, official_name, lat, lon):
         info="info",
         image_filename=f"{city}.jpg",
         has_image=True,
+        timezone="America/Chicago",
+        tz_label="Central Time",
     )
 
 
@@ -43,14 +51,22 @@ def test_map_has_one_marker_per_venue():
     assert len(_markers(build_map(VENUES))) == len(VENUES)
 
 
-def test_map_has_osm_tile_layer():
+def test_map_has_themed_base_tile_layer():
     tile_layers = [c for c in _children(build_map(VENUES)) if isinstance(c, dl.TileLayer)]
     assert len(tile_layers) == 1
-    assert tile_layers[0].url == OSM_URL
+    tl = tile_layers[0]
+    assert tl.id == "base-tiles"
+    # Defaults to the dark tiles (the app starts in dark mode).
+    assert tl.url == DARK_TILE
+    assert DARK_TILE != LIGHT_TILE
 
 
 def test_map_bounds_locked_to_north_america():
     assert build_map(VENUES).maxBounds == NA_BOUNDS
+
+
+def test_map_bounds_are_a_hard_wall():
+    assert build_map(VENUES).maxBoundsViscosity == 1.0
 
 
 def test_markers_positioned_at_venue_coordinates():

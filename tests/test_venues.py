@@ -25,6 +25,15 @@ def test_all_sixteen_cities_join():
     assert all(isinstance(v, Venue) for v in venues)
 
 
+def test_every_venue_carries_a_timezone():
+    cities, stadiums = _real_inputs()
+    venues = build_venues(cities, stadiums, IMAGE_DIR)
+    assert all(v.timezone and v.tz_label for v in venues)
+    dallas = next(v for v in venues if v.city == "Dallas")
+    assert dallas.timezone == "America/Chicago"
+    assert dallas.tz_label == "Central Time"
+
+
 def test_venue_combines_coords_and_detail():
     cities, stadiums = _real_inputs()
     venues = build_venues(cities, stadiums, IMAGE_DIR)
