@@ -65,3 +65,30 @@ def test_legend_row_includes_formatted_distance():
     joined = " ".join(t for t in texts if isinstance(t, str))
     assert "Brazil" in joined
     assert "1,840 km / 1,143 mi" in joined
+
+
+def _flows_for_leaderboard():
+    def mk(team, km):
+        return TeamFlow(team, "Europe", "#fff",
+                        (FlowStop(0, 0, "S", date(2026, 6, 1), 1),), km)
+    return {
+        "Faraway": mk("Faraway", 9000.0),
+        "Midway": mk("Midway", 3000.0),
+        "Nearby": mk("Nearby", 100.0),
+    }
+
+
+def test_drawer_renders_longest_and_shortest_leaderboard():
+    drawer = build_filter_drawer([], _flows_for_leaderboard())
+    texts = [n.children for n in _walk(drawer) if isinstance(n, dmc.Text)]
+    joined = " ".join(t for t in texts if isinstance(t, str))
+    assert "Longest journeys" in joined
+    assert "Shortest journeys" in joined
+    assert "Faraway" in joined
+    assert "Nearby" in joined
+    assert "9,000 km" in joined
+
+
+def test_build_filter_drawer_without_flows_still_builds():
+    drawer = build_filter_drawer([])
+    assert isinstance(drawer, dmc.Drawer)

@@ -83,7 +83,7 @@ def build_layout(
         zIndex=DRAWER_Z_INDEX,
     )
 
-    filter_drawer = build_filter_drawer(team_options or [])
+    filter_drawer = build_filter_drawer(team_options or [], team_flows or {})
 
     return dmc.MantineProvider(
         [shell, drawer, filter_drawer],

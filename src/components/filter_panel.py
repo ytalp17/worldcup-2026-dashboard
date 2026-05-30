@@ -2,10 +2,67 @@ from __future__ import annotations
 
 import dash_mantine_components as dmc
 
-from src.data.flows import TeamFlow, format_distance
+from src.data.flows import TeamFlow, format_distance, rank_by_distance
 
 
-def build_filter_drawer(options: list[dict]) -> dmc.Drawer:
+def _leaderboard_section(title: str, flows: list[TeamFlow]) -> dmc.Stack:
+    rows = [
+        dmc.Group(
+            [
+                dmc.Box(
+                    w=10,
+                    h=10,
+                    style={
+                        "background": f.color,
+                        "borderRadius": "50%",
+                        "flex": "0 0 auto",
+                    },
+                ),
+                dmc.Text(f"{f.team} — {format_distance(f.distance_km)}", size="xs"),
+            ],
+            gap="xs",
+            align="center",
+        )
+        for f in flows
+    ]
+    return dmc.Stack(
+        [dmc.Text(title, size="sm", fw=600), *rows],
+        gap=4,
+    )
+
+
+def _leaderboard(team_flows: dict[str, TeamFlow]) -> dmc.Stack:
+    longest, shortest = rank_by_distance(team_flows, n=5)
+    return dmc.Stack(
+        [
+            _leaderboard_section("Longest journeys", longest),
+            _leaderboard_section("Shortest journeys", shortest),
+        ],
+        gap="md",
+        mt="lg",
+    )
+
+
+def build_filter_drawer(
+    options: list[dict], team_flows: dict | None = None
+) -> dmc.Drawer:
+    children = [
+        dmc.MultiSelect(
+            id="team-filter",
+            data=options,
+            searchable=True,
+            clearable=True,
+            placeholder="Select teams…",
+            maxDropdownHeight=320,
+            # Float the dropdown above the drawer (zIndex 2500); otherwise the
+            # drawer paints over the options and intercepts clicks.
+            comboboxProps={"zIndex": 3000},
+        ),
+        dmc.Stack(id="filter-legend", gap="xs", mt="md"),
+    ]
+    if team_flows:
+        children.append(dmc.Divider(my="md"))
+        children.append(_leaderboard(team_flows))
     return dmc.Drawer(
         id="filter-drawer",
         title="Flow lines by team",
@@ -17,20 +74,7 @@ def build_filter_drawer(options: list[dict]) -> dmc.Drawer:
         withOverlay=False,
         lockScroll=False,
         zIndex=2500,
-        children=[
-            dmc.MultiSelect(
-                id="team-filter",
-                data=options,
-                searchable=True,
-                clearable=True,
-                placeholder="Select teams…",
-                maxDropdownHeight=320,
-                # Float the dropdown above the drawer (zIndex 2500); otherwise the
-                # drawer paints over the options and intercepts clicks.
-                comboboxProps={"zIndex": 3000},
-            ),
-            dmc.Stack(id="filter-legend", gap="xs", mt="md"),
-        ],
+        children=children,
     )
 
 
