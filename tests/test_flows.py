@@ -55,3 +55,31 @@ def test_unmatched_stadium_raises():
     bad = [Match(1, "Brazil", "X", "Group A", "Group Stage", "Nowhere Stadium", date(2026, 6, 11))]
     with pytest.raises(ValueError):
         build_team_flows(bad, [])
+
+
+from src.data.flows import haversine_km, path_distance_km
+
+
+def test_haversine_zero_for_same_point():
+    assert haversine_km(40.0, -74.0, 40.0, -74.0) == 0.0
+
+
+def test_haversine_known_pair_nyc_to_la():
+    # NYC (40.7128,-74.0060) -> LA (34.0522,-118.2437) ~= 3936 km
+    d = haversine_km(40.7128, -74.0060, 34.0522, -118.2437)
+    assert abs(d - 3936) < 20
+
+
+def test_path_distance_sums_consecutive_legs():
+    stops = (
+        FlowStop(40.7128, -74.0060, "A", date(2026, 6, 1), 1),
+        FlowStop(34.0522, -118.2437, "B", date(2026, 6, 2), 2),
+        FlowStop(40.7128, -74.0060, "C", date(2026, 6, 3), 3),
+    )
+    leg = haversine_km(40.7128, -74.0060, 34.0522, -118.2437)
+    assert abs(path_distance_km(stops) - 2 * leg) < 1e-6
+
+
+def test_path_distance_zero_or_one_stop_is_zero():
+    assert path_distance_km(()) == 0.0
+    assert path_distance_km((FlowStop(0, 0, "A", date(2026, 6, 1), 1),)) == 0.0
