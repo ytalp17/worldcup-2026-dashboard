@@ -9,6 +9,7 @@ from dash import ALL, Dash, Input, Output, callback, clientside_callback, ctx, n
 from src.components.detail_panel import stadium_detail
 from src.components.layout import build_layout
 from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE
+from src.data.altitudes import AltitudeRepository
 from src.data.host_cities import HostCityRepository
 from src.data.matches import MatchRepository, matches_by_stadium
 from src.data.stadiums import StadiumRepository
@@ -25,7 +26,8 @@ IMAGE_DIR = Path(__file__).parent / "assets" / "stadiums"
 
 CITIES = HostCityRepository(DATA_DIR / "fifa_2026_host_cities.csv").load()
 STADIUMS = StadiumRepository(DATA_DIR / "fifa_wc2026_stadiums.csv").load()
-VENUES = build_venues(CITIES, STADIUMS, IMAGE_DIR)
+ALTITUDES = AltitudeRepository(DATA_DIR / "wc2026_stadium_altitude.csv").load()
+VENUES = build_venues(CITIES, STADIUMS, IMAGE_DIR, ALTITUDES)
 VENUES_BY_CITY = {v.city: v for v in VENUES}
 
 MATCHES = MatchRepository(DATA_DIR / "wc2026_matches.csv").load()

@@ -25,6 +25,23 @@ def test_all_sixteen_cities_join():
     assert all(isinstance(v, Venue) for v in venues)
 
 
+def test_venue_altitude_from_mapping():
+    cities, stadiums = _real_inputs()
+    altitudes = {"Mexico City": 2240, "Dallas": 183}
+    venues = build_venues(cities, stadiums, IMAGE_DIR, altitudes)
+    by_city = {v.city: v for v in venues}
+    assert by_city["Mexico City"].altitude_m == 2240
+    assert by_city["Dallas"].altitude_m == 183
+    # Cities absent from the mapping get None (no altitude).
+    assert by_city["Toronto"].altitude_m is None
+
+
+def test_venue_altitude_defaults_none_without_mapping():
+    cities, stadiums = _real_inputs()
+    venues = build_venues(cities, stadiums, IMAGE_DIR)
+    assert all(v.altitude_m is None for v in venues)
+
+
 def test_every_venue_carries_a_timezone():
     cities, stadiums = _real_inputs()
     venues = build_venues(cities, stadiums, IMAGE_DIR)
