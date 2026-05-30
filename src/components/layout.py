@@ -42,7 +42,11 @@ theme_toggle = dmc.Switch(
 )
 
 
-def build_layout(venues: list[Venue], team_options: list | None = None) -> dmc.MantineProvider:
+def build_layout(
+    venues: list[Venue],
+    team_options: list | None = None,
+    team_flows: dict | None = None,
+) -> dmc.MantineProvider:
     header = dmc.AppShellHeader(
         dmc.Group(
             [
