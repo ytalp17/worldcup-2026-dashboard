@@ -50,5 +50,18 @@ def test_legend_lists_selected_teams_with_color():
     )
     rows = legend(["Brazil"], {"Brazil": flow})
     texts = [n.children for n in _walk(dmc.Box(rows)) if isinstance(n, dmc.Text)]
-    assert "Brazil" in texts
+    assert any(isinstance(t, str) and "Brazil" in t for t in texts)
     assert legend([], {"Brazil": flow}) == []
+
+
+def test_legend_row_includes_formatted_distance():
+    flow = TeamFlow(
+        "Brazil", "South America", "#22c55e",
+        (FlowStop(0, 0, "S", date(2026, 6, 1), 1),),
+        1839.7,
+    )
+    rows = legend(["Brazil"], {"Brazil": flow})
+    texts = [n.children for n in _walk(dmc.Box(rows)) if isinstance(n, dmc.Text)]
+    joined = " ".join(t for t in texts if isinstance(t, str))
+    assert "Brazil" in joined
+    assert "1,840 km / 1,143 mi" in joined

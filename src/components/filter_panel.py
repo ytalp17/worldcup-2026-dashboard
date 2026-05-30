@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dash_mantine_components as dmc
 
-from src.data.flows import TeamFlow
+from src.data.flows import TeamFlow, format_distance
 
 
 def build_filter_drawer(options: list[dict]) -> dmc.Drawer:
@@ -52,7 +52,9 @@ def legend(selected, team_flows: dict[str, TeamFlow]) -> list:
                             "flex": "0 0 auto",
                         },
                     ),
-                    dmc.Text(team, size="sm"),
+                    dmc.Text(
+                        f"{team} — {format_distance(flow.distance_km)}", size="sm"
+                    ),
                 ],
                 gap="xs",
                 align="center",
