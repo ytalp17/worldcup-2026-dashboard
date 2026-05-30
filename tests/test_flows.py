@@ -101,3 +101,16 @@ def test_path_distance_sums_consecutive_legs():
 def test_path_distance_zero_or_one_stop_is_zero():
     assert path_distance_km(()) == 0.0
     assert path_distance_km((FlowStop(0, 0, "A", date(2026, 6, 1), 1),)) == 0.0
+
+
+from src.data.flows import format_distance
+
+
+def test_format_distance_km_and_miles():
+    # 1839.7 km -> 1840 km, 1143 mi, with thousands separators.
+    assert format_distance(1839.7) == "1,840 km / 1,143 mi"
+
+
+def test_format_distance_small_value():
+    # 500 km -> 311 mi
+    assert format_distance(500.0) == "500 km / 311 mi"

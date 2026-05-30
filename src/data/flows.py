@@ -51,6 +51,15 @@ def path_distance_km(stops: tuple[FlowStop, ...]) -> float:
     )
 
 
+_KM_TO_MILES = 0.621371
+
+
+def format_distance(km: float) -> str:
+    """Human-readable distance, e.g. '1,840 km / 1,143 mi'."""
+    miles = km * _KM_TO_MILES
+    return f"{round(km):,} km / {round(miles):,} mi"
+
+
 @dataclass(frozen=True)
 class TeamFlow:
     team: str
