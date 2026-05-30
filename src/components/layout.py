@@ -4,6 +4,7 @@ import dash_mantine_components as dmc
 from dash import html
 from dash_iconify import DashIconify
 
+from src.components.filter_panel import build_filter_drawer
 from src.components.map_view import build_map
 from src.data.venues import Venue
 
@@ -41,7 +42,7 @@ theme_toggle = dmc.Switch(
 )
 
 
-def build_layout(venues: list[Venue]) -> dmc.MantineProvider:
+def build_layout(venues: list[Venue], team_options: list | None = None) -> dmc.MantineProvider:
     header = dmc.AppShellHeader(
         dmc.Group(
             [
@@ -78,8 +79,10 @@ def build_layout(venues: list[Venue]) -> dmc.MantineProvider:
         zIndex=DRAWER_Z_INDEX,
     )
 
+    filter_drawer = build_filter_drawer(team_options or [])
+
     return dmc.MantineProvider(
-        [shell, drawer],
+        [shell, drawer, filter_drawer],
         id="mantine-provider",
         defaultColorScheme=DEFAULT_COLOR_SCHEME,
     )

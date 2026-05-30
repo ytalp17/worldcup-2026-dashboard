@@ -21,6 +21,30 @@ NA_MIN_ZOOM = 5
 # markers of this type and opens the detail drawer for the clicked one.
 MARKER_TYPE = "venue-marker"
 
+# Fixed control pin (right-middle, over the Atlantic) that opens the filter drawer.
+FILTER_PIN = [37.5, -71.0]
+
+
+def _filter_pin() -> dl.DivMarker:
+    funnel = (
+        '<div class="filter-pin">'
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" '
+        'stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+        'stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>'
+        "</div>"
+    )
+    return dl.DivMarker(
+        id="filter-pin",
+        position=FILTER_PIN,
+        iconOptions={
+            "html": funnel,
+            "className": "filter-pin-icon",
+            "iconSize": [34, 34],
+            "iconAnchor": [17, 17],
+        },
+        children=[dl.Tooltip("Filter teams")],
+    )
+
 
 MARKER_SIZE = 16  # px
 
@@ -44,6 +68,8 @@ def build_map(venues: list[Venue]) -> dl.Map:
         children=[
             dl.TileLayer(id="base-tiles", url=DARK_TILE, attribution=TILE_ATTRIBUTION),
             *[_marker(v) for v in venues],
+            dl.LayerGroup(id="flow-layer"),
+            _filter_pin(),
         ],
         center=NA_CENTER,
         zoom=NA_ZOOM,

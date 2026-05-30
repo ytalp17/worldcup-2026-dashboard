@@ -45,12 +45,14 @@ def test_build_layout_returns_mantine_provider():
 
 def test_layout_contains_stadium_drawer():
     drawers = [n for n in _walk(build_layout(VENUES)) if isinstance(n, dmc.Drawer)]
-    assert len(drawers) == 1
-    assert drawers[0].id == "stadium-drawer"
+    assert "stadium-drawer" in {d.id for d in drawers}
 
 
 def test_drawer_opens_from_left_and_above_leaflet():
-    drawer = next(n for n in _walk(build_layout(VENUES)) if isinstance(n, dmc.Drawer))
+    drawer = next(
+        n for n in _walk(build_layout(VENUES))
+        if isinstance(n, dmc.Drawer) and n.id == "stadium-drawer"
+    )
     assert drawer.position == "left"
     # Leaflet panes/controls go up to ~1000; the drawer must sit above them.
     assert DRAWER_Z_INDEX > 1000
@@ -80,8 +82,19 @@ def test_header_has_contrast_logos_before_title():
     assert white.lightHidden is True
 
 
+def test_layout_contains_filter_drawer():
+    layout = build_layout(VENUES)
+    drawers = [n for n in _walk(layout) if isinstance(n, dmc.Drawer)]
+    ids = {d.id for d in drawers}
+    assert "filter-drawer" in ids
+    assert "stadium-drawer" in ids
+
+
 def test_layout_contains_map_with_marker_per_venue():
     maps = [n for n in _walk(build_layout(VENUES)) if isinstance(n, dl.Map)]
     assert len(maps) == 1
-    markers = [c for c in maps[0].children if isinstance(c, dl.DivMarker)]
+    markers = [
+        c for c in maps[0].children
+        if isinstance(c, dl.DivMarker) and isinstance(getattr(c, "id", None), dict)
+    ]
     assert len(markers) == len(VENUES)
