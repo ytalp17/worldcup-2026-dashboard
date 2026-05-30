@@ -30,6 +30,26 @@ app = Dash(__name__)
 app.title = "FIFA World Cup 2026"
 app.layout = build_layout(VENUES)
 
+# Use the white FIFA logo as the browser tab icon (SVG favicon, modern browsers).
+_FAVICON = app.get_asset_url("logos/fifa_logo_white.cc.svg")
+app.index_string = f"""<!DOCTYPE html>
+<html>
+    <head>
+        {{%metas%}}
+        <title>{{%title%}}</title>
+        <link rel="icon" type="image/svg+xml" href="{_FAVICON}">
+        {{%css%}}
+    </head>
+    <body>
+        {{%app_entry%}}
+        <footer>
+            {{%config%}}
+            {{%scripts%}}
+            {{%renderer%}}
+        </footer>
+    </body>
+</html>"""
+
 
 def drawer_for_city(city: str | None):
     """Compute the (opened, title, children) drawer state for a clicked city.

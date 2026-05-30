@@ -26,3 +26,11 @@ def test_drawer_for_unknown_city_stays_closed():
 
     opened, title, children = app.drawer_for_city("Atlantis")
     assert opened is False
+
+
+def test_favicon_uses_white_fifa_logo():
+    import app
+
+    index = app.app.index_string
+    assert 'rel="icon"' in index
+    assert "fifa_logo_white.cc.svg" in index
