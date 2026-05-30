@@ -13,12 +13,15 @@ DATA = Path(__file__).parent.parent / "assets" / "data"
 IMAGE_DIR = DATA.parent / "stadiums"
 
 
-def _flows():
+def _venues():
     cities = HostCityRepository(DATA / "fifa_2026_host_cities.csv").load()
     stadiums = StadiumRepository(DATA / "fifa_wc2026_stadiums.csv").load()
-    venues = build_venues(cities, stadiums, IMAGE_DIR)
+    return build_venues(cities, stadiums, IMAGE_DIR)
+
+
+def _flows():
     matches = MatchRepository(DATA / "wc2026_matches.csv").load()
-    return build_team_flows(matches, venues)
+    return build_team_flows(matches, _venues())
 
 
 def test_team_color_is_deterministic_and_hex():
@@ -55,6 +58,21 @@ def test_unmatched_stadium_raises():
     bad = [Match(1, "Brazil", "X", "Group A", "Group Stage", "Nowhere Stadium", date(2026, 6, 11))]
     with pytest.raises(ValueError):
         build_team_flows(bad, [])
+
+
+def test_build_team_flows_stamps_distance_from_dict():
+    flows = build_team_flows(
+        MatchRepository(DATA / "wc2026_matches.csv").load(),
+        _venues(),
+        distances={"Brazil": 1839.7},
+    )
+    assert flows["Brazil"].distance_km == 1839.7
+    # A team absent from the dict keeps the default.
+    assert flows["Mexico"].distance_km == 0.0
+
+
+def test_build_team_flows_distance_defaults_to_zero():
+    assert all(f.distance_km == 0.0 for f in _flows().values())
 
 
 from src.data.flows import haversine_km, path_distance_km

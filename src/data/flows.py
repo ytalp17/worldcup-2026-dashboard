@@ -57,9 +57,14 @@ class TeamFlow:
     continent: str
     color: str
     stops: tuple[FlowStop, ...]
+    distance_km: float = 0.0
 
 
-def build_team_flows(matches: list[Match], venues: list[Venue]) -> dict[str, TeamFlow]:
+def build_team_flows(
+    matches: list[Match],
+    venues: list[Venue],
+    distances: dict[str, float] | None = None,
+) -> dict[str, TeamFlow]:
     venue_by_name = {v.stadium_name: v for v in venues}
     by_team: dict[str, list[Match]] = defaultdict(list)
     for m in matches:
@@ -68,6 +73,7 @@ def build_team_flows(matches: list[Match], venues: list[Venue]) -> dict[str, Tea
         by_team[m.home].append(m)
         by_team[m.away].append(m)
 
+    distances = distances or {}
     flows: dict[str, TeamFlow] = {}
     for team, team_matches in by_team.items():
         stops: list[FlowStop] = []
@@ -76,5 +82,11 @@ def build_team_flows(matches: list[Match], venues: list[Venue]) -> dict[str, Tea
             if venue is None:
                 raise ValueError(f"No venue for stadium {m.stadium!r}")
             stops.append(FlowStop(venue.lat, venue.lon, m.stadium, m.date, m.number))
-        flows[team] = TeamFlow(team, continent_for(team), team_color(team), tuple(stops))
+        flows[team] = TeamFlow(
+            team,
+            continent_for(team),
+            team_color(team),
+            tuple(stops),
+            distances.get(team, 0.0),
+        )
     return flows
