@@ -40,7 +40,7 @@ def _children(m):
 
 
 def _markers(m):
-    return [c for c in _children(m) if isinstance(c, dl.Marker)]
+    return [c for c in _children(m) if isinstance(c, dl.DivMarker)]
 
 
 def test_build_map_returns_dl_map():
@@ -87,3 +87,11 @@ def test_marker_tooltip_shows_city_and_official_name():
     tooltip = next(c for c in dallas.children if isinstance(c, dl.Tooltip))
     assert "Dallas" in tooltip.children
     assert "AT&T Stadium" in tooltip.children
+
+
+def test_marker_uses_custom_pulse_dot_markup():
+    marker = _markers(build_map(VENUES))[0]
+    opts = marker.iconOptions
+    assert "venue-marker" in opts["html"]
+    # Custom className avoids Leaflet's default white box around div icons.
+    assert opts["className"] == "venue-marker-icon"
