@@ -54,5 +54,6 @@ def build_map(venues: list[Venue]) -> dl.Map:
         dragging=False,
         boxZoom=False,
         keyboard=False,
+        zoomControl=False,  # hide the +/- buttons (wheel/dbl-click still zoom in)
         style={"height": "100%", "width": "100%"},
     )
