@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dash_leaflet as dl
 
-from src.data.host_cities import HostCity
+from src.data.venues import Venue
 
 OSM_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 OSM_ATTRIBUTION = "© OpenStreetMap contributors"
@@ -14,20 +14,24 @@ NA_CENTER = [40.0, -100.0]
 NA_ZOOM = 3
 NA_MIN_ZOOM = 3
 
+# Pattern-matching id type for venue markers; the app callback listens to all
+# markers of this type and opens the detail drawer for the clicked one.
+MARKER_TYPE = "venue-marker"
 
-def _marker(city: HostCity) -> dl.Marker:
-    label = f"{city.city} — {city.stadium} ({city.capacity:,})"
+
+def _marker(venue: Venue) -> dl.Marker:
     return dl.Marker(
-        position=[city.lat, city.lon],
-        children=[dl.Tooltip(label)],
+        id={"type": MARKER_TYPE, "index": venue.city},
+        position=[venue.lat, venue.lon],
+        children=[dl.Tooltip(f"{venue.city} — {venue.official_name}")],
     )
 
 
-def build_map(cities: list[HostCity]) -> dl.Map:
+def build_map(venues: list[Venue]) -> dl.Map:
     return dl.Map(
         children=[
             dl.TileLayer(url=OSM_URL, attribution=OSM_ATTRIBUTION),
-            *[_marker(c) for c in cities],
+            *[_marker(v) for v in venues],
         ],
         center=NA_CENTER,
         zoom=NA_ZOOM,

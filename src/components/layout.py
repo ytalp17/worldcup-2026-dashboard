@@ -5,7 +5,7 @@ from dash import html
 from dash_iconify import DashIconify
 
 from src.components.map_view import build_map
-from src.data.host_cities import HostCity
+from src.data.venues import Venue
 
 DEFAULT_COLOR_SCHEME = "dark"
 
@@ -19,7 +19,7 @@ theme_toggle = dmc.Switch(
 )
 
 
-def build_layout(cities: list[HostCity]) -> dmc.MantineProvider:
+def build_layout(venues: list[Venue]) -> dmc.MantineProvider:
     header = dmc.AppShellHeader(
         dmc.Group(
             [
@@ -34,7 +34,7 @@ def build_layout(cities: list[HostCity]) -> dmc.MantineProvider:
     )
 
     main = dmc.AppShellMain(
-        html.Div(build_map(cities), id="map-container")
+        html.Div(build_map(venues), id="map-container")
     )
 
     shell = dmc.AppShell(
@@ -44,8 +44,19 @@ def build_layout(cities: list[HostCity]) -> dmc.MantineProvider:
         id="appshell",
     )
 
+    # Stadium detail drawer; its title/children/opened are filled by the
+    # marker-click callback in app.py.
+    drawer = dmc.Drawer(
+        id="stadium-drawer",
+        position="right",
+        size="md",
+        padding="md",
+        opened=False,
+        withCloseButton=True,
+    )
+
     return dmc.MantineProvider(
-        shell,
+        [shell, drawer],
         id="mantine-provider",
         defaultColorScheme=DEFAULT_COLOR_SCHEME,
     )

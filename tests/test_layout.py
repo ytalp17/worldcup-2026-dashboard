@@ -1,0 +1,53 @@
+import dash_leaflet as dl
+import dash_mantine_components as dmc
+
+from src.components.layout import build_layout
+from src.data.venues import Venue
+
+
+def _venue(city):
+    return Venue(
+        city=city,
+        country="USA",
+        lat=10.0,
+        lon=10.0,
+        official_name=f"{city} Field",
+        location="Loc",
+        capacity=1,
+        opened=2000,
+        info="info",
+        image_filename=f"{city}.jpg",
+        has_image=True,
+    )
+
+
+VENUES = [_venue("Dallas"), _venue("Toronto")]
+
+
+def _walk(node):
+    yield node
+    children = getattr(node, "children", None)
+    if isinstance(children, (list, tuple)):
+        for c in children:
+            yield from _walk(c)
+    elif children is not None:
+        yield from _walk(children)
+
+
+def test_build_layout_returns_mantine_provider():
+    layout = build_layout(VENUES)
+    assert isinstance(layout, dmc.MantineProvider)
+    assert layout.id == "mantine-provider"
+
+
+def test_layout_contains_stadium_drawer():
+    drawers = [n for n in _walk(build_layout(VENUES)) if isinstance(n, dmc.Drawer)]
+    assert len(drawers) == 1
+    assert drawers[0].id == "stadium-drawer"
+
+
+def test_layout_contains_map_with_marker_per_venue():
+    maps = [n for n in _walk(build_layout(VENUES)) if isinstance(n, dl.Map)]
+    assert len(maps) == 1
+    markers = [c for c in maps[0].children if isinstance(c, dl.Marker)]
+    assert len(markers) == len(VENUES)
