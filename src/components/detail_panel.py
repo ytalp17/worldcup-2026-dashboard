@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 
-from src.data.matches import Match
+from src.data.matches import Match, is_placeholder
 from src.data.venues import Venue
 
 PLACEHOLDER_TEXT = "Photo unavailable"
@@ -54,12 +54,24 @@ def _match_label(match: Match) -> str:
     return match.group or match.stage
 
 
+def _team_span(name: str):
+    """Render a team name; not-yet-decided slots are italic + dimmed."""
+    if is_placeholder(name):
+        return dmc.Text(name, span=True, fs="italic", c="dimmed")
+    return dmc.Text(name, span=True, fw=500)
+
+
 def _match_item(match: Match) -> dmc.TimelineItem:
     title = f"{match.date.strftime('%b')} {match.date.day} · {_match_label(match)}"
     return dmc.TimelineItem(
         title=title,
         bullet=DashIconify(icon="tabler:ball-football", width=12),
-        children=[dmc.Text(f"{match.home} vs {match.away}", size="sm", c="dimmed")],
+        children=[
+            dmc.Text(
+                [_team_span(match.home), " vs ", _team_span(match.away)],
+                size="sm",
+            )
+        ],
     )
 
 

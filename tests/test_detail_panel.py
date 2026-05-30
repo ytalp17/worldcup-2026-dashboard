@@ -112,10 +112,33 @@ def test_detail_renders_matches_timeline():
     assert len(_timelines(content)) == 1
     assert len(_timeline_items(content)) == 2
     text = _all_text(content)
-    assert "Mexico vs South Africa" in text
+    assert "Mexico" in text and "South Africa" in text
     assert "Jun 11" in text          # formatted date
     assert "Group A" in text         # group label for group stage
     assert "Round of 16" in text     # stage label for knockout
+
+
+def _italic_texts(node):
+    return [
+        n for n in _walk(node)
+        if isinstance(n, dmc.Text) and getattr(n, "fs", None) == "italic"
+    ]
+
+
+def test_placeholder_teams_rendered_italic():
+    matches = [_match(89, "Winner Match 74", "Winner Match 77", "", "Round of 16", 30)]
+    content = dmc.Box(stadium_detail(_venue(has_image=True), matches))
+    italic = " ".join(t.children for t in _italic_texts(content) if isinstance(t.children, str))
+    assert "Winner Match 74" in italic    # original wording preserved
+    assert "Winner Match 77" in italic
+
+
+def test_real_teams_not_italic():
+    matches = [_match(1, "Mexico", "South Africa", "Group A", "Group Stage", 11)]
+    content = dmc.Box(stadium_detail(_venue(has_image=True), matches))
+    italic = " ".join(t.children for t in _italic_texts(content) if isinstance(t.children, str))
+    assert "Mexico" not in italic
+    assert "South Africa" not in italic
 
 
 def test_detail_without_matches_shows_placeholder():
