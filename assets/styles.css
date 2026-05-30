@@ -29,30 +29,32 @@ body,
     border: none;
 }
 
-/* Base markers are matte, muted dots so the vivid pulse on active (match-day)
-   stadiums clearly stands out. The accent colour lives on the pulse ring only. */
+/* Accent recolours with the Mantine color scheme: cyan on dark, rose on light.
+   Base markers keep the accent colour but at reduced brightness (dimmed); the
+   active match-day pulse overlay shows the same colour at full brightness. */
 .venue-marker {
-    --matte-rgb: 148, 163, 184; /* slate-400 */
+    --marker-rgb: 56, 189, 248; /* fallback (sky) */
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: rgba(var(--matte-rgb), 0.5);
-    box-shadow: 0 0 0 1px rgba(var(--matte-rgb), 0.7);
+    background: rgba(var(--marker-rgb), 0.45);
+    box-shadow: 0 0 0 1px rgba(var(--marker-rgb), 0.4);
+    filter: brightness(0.7);
     position: relative;
     cursor: pointer;
 }
 
 [data-mantine-color-scheme="dark"] .venue-marker {
-    --matte-rgb: 203, 213, 225; /* slate-300, legible on dark tiles */
+    --marker-rgb: 56, 189, 248; /* sky-400 */
 }
 
 [data-mantine-color-scheme="light"] .venue-marker {
-    --matte-rgb: 71, 85, 105; /* slate-600, legible on light tiles */
+    --marker-rgb: 225, 29, 72; /* rose-600 */
 }
 
-/* Pulse overlay: a ring drawn over stadiums hosting a match on the selected
-   day. Non-interactive so clicks reach the base marker underneath. Themed to
-   match the marker accent (cyan on dark, rose on light). */
+/* Pulse overlay over stadiums hosting a match on the selected day: the same
+   accent colour at full brightness with a glow and pulsing ring. Non-interactive
+   so clicks reach the base marker underneath. */
 .venue-pulse-icon {
     background: transparent;
     border: none;
@@ -64,7 +66,19 @@ body,
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    border: 2px solid rgba(var(--marker-rgb), 0.7);
+    background: rgb(var(--marker-rgb));
+    box-shadow:
+        0 0 0 2px rgba(var(--marker-rgb), 0.35),
+        0 0 10px 2px rgba(var(--marker-rgb), 0.75);
+    position: relative;
+}
+
+.venue-pulse-ring::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(var(--marker-rgb), 0.6);
     animation: venue-pulse 2s ease-out infinite;
 }
 
