@@ -107,3 +107,28 @@ body,
 [data-mantine-color-scheme="dark"] .filter-drawer-frosted {
     background-color: rgba(26, 27, 30, 0.8);
 }
+
+/* Calendar match-days blink with the same pulse as the venue markers: a small
+   accent dot under the day number that expands and fades. */
+.calendar-match-day {
+    position: relative;
+    font-weight: 700;
+}
+
+.calendar-match-day::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 3px;
+    width: 5px;
+    height: 5px;
+    margin-left: -2.5px;
+    border-radius: 50%;
+    background: rgb(56, 189, 248);
+    animation: venue-pulse 1.8s ease-out infinite;
+    pointer-events: none;
+}
+
+[data-mantine-color-scheme="light"] .calendar-match-day::after {
+    background: rgb(225, 29, 72);
+}

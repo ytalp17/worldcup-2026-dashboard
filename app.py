@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import date
 from pathlib import Path
 
 from dash import ALL, Dash, Input, Output, callback, clientside_callback, ctx, no_update
@@ -8,12 +9,14 @@ from dash import ALL, Dash, Input, Output, callback, clientside_callback, ctx, n
 from src.components.detail_panel import stadium_detail
 from src.components.filter_panel import legend
 from src.components.flow_layer import flows_for
+from src.components.header_calendar import build_match_calendar
 from src.components.layout import build_layout
 from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE
 from src.data.altitudes import AltitudeRepository
 from src.data.distances import DistanceRepository
 from src.data.flows import build_team_flows
 from src.data.host_cities import HostCityRepository
+from src.data.match_calendar import MatchCalendar
 from src.data.matches import MatchRepository, matches_by_stadium
 from src.data.stadiums import StadiumRepository
 from src.data.team_continents import grouped_team_options
@@ -35,13 +38,19 @@ MATCHES_BY_STADIUM = matches_by_stadium(MATCHES)
 TEAM_FLOWS = build_team_flows(MATCHES, VENUES, distances=DISTANCES)
 TEAM_OPTIONS = grouped_team_options(sorted(TEAM_FLOWS))
 
+STADIUM_TO_CITY = {v.stadium_name: v.city for v in VENUES}
+MATCH_CALENDAR = MatchCalendar(MATCHES, STADIUM_TO_CITY, today=date.today())
+MATCH_DATES_JSON = json.dumps(sorted(d.isoformat() for d in MATCH_CALENDAR.match_dates))
+
 
 def flow_children(selected):
     return flows_for(selected, TEAM_FLOWS)
 
 app = Dash(__name__)
 app.title = "FIFA World Cup 2026"
-app.layout = build_layout(VENUES, TEAM_OPTIONS, TEAM_FLOWS)
+app.layout = build_layout(
+    VENUES, TEAM_OPTIONS, TEAM_FLOWS, match_calendar=build_match_calendar(MATCH_CALENDAR)
+)
 
 # Use the white FIFA logo as the browser tab icon (SVG favicon, modern browsers).
 _FAVICON = app.get_asset_url("logos/fifa_logo_white.cc.svg")
@@ -51,6 +60,7 @@ app.index_string = f"""<!DOCTYPE html>
         {{%metas%}}
         <title>{{%title%}}</title>
         <link rel="icon" type="image/svg+xml" href="{_FAVICON}">
+        <script>window.WC_MATCH_DATES = {MATCH_DATES_JSON};</script>
         {{%css%}}
     </head>
     <body>

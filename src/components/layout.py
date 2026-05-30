@@ -46,17 +46,26 @@ def build_layout(
     venues: list[Venue],
     team_options: list | None = None,
     team_flows: dict | None = None,
+    match_calendar=None,
 ) -> dmc.MantineProvider:
+    # Centre zone holds the match calendar (when provided); it flexes to fill
+    # the space between the brand (left) and the theme toggle (right).
+    center = dmc.Box(
+        match_calendar,
+        style={"flex": "1 1 auto", "display": "flex", "justifyContent": "center"},
+    )
     header = dmc.AppShellHeader(
         dmc.Group(
             [
                 _brand(),
+                center,
                 theme_toggle,
             ],
             justify="space-between",
             align="center",
             h="100%",
             px="md",
+            wrap="nowrap",
         )
     )
 

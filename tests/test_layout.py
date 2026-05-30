@@ -90,6 +90,17 @@ def test_layout_contains_filter_drawer():
     assert "stadium-drawer" in ids
 
 
+def test_header_contains_match_calendar_when_provided():
+    calendar = dmc.MiniCalendar(id="match-calendar", value="2026-05-30")
+    layout = build_layout(VENUES, match_calendar=calendar)
+    minicals = [n for n in _walk(layout) if isinstance(n, dmc.MiniCalendar)]
+    assert len(minicals) == 1
+    assert minicals[0].id == "match-calendar"
+    # It lives inside the header, not the body.
+    header = next(n for n in _walk(layout) if isinstance(n, dmc.AppShellHeader))
+    assert any(isinstance(n, dmc.MiniCalendar) for n in _walk(header))
+
+
 def test_layout_contains_map_with_marker_per_venue():
     maps = [n for n in _walk(build_layout(VENUES)) if isinstance(n, dl.Map)]
     assert len(maps) == 1
