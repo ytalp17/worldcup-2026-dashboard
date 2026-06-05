@@ -1,105 +1,105 @@
-match_number,home_team,away_team,group,stage,stadium,match_date
-1,Mexico,South Africa,Group A,Group Stage,Mexico City Stadium,2026-06-11
-2,Korea Republic,Czechia,Group A,Group Stage,Estadio Guadalajara,2026-06-11
-3,Canada,Bosnia and Herzegovina,Group B,Group Stage,Toronto Stadium,2026-06-12
-4,USA,Paraguay,Group D,Group Stage,Los Angeles Stadium,2026-06-12
-5,Haiti,Scotland,Group C,Group Stage,Boston Stadium,2026-06-13
-6,Australia,Türkiye,Group D,Group Stage,BC Place Vancouver,2026-06-13
-7,Brazil,Morocco,Group C,Group Stage,New York New Jersey Stadium,2026-06-13
-8,Qatar,Switzerland,Group B,Group Stage,San Francisco Bay Area Stadium,2026-06-13
-9,Côte d'Ivoire,Ecuador,Group E,Group Stage,Philadelphia Stadium,2026-06-14
-10,Germany,Curaçao,Group E,Group Stage,Houston Stadium,2026-06-14
-11,Netherlands,Japan,Group F,Group Stage,Dallas Stadium,2026-06-14
-12,Sweden,Tunisia,Group F,Group Stage,Estadio Monterrey,2026-06-14
-13,Saudi Arabia,Uruguay,Group H,Group Stage,Miami Stadium,2026-06-15
-14,Spain,Cabo Verde,Group H,Group Stage,Atlanta Stadium,2026-06-15
-15,IR Iran,New Zealand,Group G,Group Stage,Los Angeles Stadium,2026-06-15
-16,Belgium,Egypt,Group G,Group Stage,Seattle Stadium,2026-06-15
-17,France,Senegal,Group I,Group Stage,New York New Jersey Stadium,2026-06-16
-18,Iraq,Norway,Group I,Group Stage,Boston Stadium,2026-06-16
-19,Argentina,Algeria,Group J,Group Stage,Kansas City Stadium,2026-06-16
-20,Austria,Jordan,Group J,Group Stage,San Francisco Bay Area Stadium,2026-06-16
-21,Ghana,Panama,Group L,Group Stage,Toronto Stadium,2026-06-17
-22,England,Croatia,Group L,Group Stage,Dallas Stadium,2026-06-17
-23,Portugal,Congo DR,Group K,Group Stage,Houston Stadium,2026-06-17
-24,Uzbekistan,Colombia,Group K,Group Stage,Mexico City Stadium,2026-06-17
-25,Czechia,South Africa,Group A,Group Stage,Atlanta Stadium,2026-06-18
-26,Switzerland,Bosnia and Herzegovina,Group B,Group Stage,Los Angeles Stadium,2026-06-18
-27,Canada,Qatar,Group B,Group Stage,BC Place Vancouver,2026-06-18
-28,Mexico,Korea Republic,Group A,Group Stage,Estadio Guadalajara,2026-06-18
-29,Brazil,Haiti,Group C,Group Stage,Philadelphia Stadium,2026-06-19
-30,Scotland,Morocco,Group C,Group Stage,Boston Stadium,2026-06-19
-31,Türkiye,Paraguay,Group D,Group Stage,San Francisco Bay Area Stadium,2026-06-19
-32,USA,Australia,Group D,Group Stage,Seattle Stadium,2026-06-19
-33,Germany,Côte d'Ivoire,Group E,Group Stage,Toronto Stadium,2026-06-20
-34,Ecuador,Curaçao,Group E,Group Stage,Kansas City Stadium,2026-06-20
-35,Netherlands,Sweden,Group F,Group Stage,Houston Stadium,2026-06-20
-36,Tunisia,Japan,Group F,Group Stage,Estadio Monterrey,2026-06-20
-37,Uruguay,Cabo Verde,Group H,Group Stage,Miami Stadium,2026-06-21
-38,Spain,Saudi Arabia,Group H,Group Stage,Atlanta Stadium,2026-06-21
-39,Belgium,IR Iran,Group G,Group Stage,Los Angeles Stadium,2026-06-21
-40,New Zealand,Egypt,Group G,Group Stage,BC Place Vancouver,2026-06-21
-41,Norway,Senegal,Group I,Group Stage,New York New Jersey Stadium,2026-06-22
-42,France,Iraq,Group I,Group Stage,Philadelphia Stadium,2026-06-22
-43,Argentina,Austria,Group J,Group Stage,Dallas Stadium,2026-06-22
-44,Jordan,Algeria,Group J,Group Stage,San Francisco Bay Area Stadium,2026-06-22
-45,England,Ghana,Group L,Group Stage,Boston Stadium,2026-06-23
-46,Panama,Croatia,Group L,Group Stage,Toronto Stadium,2026-06-23
-47,Portugal,Uzbekistan,Group K,Group Stage,Houston Stadium,2026-06-23
-48,Colombia,Congo DR,Group K,Group Stage,Estadio Guadalajara,2026-06-23
-49,Scotland,Brazil,Group C,Group Stage,Miami Stadium,2026-06-24
-50,Morocco,Haiti,Group C,Group Stage,Atlanta Stadium,2026-06-24
-51,Switzerland,Canada,Group B,Group Stage,BC Place Vancouver,2026-06-24
-52,Bosnia and Herzegovina,Qatar,Group B,Group Stage,Seattle Stadium,2026-06-24
-53,Czechia,Mexico,Group A,Group Stage,Mexico City Stadium,2026-06-24
-54,South Africa,Korea Republic,Group A,Group Stage,Estadio Monterrey,2026-06-24
-55,Curaçao,Côte d'Ivoire,Group E,Group Stage,Philadelphia Stadium,2026-06-25
-56,Ecuador,Germany,Group E,Group Stage,New York New Jersey Stadium,2026-06-25
-57,Japan,Sweden,Group F,Group Stage,Dallas Stadium,2026-06-25
-58,Tunisia,Netherlands,Group F,Group Stage,Kansas City Stadium,2026-06-25
-59,Türkiye,USA,Group D,Group Stage,Los Angeles Stadium,2026-06-25
-60,Paraguay,Australia,Group D,Group Stage,San Francisco Bay Area Stadium,2026-06-25
-61,Norway,France,Group I,Group Stage,Boston Stadium,2026-06-26
-62,Senegal,Iraq,Group I,Group Stage,Toronto Stadium,2026-06-26
-63,Egypt,IR Iran,Group G,Group Stage,Seattle Stadium,2026-06-26
-64,New Zealand,Belgium,Group G,Group Stage,BC Place Vancouver,2026-06-26
-65,Cabo Verde,Saudi Arabia,Group H,Group Stage,Houston Stadium,2026-06-26
-66,Uruguay,Spain,Group H,Group Stage,Estadio Guadalajara,2026-06-26
-67,Panama,England,Group L,Group Stage,New York New Jersey Stadium,2026-06-27
-68,Croatia,Ghana,Group L,Group Stage,Philadelphia Stadium,2026-06-27
-69,Algeria,Austria,Group J,Group Stage,Kansas City Stadium,2026-06-27
-70,Jordan,Argentina,Group J,Group Stage,Dallas Stadium,2026-06-27
-71,Colombia,Portugal,Group K,Group Stage,Miami Stadium,2026-06-27
-72,Congo DR,Uzbekistan,Group K,Group Stage,Atlanta Stadium,2026-06-27
-73,Group A runners-up,Group B runners-up,,Round of 32,Los Angeles Stadium,2026-06-28
-74,Group E winners,Group A/B/C/D/F third place,,Round of 32,Boston Stadium,2026-06-29
-75,Group F winners,Group C runners-up,,Round of 32,Estadio Monterrey,2026-06-29
-76,Group C winners,Group F runners-up,,Round of 32,Houston Stadium,2026-06-29
-77,Group I winners,Group C/D/F/G/H third place,,Round of 32,New York New Jersey Stadium,2026-06-30
-78,Group E runners-up,Group I runners-up,,Round of 32,Dallas Stadium,2026-06-30
-79,Group A winners,Group C/E/F/H/I third place,,Round of 32,Mexico City Stadium,2026-06-30
-80,Group L winners,Group E/H/I/J/K third place,,Round of 32,Atlanta Stadium,2026-07-01
-81,Group D winners,Group B/E/F/I/J third place,,Round of 32,San Francisco Bay Area Stadium,2026-07-01
-82,Group G winners,Group A/E/H/I/J third place,,Round of 32,Seattle Stadium,2026-07-01
-83,Group K runners-up,Group L runners-up,,Round of 32,Toronto Stadium,2026-07-02
-84,Group H winners,Group J runners-up,,Round of 32,Los Angeles Stadium,2026-07-02
-85,Group B winners,Group E/F/G/I/J third place,,Round of 32,BC Place Vancouver,2026-07-02
-86,Group J winners,Group H runners-up,,Round of 32,Miami Stadium,2026-07-03
-87,Group K winners,Group D/E/I/J/L third place,,Round of 32,Kansas City Stadium,2026-07-03
-88,Group D runners-up,Group G runners-up,,Round of 32,Dallas Stadium,2026-07-03
-89,Winner Match 74,Winner Match 77,,Round of 16,Philadelphia Stadium,2026-07-04
-90,Winner Match 73,Winner Match 75,,Round of 16,Houston Stadium,2026-07-04
-91,Winner Match 76,Winner Match 78,,Round of 16,New York New Jersey Stadium,2026-07-05
-92,Winner Match 79,Winner Match 80,,Round of 16,Mexico City Stadium,2026-07-05
-93,Winner Match 83,Winner Match 84,,Round of 16,Dallas Stadium,2026-07-06
-94,Winner Match 81,Winner Match 82,,Round of 16,Seattle Stadium,2026-07-06
-95,Winner Match 86,Winner Match 88,,Round of 16,Atlanta Stadium,2026-07-07
-96,Winner Match 85,Winner Match 87,,Round of 16,BC Place Vancouver,2026-07-07
-97,Winner Match 89,Winner Match 90,,Quarter-Final,Boston Stadium,2026-07-09
-98,Winner Match 93,Winner Match 94,,Quarter-Final,Los Angeles Stadium,2026-07-10
-99,Winner Match 91,Winner Match 92,,Quarter-Final,Miami Stadium,2026-07-11
-100,Winner Match 95,Winner Match 96,,Quarter-Final,Kansas City Stadium,2026-07-11
-101,Winner Match 97,Winner Match 98,,Semi-Final,Dallas Stadium,2026-07-14
-102,Winner Match 99,Winner Match 100,,Semi-Final,Atlanta Stadium,2026-07-15
-103,Runner-up Match 101,Runner-up Match 102,,Bronze Final,Miami Stadium,2026-07-18
-104,Winner Match 101,Winner Match 102,,Final,New York New Jersey Stadium,2026-07-19
+match_number,home_team,away_team,group,stage,stadium,match_date,local_time,kickoff_utc
+1,Mexico,South Africa,Group A,Group Stage,Mexico City Stadium,2026-06-11,13:00,2026-06-11T19:00:00+00:00
+2,Korea Republic,Czechia,Group A,Group Stage,Estadio Guadalajara,2026-06-11,20:00,2026-06-12T02:00:00+00:00
+3,Canada,Bosnia and Herzegovina,Group B,Group Stage,Toronto Stadium,2026-06-12,15:00,2026-06-12T19:00:00+00:00
+4,USA,Paraguay,Group D,Group Stage,Los Angeles Stadium,2026-06-12,18:00,2026-06-13T01:00:00+00:00
+5,Haiti,Scotland,Group C,Group Stage,Boston Stadium,2026-06-13,21:00,2026-06-14T01:00:00+00:00
+6,Australia,Türkiye,Group D,Group Stage,BC Place Vancouver,2026-06-13,21:00,2026-06-14T04:00:00+00:00
+7,Brazil,Morocco,Group C,Group Stage,New York New Jersey Stadium,2026-06-13,18:00,2026-06-13T22:00:00+00:00
+8,Qatar,Switzerland,Group B,Group Stage,San Francisco Bay Area Stadium,2026-06-13,12:00,2026-06-13T19:00:00+00:00
+9,Côte d'Ivoire,Ecuador,Group E,Group Stage,Philadelphia Stadium,2026-06-14,19:00,2026-06-14T23:00:00+00:00
+10,Germany,Curaçao,Group E,Group Stage,Houston Stadium,2026-06-14,12:00,2026-06-14T17:00:00+00:00
+11,Netherlands,Japan,Group F,Group Stage,Dallas Stadium,2026-06-14,15:00,2026-06-14T20:00:00+00:00
+12,Sweden,Tunisia,Group F,Group Stage,Estadio Monterrey,2026-06-14,20:00,2026-06-15T02:00:00+00:00
+13,Saudi Arabia,Uruguay,Group H,Group Stage,Miami Stadium,2026-06-15,18:00,2026-06-15T22:00:00+00:00
+14,Spain,Cabo Verde,Group H,Group Stage,Atlanta Stadium,2026-06-15,12:00,2026-06-15T16:00:00+00:00
+15,IR Iran,New Zealand,Group G,Group Stage,Los Angeles Stadium,2026-06-15,18:00,2026-06-16T01:00:00+00:00
+16,Belgium,Egypt,Group G,Group Stage,Seattle Stadium,2026-06-15,12:00,2026-06-15T19:00:00+00:00
+17,France,Senegal,Group I,Group Stage,New York New Jersey Stadium,2026-06-16,15:00,2026-06-16T19:00:00+00:00
+18,Iraq,Norway,Group I,Group Stage,Boston Stadium,2026-06-16,18:00,2026-06-16T22:00:00+00:00
+19,Argentina,Algeria,Group J,Group Stage,Kansas City Stadium,2026-06-16,20:00,2026-06-17T01:00:00+00:00
+20,Austria,Jordan,Group J,Group Stage,San Francisco Bay Area Stadium,2026-06-16,21:00,2026-06-17T04:00:00+00:00
+21,Ghana,Panama,Group L,Group Stage,Toronto Stadium,2026-06-17,19:00,2026-06-17T23:00:00+00:00
+22,England,Croatia,Group L,Group Stage,Dallas Stadium,2026-06-17,15:00,2026-06-17T20:00:00+00:00
+23,Portugal,Congo DR,Group K,Group Stage,Houston Stadium,2026-06-17,12:00,2026-06-17T17:00:00+00:00
+24,Uzbekistan,Colombia,Group K,Group Stage,Mexico City Stadium,2026-06-17,20:00,2026-06-18T02:00:00+00:00
+25,Czechia,South Africa,Group A,Group Stage,Atlanta Stadium,2026-06-18,12:00,2026-06-18T16:00:00+00:00
+26,Switzerland,Bosnia and Herzegovina,Group B,Group Stage,Los Angeles Stadium,2026-06-18,12:00,2026-06-18T19:00:00+00:00
+27,Canada,Qatar,Group B,Group Stage,BC Place Vancouver,2026-06-18,15:00,2026-06-18T22:00:00+00:00
+28,Mexico,Korea Republic,Group A,Group Stage,Estadio Guadalajara,2026-06-18,19:00,2026-06-19T01:00:00+00:00
+29,Brazil,Haiti,Group C,Group Stage,Philadelphia Stadium,2026-06-19,21:00,2026-06-20T01:00:00+00:00
+30,Scotland,Morocco,Group C,Group Stage,Boston Stadium,2026-06-19,18:00,2026-06-19T22:00:00+00:00
+31,Türkiye,Paraguay,Group D,Group Stage,San Francisco Bay Area Stadium,2026-06-19,20:00,2026-06-20T03:00:00+00:00
+32,USA,Australia,Group D,Group Stage,Seattle Stadium,2026-06-19,12:00,2026-06-19T19:00:00+00:00
+33,Germany,Côte d'Ivoire,Group E,Group Stage,Toronto Stadium,2026-06-20,16:00,2026-06-20T20:00:00+00:00
+34,Ecuador,Curaçao,Group E,Group Stage,Kansas City Stadium,2026-06-20,19:00,2026-06-21T00:00:00+00:00
+35,Netherlands,Sweden,Group F,Group Stage,Houston Stadium,2026-06-20,12:00,2026-06-20T17:00:00+00:00
+36,Tunisia,Japan,Group F,Group Stage,Estadio Monterrey,2026-06-20,22:00,2026-06-21T04:00:00+00:00
+37,Uruguay,Cabo Verde,Group H,Group Stage,Miami Stadium,2026-06-21,18:00,2026-06-21T22:00:00+00:00
+38,Spain,Saudi Arabia,Group H,Group Stage,Atlanta Stadium,2026-06-21,12:00,2026-06-21T16:00:00+00:00
+39,Belgium,IR Iran,Group G,Group Stage,Los Angeles Stadium,2026-06-21,12:00,2026-06-21T19:00:00+00:00
+40,New Zealand,Egypt,Group G,Group Stage,BC Place Vancouver,2026-06-21,18:00,2026-06-22T01:00:00+00:00
+41,Norway,Senegal,Group I,Group Stage,New York New Jersey Stadium,2026-06-22,20:00,2026-06-23T00:00:00+00:00
+42,France,Iraq,Group I,Group Stage,Philadelphia Stadium,2026-06-22,17:00,2026-06-22T21:00:00+00:00
+43,Argentina,Austria,Group J,Group Stage,Dallas Stadium,2026-06-22,12:00,2026-06-22T17:00:00+00:00
+44,Jordan,Algeria,Group J,Group Stage,San Francisco Bay Area Stadium,2026-06-22,20:00,2026-06-23T03:00:00+00:00
+45,England,Ghana,Group L,Group Stage,Boston Stadium,2026-06-23,16:00,2026-06-23T20:00:00+00:00
+46,Panama,Croatia,Group L,Group Stage,Toronto Stadium,2026-06-23,19:00,2026-06-23T23:00:00+00:00
+47,Portugal,Uzbekistan,Group K,Group Stage,Houston Stadium,2026-06-23,12:00,2026-06-23T17:00:00+00:00
+48,Colombia,Congo DR,Group K,Group Stage,Estadio Guadalajara,2026-06-23,20:00,2026-06-24T02:00:00+00:00
+49,Scotland,Brazil,Group C,Group Stage,Miami Stadium,2026-06-24,18:00,2026-06-24T22:00:00+00:00
+50,Morocco,Haiti,Group C,Group Stage,Atlanta Stadium,2026-06-24,18:00,2026-06-24T22:00:00+00:00
+51,Switzerland,Canada,Group B,Group Stage,BC Place Vancouver,2026-06-24,12:00,2026-06-24T19:00:00+00:00
+52,Bosnia and Herzegovina,Qatar,Group B,Group Stage,Seattle Stadium,2026-06-24,12:00,2026-06-24T19:00:00+00:00
+53,Czechia,Mexico,Group A,Group Stage,Mexico City Stadium,2026-06-24,19:00,2026-06-25T01:00:00+00:00
+54,South Africa,Korea Republic,Group A,Group Stage,Estadio Monterrey,2026-06-24,19:00,2026-06-25T01:00:00+00:00
+55,Curaçao,Côte d'Ivoire,Group E,Group Stage,Philadelphia Stadium,2026-06-25,16:00,2026-06-25T20:00:00+00:00
+56,Ecuador,Germany,Group E,Group Stage,New York New Jersey Stadium,2026-06-25,16:00,2026-06-25T20:00:00+00:00
+57,Japan,Sweden,Group F,Group Stage,Dallas Stadium,2026-06-25,18:00,2026-06-25T23:00:00+00:00
+58,Tunisia,Netherlands,Group F,Group Stage,Kansas City Stadium,2026-06-25,18:00,2026-06-25T23:00:00+00:00
+59,Türkiye,USA,Group D,Group Stage,Los Angeles Stadium,2026-06-25,19:00,2026-06-26T02:00:00+00:00
+60,Paraguay,Australia,Group D,Group Stage,San Francisco Bay Area Stadium,2026-06-25,19:00,2026-06-26T02:00:00+00:00
+61,Norway,France,Group I,Group Stage,Boston Stadium,2026-06-26,15:00,2026-06-26T19:00:00+00:00
+62,Senegal,Iraq,Group I,Group Stage,Toronto Stadium,2026-06-26,15:00,2026-06-26T19:00:00+00:00
+63,Egypt,IR Iran,Group G,Group Stage,Seattle Stadium,2026-06-26,20:00,2026-06-27T03:00:00+00:00
+64,New Zealand,Belgium,Group G,Group Stage,BC Place Vancouver,2026-06-26,20:00,2026-06-27T03:00:00+00:00
+65,Cabo Verde,Saudi Arabia,Group H,Group Stage,Houston Stadium,2026-06-26,19:00,2026-06-27T00:00:00+00:00
+66,Uruguay,Spain,Group H,Group Stage,Estadio Guadalajara,2026-06-26,18:00,2026-06-27T00:00:00+00:00
+67,Panama,England,Group L,Group Stage,New York New Jersey Stadium,2026-06-27,17:00,2026-06-27T21:00:00+00:00
+68,Croatia,Ghana,Group L,Group Stage,Philadelphia Stadium,2026-06-27,17:00,2026-06-27T21:00:00+00:00
+69,Algeria,Austria,Group J,Group Stage,Kansas City Stadium,2026-06-27,21:00,2026-06-28T02:00:00+00:00
+70,Jordan,Argentina,Group J,Group Stage,Dallas Stadium,2026-06-27,21:00,2026-06-28T02:00:00+00:00
+71,Colombia,Portugal,Group K,Group Stage,Miami Stadium,2026-06-27,19:30,2026-06-27T23:30:00+00:00
+72,Congo DR,Uzbekistan,Group K,Group Stage,Atlanta Stadium,2026-06-27,19:30,2026-06-27T23:30:00+00:00
+73,Group A runners-up,Group B runners-up,,Round of 32,Los Angeles Stadium,2026-06-28,12:00,2026-06-28T19:00:00+00:00
+74,Group E winners,Group A/B/C/D/F third place,,Round of 32,Boston Stadium,2026-06-29,16:30,2026-06-29T20:30:00+00:00
+75,Group F winners,Group C runners-up,,Round of 32,Estadio Monterrey,2026-06-29,19:00,2026-06-30T01:00:00+00:00
+76,Group C winners,Group F runners-up,,Round of 32,Houston Stadium,2026-06-29,12:00,2026-06-29T17:00:00+00:00
+77,Group I winners,Group C/D/F/G/H third place,,Round of 32,New York New Jersey Stadium,2026-06-30,17:00,2026-06-30T21:00:00+00:00
+78,Group E runners-up,Group I runners-up,,Round of 32,Dallas Stadium,2026-06-30,12:00,2026-06-30T17:00:00+00:00
+79,Group A winners,Group C/E/F/H/I third place,,Round of 32,Mexico City Stadium,2026-06-30,19:00,2026-07-01T01:00:00+00:00
+80,Group L winners,Group E/H/I/J/K third place,,Round of 32,Atlanta Stadium,2026-07-01,12:00,2026-07-01T16:00:00+00:00
+81,Group D winners,Group B/E/F/I/J third place,,Round of 32,San Francisco Bay Area Stadium,2026-07-01,17:00,2026-07-02T00:00:00+00:00
+82,Group G winners,Group A/E/H/I/J third place,,Round of 32,Seattle Stadium,2026-07-01,13:00,2026-07-01T20:00:00+00:00
+83,Group K runners-up,Group L runners-up,,Round of 32,Toronto Stadium,2026-07-02,19:00,2026-07-02T23:00:00+00:00
+84,Group H winners,Group J runners-up,,Round of 32,Los Angeles Stadium,2026-07-02,12:00,2026-07-02T19:00:00+00:00
+85,Group B winners,Group E/F/G/I/J third place,,Round of 32,BC Place Vancouver,2026-07-02,20:00,2026-07-03T03:00:00+00:00
+86,Group J winners,Group H runners-up,,Round of 32,Miami Stadium,2026-07-03,18:00,2026-07-03T22:00:00+00:00
+87,Group K winners,Group D/E/I/J/L third place,,Round of 32,Kansas City Stadium,2026-07-03,20:30,2026-07-04T01:30:00+00:00
+88,Group D runners-up,Group G runners-up,,Round of 32,Dallas Stadium,2026-07-03,13:00,2026-07-03T18:00:00+00:00
+89,Winner Match 74,Winner Match 77,,Round of 16,Philadelphia Stadium,2026-07-04,17:00,2026-07-04T21:00:00+00:00
+90,Winner Match 73,Winner Match 75,,Round of 16,Houston Stadium,2026-07-04,12:00,2026-07-04T17:00:00+00:00
+91,Winner Match 76,Winner Match 78,,Round of 16,New York New Jersey Stadium,2026-07-05,16:00,2026-07-05T20:00:00+00:00
+92,Winner Match 79,Winner Match 80,,Round of 16,Mexico City Stadium,2026-07-05,18:00,2026-07-06T00:00:00+00:00
+93,Winner Match 83,Winner Match 84,,Round of 16,Dallas Stadium,2026-07-06,14:00,2026-07-06T19:00:00+00:00
+94,Winner Match 81,Winner Match 82,,Round of 16,Seattle Stadium,2026-07-06,17:00,2026-07-07T00:00:00+00:00
+95,Winner Match 86,Winner Match 88,,Round of 16,Atlanta Stadium,2026-07-07,12:00,2026-07-07T16:00:00+00:00
+96,Winner Match 85,Winner Match 87,,Round of 16,BC Place Vancouver,2026-07-07,13:00,2026-07-07T20:00:00+00:00
+97,Winner Match 89,Winner Match 90,,Quarter-Final,Boston Stadium,2026-07-09,16:00,2026-07-09T20:00:00+00:00
+98,Winner Match 93,Winner Match 94,,Quarter-Final,Los Angeles Stadium,2026-07-10,12:00,2026-07-10T19:00:00+00:00
+99,Winner Match 91,Winner Match 92,,Quarter-Final,Miami Stadium,2026-07-11,17:00,2026-07-11T21:00:00+00:00
+100,Winner Match 95,Winner Match 96,,Quarter-Final,Kansas City Stadium,2026-07-11,20:00,2026-07-12T01:00:00+00:00
+101,Winner Match 97,Winner Match 98,,Semi-Final,Dallas Stadium,2026-07-14,14:00,2026-07-14T19:00:00+00:00
+102,Winner Match 99,Winner Match 100,,Semi-Final,Atlanta Stadium,2026-07-15,15:00,2026-07-15T19:00:00+00:00
+103,Runner-up Match 101,Runner-up Match 102,,Bronze Final,Miami Stadium,2026-07-18,17:00,2026-07-18T21:00:00+00:00
+104,Winner Match 101,Winner Match 102,,Final,New York New Jersey Stadium,2026-07-19,15:00,2026-07-19T19:00:00+00:00
