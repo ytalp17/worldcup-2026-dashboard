@@ -87,7 +87,8 @@ def build_group_panel(group: Group | None, asset_url: Callable[[str], str]) -> d
         id="group-grid",
         columnDefs=COL_DEFS,
         rowData=rows,
-        columnSize="sizeToFit",
+        columnSize="responsiveSizeToFit",
+        # Dark theme by default; a clientside callback swaps quartz <-> quartz-dark to follow the app color scheme.
         className="ag-theme-quartz-dark group-grid",
         dashGridOptions=_GRID_OPTIONS,
         style={"width": "100%"},
