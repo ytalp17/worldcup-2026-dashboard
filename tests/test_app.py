@@ -152,3 +152,24 @@ def test_drawer_for_city_accepts_user_tz():
     opened, title, children = app.drawer_for_city("Dallas", "Asia/Tokyo")
     assert opened is True
     assert children is not None
+
+
+def test_group_panel_payload_for_group_a_team():
+    import app
+
+    idx = app.TEAM_NAMES.index("Mexico")
+    name, rows = app.group_panel_payload(idx)
+    assert name == "Group A"
+    assert [r["rank"] for r in rows] == [1, 2, 3, 4]
+    assert rows[0]["team"] == "Mexico"
+    # Korea Republic is in Group A and shows under its display name.
+    assert any(r["team"] == "South Korea" for r in rows)
+
+
+def test_group_panel_payload_handles_none_index():
+    import app
+
+    name, rows = app.group_panel_payload(None)
+    # index 0 resolves to the first team alphabetically; it has a real group.
+    assert name != "—"
+    assert len(rows) == 4

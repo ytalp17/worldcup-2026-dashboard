@@ -10,12 +10,14 @@ from dash import ALL, Dash, Input, Output, State, callback, clientside_callback,
 from src.components.detail_panel import stadium_detail
 from src.components.filter_panel import legend
 from src.components.flow_layer import flows_for
+from src.components.group_table import build_group_panel, group_rows
 from src.components.header_calendar import build_match_calendar
 from src.components.layout import build_layout
 from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, filter_pin, pulse_markers
 from src.data.altitudes import AltitudeRepository
 from src.data.distances import DistanceRepository
 from src.data.flows import build_team_flows, team_cities
+from src.data.groups import build_groups, group_for_team
 from src.data.host_cities import HostCityRepository
 from src.data.match_calendar import MatchCalendar
 from src.data.matches import MatchRepository, matches_by_stadium
@@ -46,6 +48,7 @@ MATCHES_BY_STADIUM = matches_by_stadium(MATCHES)
 TEAM_FLOWS = build_team_flows(MATCHES, VENUES, distances=DISTANCES)
 TEAM_OPTIONS = grouped_team_options(sorted(TEAM_FLOWS))
 TEAM_NAMES = team_order(TEAM_FLOWS)
+GROUPS = build_groups(MATCHES)
 
 STADIUM_TO_CITY = {v.stadium_name: v.city for v in VENUES}
 MATCH_CALENDAR = MatchCalendar(MATCHES, STADIUM_TO_CITY, today=date.today())
@@ -57,12 +60,25 @@ def flow_children(selected):
 app = Dash(__name__)
 app.title = "FIFA World Cup 2026"
 TEAM_CAROUSEL = build_team_carousel(TEAM_NAMES, app.get_asset_url, index=0)
+
+
+def group_panel_payload(index):
+    """(group_name, rowData) for the centred team at `index`. Used by the
+    content callback and the initial panel render."""
+    team = center_team(TEAM_NAMES, index or 0)
+    group = group_for_team(GROUPS, team)
+    name = group.name if group else "—"
+    rows = group_rows(group, app.get_asset_url) if group else []
+    return name, rows
+
+
 app.layout = build_layout(
     VENUES,
     TEAM_OPTIONS,
     TEAM_FLOWS,
     match_calendar=build_match_calendar(MATCH_CALENDAR),
     team_carousel=TEAM_CAROUSEL,
+    group_panel=build_group_panel(group_for_team(GROUPS, center_team(TEAM_NAMES, 0)), app.get_asset_url),
 )
 
 # Use the white FIFA logo as the browser tab icon (SVG favicon, modern browsers).
@@ -271,6 +287,16 @@ def render_carousel(index):
     )
 
 
+@callback(
+    Output("group-grid", "rowData"),
+    Output("group-table-title", "children"),
+    Input("carousel-index", "data"),
+)
+def update_group_panel(index):
+    name, rows = group_panel_payload(index)
+    return rows, name
+
+
 # Toggling the switch flips both the Mantine color scheme and the base map
 # tiles in one clientside callback (checked => dark). The tile URLs contain
 # Leaflet's {s}/{z}/{x}/{y} placeholders, so inject them via json.dumps rather
@@ -302,6 +328,35 @@ clientside_callback(
     _TZ_JS,
     Output("user-tz", "data"),
     Input("tz-probe", "n_intervals"),
+)
+
+# Show the standings panel in Team mode; hide it (map fills the width) in Time
+# mode. After the CSS width transition, dispatch a window resize so Leaflet runs
+# invalidateSize() and re-tiles the resized map (otherwise the newly-exposed
+# strip renders gray).
+_PANEL_JS = """
+(checked) => {
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 350);
+    return checked ? {display: 'flex'} : {display: 'none'};
+}
+"""
+
+clientside_callback(
+    _PANEL_JS,
+    Output("group-panel", "style"),
+    Input("mode-toggle", "checked"),
+)
+
+# Keep the ag-grid theme in sync with the app's color scheme.
+_GRID_THEME_JS = """
+(checked) => (checked ? 'ag-theme-quartz-dark group-grid'
+                      : 'ag-theme-quartz group-grid')
+"""
+
+clientside_callback(
+    _GRID_THEME_JS,
+    Output("group-grid", "className"),
+    Input("color-scheme-toggle", "checked"),
 )
 
 if __name__ == "__main__":
