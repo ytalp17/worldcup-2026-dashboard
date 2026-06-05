@@ -68,24 +68,19 @@ def _team_span(name: str):
 def _kickoff_line(kv: KickoffView) -> dmc.Group:
     if kv.same_clock:
         return dmc.Group(
-            [
-                DashIconify(icon="tabler:building-stadium", width=14),
-                dmc.Text(f"{kv.venue_time} local", size="xs", c="dimmed"),
-            ],
+            [dmc.Text(f"{kv.venue_time} local", size="xs", c="dimmed")],
             gap=4,
             align="center",
             wrap="nowrap",
         )
-    # same_clock is False here, so the offset is non-zero -> tag is non-empty.
     tag = venue_offset_tag(kv.venue_day_offset)
-    venue_text = f"{kv.venue_time} venue {tag}"
+    local_text = f"{kv.venue_time} local {tag}".strip()
     return dmc.Group(
         [
             DashIconify(icon="tabler:world", width=14),
             dmc.Text(f"{kv.user_time} your time", size="xs", fw=500),
             dmc.Text("·", size="xs", c="dimmed"),
-            DashIconify(icon="tabler:building-stadium", width=14),
-            dmc.Text(venue_text, size="xs", c="dimmed"),
+            dmc.Text(local_text, size="xs", c="dimmed"),
         ],
         gap=4,
         align="center",
@@ -120,9 +115,9 @@ def _matches_section(matches: Sequence[Match], user_tz: str | None):
         align="center",
     )
     note_text = (
-        f"Times in {user_tz}, with venue time alongside"
+        f"Times in {user_tz}, with local time alongside"
         if user_tz
-        else "Times in venue-local time"
+        else "Times in local time"
     )
     note = dmc.Text(note_text, size="xs", c="dimmed")
     if not matches:

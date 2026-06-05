@@ -195,3 +195,25 @@ def test_match_same_zone_shows_single_time():
     text = _all_text(content)
     assert text.count("13:00") == 1
     assert "your time" not in text
+
+
+def test_match_line_uses_local_not_venue_and_no_stadium_icon():
+    from dash_iconify import DashIconify
+
+    matches = [_match(1, "Mexico", "South Africa", "Group A", "Group Stage", 11)]
+    content = dmc.Box(stadium_detail(_venue(has_image=True), matches, user_tz="Asia/Tokyo"))
+    text = _all_text(content)
+    assert "local" in text
+    assert "venue" not in text
+    icons = [n for n in _walk(content) if isinstance(n, DashIconify)]
+    assert all(getattr(i, "icon", "") != "tabler:building-stadium" for i in icons)
+
+
+def test_match_same_day_different_clock_has_no_day_tag():
+    # Caracas (UTC-4) viewer of a 13:00 Mexico-City (19:00Z) match -> 15:00 same day.
+    matches = [_match(1, "Mexico", "South Africa", "Group A", "Group Stage", 11)]
+    content = dmc.Box(stadium_detail(_venue(has_image=True), matches, user_tz="America/Caracas"))
+    text = _all_text(content)
+    assert "15:00 your time" in text
+    assert "13:00 local" in text          # no trailing junk / no day tag
+    assert "(+0d)" not in text and "(-0d)" not in text
