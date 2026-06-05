@@ -26,7 +26,7 @@ MARKER_TYPE = "venue-marker"
 FILTER_PIN = [19.5, -134.5]
 
 
-def _filter_pin() -> dl.DivMarker:
+def filter_pin() -> dl.DivMarker:
     plane = (
         '<div class="filter-pin" data-icon="plane">'
         '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" '
@@ -108,7 +108,7 @@ def build_map(venues: list[Venue]) -> dl.Map:
             dl.LayerGroup(id="venue-layer", children=venue_markers(venues)),
             dl.LayerGroup(id="pulse-layer"),
             dl.LayerGroup(id="flow-layer"),
-            _filter_pin(),
+            dl.LayerGroup(id="filter-pin-layer", children=[filter_pin()]),
         ],
         center=NA_CENTER,
         zoom=NA_ZOOM,

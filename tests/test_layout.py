@@ -1,5 +1,6 @@
 import dash_leaflet as dl
 import dash_mantine_components as dmc
+from dash import dcc
 
 from src.components.layout import DRAWER_Z_INDEX, build_layout
 from src.data.venues import Venue
@@ -110,3 +111,43 @@ def test_layout_contains_map_with_marker_per_venue():
         if isinstance(c, dl.DivMarker) and isinstance(getattr(c, "id", None), dict)
     ]
     assert len(markers) == len(VENUES)
+
+
+def test_layout_mounts_calendar_and_carousel_wrappers():
+    calendar = dmc.MiniCalendar(id="match-calendar", value="2026-05-30")
+    carousel = dmc.Box(id="team-carousel", children=[])
+    layout = build_layout(VENUES, match_calendar=calendar, team_carousel=carousel)
+
+    ids = {
+        nid
+        for n in _walk(layout)
+        if isinstance((nid := getattr(n, "id", None)), str)
+    }
+    assert "calendar-wrapper" in ids
+    assert "carousel-wrapper" in ids
+    assert "team-carousel" in ids
+
+    # Carousel wrapper starts hidden (Time is the default mode).
+    carousel_wrapper = next(
+        n for n in _walk(layout)
+        if isinstance(n, dmc.Box) and getattr(n, "id", None) == "carousel-wrapper"
+    )
+    assert carousel_wrapper.style.get("display") == "none"
+
+    # The carousel-index store is present.
+    stores = [n for n in _walk(layout) if isinstance(n, dcc.Store)]
+    assert "carousel-index" in {s.id for s in stores}
+
+
+def test_layout_header_contains_mode_switch():
+    from src.components.mode_switch import MODE_SWITCH_ID
+
+    target_ids = {MODE_SWITCH_ID, "color-scheme-toggle"}
+    layout = build_layout(VENUES)
+    switch_ids = {
+        nid
+        for n in _walk(layout)
+        if isinstance((nid := getattr(n, "id", None)), str) and nid in target_ids
+    }
+    assert MODE_SWITCH_ID in switch_ids
+    assert "color-scheme-toggle" in switch_ids

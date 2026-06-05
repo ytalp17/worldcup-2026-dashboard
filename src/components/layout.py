@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import dash_mantine_components as dmc
-from dash import html
+from dash import dcc, html
 from dash_iconify import DashIconify
 
 from src.components.filter_panel import build_filter_drawer
 from src.components.map_view import build_map
+from src.components.mode_switch import mode_switch
 from src.data.venues import Venue
 
 DEFAULT_COLOR_SCHEME = "dark"
@@ -16,7 +17,7 @@ DRAWER_Z_INDEX = 2000
 
 LOGO_BLACK = "/assets/logos/fifa_logo_black.cc.svg"
 LOGO_WHITE = "/assets/logos/fifa_logo_white.cc.svg"
-LOGO_HEIGHT = 34
+LOGO_HEIGHT = 46
 
 
 def _brand() -> dmc.Group:
@@ -25,7 +26,7 @@ def _brand() -> dmc.Group:
             # Contrast-aware: black logo in light mode, white logo in dark mode.
             dmc.Image(src=LOGO_BLACK, h=LOGO_HEIGHT, w="auto", alt="FIFA", darkHidden=True),
             dmc.Image(src=LOGO_WHITE, h=LOGO_HEIGHT, w="auto", alt="FIFA", lightHidden=True),
-            dmc.Title("FIFA World Cup 2026", order=3),
+            dmc.Title("FIFA World Cup 2026", order=2),
         ],
         gap="sm",
         align="center",
@@ -47,16 +48,27 @@ def build_layout(
     team_options: list | None = None,
     team_flows: dict | None = None,
     match_calendar=None,
+    team_carousel=None,
 ) -> dmc.MantineProvider:
-    # Three equal-flex zones so the calendar sits at the true centre of the
-    # header regardless of the brand / toggle widths: left and right grow
-    # equally and push the centre to the middle.
-    left = dmc.Box(_brand(), style={"flex": "1 1 0", "display": "flex", "justifyContent": "flex-start"})
+    # Three equal-flex zones so the centre widget sits at the true centre of the
+    # header regardless of the brand / controls widths.
+    left = dmc.Box(
+        _brand(),
+        style={"flex": "1 1 0", "display": "flex", "justifyContent": "flex-start"},
+    )
+    # Both centre widgets are always mounted; a callback toggles their display.
+    calendar_wrapper = dmc.Box(match_calendar, id="calendar-wrapper")
+    carousel_wrapper = dmc.Box(
+        team_carousel, id="carousel-wrapper", style={"display": "none"}
+    )
     center = dmc.Box(
-        match_calendar,
+        [calendar_wrapper, carousel_wrapper],
         style={"flex": "0 0 auto", "display": "flex", "justifyContent": "center"},
     )
-    right = dmc.Box(theme_toggle, style={"flex": "1 1 0", "display": "flex", "justifyContent": "flex-end"})
+    right = dmc.Box(
+        dmc.Stack([mode_switch, theme_toggle], gap="xs", align="flex-end"),
+        style={"flex": "1 1 0", "display": "flex", "justifyContent": "flex-end"},
+    )
     header = dmc.AppShellHeader(
         dmc.Group(
             [left, center, right],
@@ -69,19 +81,15 @@ def build_layout(
         )
     )
 
-    main = dmc.AppShellMain(
-        html.Div(build_map(venues), id="map-container")
-    )
+    main = dmc.AppShellMain(html.Div(build_map(venues), id="map-container"))
 
     shell = dmc.AppShell(
         [header, main],
-        header={"height": 60},
+        header={"height": 95},
         padding=0,
         id="appshell",
     )
 
-    # Stadium detail drawer; its title/children/opened are filled by the
-    # marker-click callback in app.py.
     drawer = dmc.Drawer(
         id="stadium-drawer",
         position="left",
@@ -95,7 +103,12 @@ def build_layout(
     filter_drawer = build_filter_drawer(team_options or [], team_flows or {})
 
     return dmc.MantineProvider(
-        [shell, drawer, filter_drawer],
+        [
+            shell,
+            drawer,
+            filter_drawer,
+            dcc.Store(id="carousel-index", data=0, storage_type="local"),
+        ],
         id="mantine-provider",
         defaultColorScheme=DEFAULT_COLOR_SCHEME,
     )

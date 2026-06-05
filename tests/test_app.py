@@ -52,3 +52,88 @@ def test_app_flow_layer_children_for_selection():
     children = app.flow_children(["Brazil"])
     assert any(isinstance(c, dl.Polyline) for c in children)
     assert app.flow_children([]) == []
+
+
+def test_app_team_names_alphabetical_48():
+    import app
+
+    assert len(app.TEAM_NAMES) == 48
+    assert app.TEAM_NAMES == sorted(app.TEAM_NAMES, key=str.casefold)
+
+
+def test_flow_children_for_mode_team_uses_centered_team():
+    import dash_leaflet as dl
+
+    import app
+
+    idx = app.TEAM_NAMES.index("Brazil")
+    # Team mode: filter value is ignored; centered team's flow is drawn.
+    children = app.flow_children_for_mode(True, ["Argentina"], idx)
+    assert any(isinstance(c, dl.Polyline) for c in children)
+
+
+def test_flow_children_for_mode_time_uses_filter():
+    import dash_leaflet as dl
+
+    import app
+
+    children = app.flow_children_for_mode(False, ["Brazil"], 0)
+    assert any(isinstance(c, dl.Polyline) for c in children)
+    assert app.flow_children_for_mode(False, [], 0) == []
+
+
+def test_pulse_children_for_mode_team_pulses_centered_team_cities():
+    import app
+
+    idx = app.TEAM_NAMES.index("Brazil")
+    rings = app.pulse_children_for_mode(True, None, idx)
+    # Brazil plays three group-stage matches → up to three distinct host cities.
+    assert 1 <= len(rings) <= 3
+
+
+def test_pulse_children_for_mode_time_uses_date_logic():
+    import app
+
+    # An out-of-tournament / None date yields no pulses in Time mode.
+    assert app.pulse_children_for_mode(False, None, 0) == []
+
+
+def test_app_layout_contains_carousel_and_mode_switch():
+    import app
+
+    def walk(node):
+        yield node
+        ch = getattr(node, "children", None)
+        if isinstance(ch, (list, tuple)):
+            for c in ch:
+                yield from walk(c)
+        elif ch is not None:
+            yield from walk(ch)
+
+    ids = {
+        nid for n in walk(app.app.layout)
+        if isinstance((nid := getattr(n, "id", None)), str)
+    }
+    assert "team-carousel" in ids
+    assert "mode-toggle" in ids
+    assert "carousel-index" in ids
+
+
+def test_app_registers_mode_callbacks():
+    import app
+    import dash._callback
+
+    outputs = set()
+    # Dash 2.x registers module-level @callback decorators into GLOBAL_CALLBACK_MAP,
+    # not app.callback_map (which stays empty until a request triggers compilation).
+    cb_map = dash._callback.GLOBAL_CALLBACK_MAP
+    for cb in cb_map.values():
+        outs = cb["output"] if isinstance(cb["output"], list) else [cb["output"]]
+        for o in outs:
+            outputs.add(str(o))
+    joined = " ".join(outputs)
+    assert "carousel-index.data" in joined
+    assert "filter-pin-layer.children" in joined
+    assert "carousel-wrapper.style" in joined
+    assert "flow-layer.children" in joined
+    assert "pulse-layer.children" in joined

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from src.data.flows import FlowStop, TeamFlow, build_team_flows, team_color
+from src.data.flows import FlowStop, TeamFlow, build_team_flows, team_cities, team_color
 from src.data.host_cities import HostCityRepository
 from src.data.matches import Match, MatchRepository
 from src.data.stadiums import StadiumRepository
@@ -140,3 +140,25 @@ def test_rank_by_distance_caps_at_available():
     longest, shortest = rank_by_distance(flows, n=5)
     assert [f.team for f in longest] == ["A"]
     assert [f.team for f in shortest] == ["A"]
+
+
+def test_team_cities_maps_stops_through_stadium_to_city():
+    stops = (
+        FlowStop(40.8, -74.0, "MetLife Stadium", date(2026, 6, 13), 7),
+        FlowStop(39.9, -75.1, "Lincoln Financial Field", date(2026, 6, 19), 40),
+        FlowStop(39.9, -75.1, "Lincoln Financial Field", date(2026, 6, 24), 60),
+    )
+    flow = TeamFlow("Brazil", "South America", "#22c55e", stops, 1839.7)
+    stadium_to_city = {
+        "MetLife Stadium": "New York New Jersey",
+        "Lincoln Financial Field": "Philadelphia",
+        "Other Stadium": "Dallas",
+    }
+    # De-duplicates by city; ignores stadiums absent from the map.
+    assert team_cities(flow, stadium_to_city) == {"New York New Jersey", "Philadelphia"}
+
+
+def test_team_cities_ignores_unknown_stadiums():
+    stops = (FlowStop(1.0, 2.0, "Ghost Stadium", date(2026, 6, 13), 1),)
+    flow = TeamFlow("X", "Y", "#fff", stops, 0.0)
+    assert team_cities(flow, {"Real Stadium": "City"}) == set()

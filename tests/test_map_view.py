@@ -141,21 +141,34 @@ def test_map_has_flow_layer_and_filter_pin():
     children = m.children if isinstance(m.children, list) else [m.children]
     layer_ids = [getattr(c, "id", None) for c in children]
     assert "flow-layer" in layer_ids
+    assert "filter-pin-layer" in layer_ids
     pins = [
-        c for c in children
+        c for c in _walk(m)
         if isinstance(c, dl.DivMarker) and getattr(c, "id", None) == "filter-pin"
     ]
     assert len(pins) == 1
     assert pins[0].position == FILTER_PIN
 
 
-def test_filter_pin_uses_a_plane_icon():
+def test_filter_pin_lives_inside_filter_pin_layer():
     m = build_map(VENUES)
     children = m.children if isinstance(m.children, list) else [m.children]
-    pin = next(c for c in children if getattr(c, "id", None) == "filter-pin")
+    layer = next(
+        c for c in children
+        if isinstance(c, dl.LayerGroup) and getattr(c, "id", None) == "filter-pin-layer"
+    )
+    pin_ids = [getattr(n, "id", None) for n in _walk(layer)]
+    assert "filter-pin" in pin_ids
+
+
+def test_filter_pin_uses_a_plane_icon():
+    m = build_map(VENUES)
+    pin = next(
+        c for c in _walk(m)
+        if isinstance(c, dl.DivMarker) and getattr(c, "id", None) == "filter-pin"
+    )
     html = pin.iconOptions["html"]
     assert 'data-icon="plane"' in html
-    # The old funnel polygon should be gone.
     assert "22 3 2 3 10 12.46" not in html
 
 

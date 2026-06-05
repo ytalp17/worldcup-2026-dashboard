@@ -21,10 +21,24 @@ def test_render_flow_has_polyline_decorator_and_dots():
     decorators = [c for c in comps if isinstance(c, dl.PolylineDecorator)]
     dots = [c for c in comps if isinstance(c, dl.CircleMarker)]
     assert len(polylines) == 1
-    assert polylines[0].color == "#22c55e"
+    assert polylines[0].pathOptions["color"] == "#22c55e"
     assert polylines[0].positions == [[40.8, -74.0], [39.9, -75.1], [25.9, -80.2]]
     assert len(decorators) == 1
     assert len(dots) == 3
+
+
+def test_arrow_color_matches_line_color_per_team():
+    flow = _flow()
+    comps = render_flow(flow)
+    line = next(c for c in comps if isinstance(c, dl.Polyline))
+    decorator = next(c for c in comps if isinstance(c, dl.PolylineDecorator))
+    arrow_opts = decorator.patterns[0]["arrowHead"]["pathOptions"]
+    # The arrowhead must be filled and stroked with the exact line/team color so
+    # the arrow never falls back to Leaflet's default colour. The line carries
+    # its colour in pathOptions so it re-styles when the team changes.
+    assert line.pathOptions["color"] == flow.color
+    assert arrow_opts["color"] == flow.color
+    assert arrow_opts["fillColor"] == flow.color
 
 
 def test_flows_for_empty_selection_is_empty():
@@ -34,7 +48,10 @@ def test_flows_for_empty_selection_is_empty():
 
 def test_flows_for_selected_team_includes_its_polyline():
     comps = flows_for(["Brazil"], {"Brazil": _flow()})
-    assert any(isinstance(c, dl.Polyline) and c.color == "#22c55e" for c in comps)
+    assert any(
+        isinstance(c, dl.Polyline) and c.pathOptions["color"] == "#22c55e"
+        for c in comps
+    )
 
 
 def test_polyline_has_distance_tooltip():

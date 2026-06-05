@@ -5,21 +5,22 @@ from datetime import date
 from pathlib import Path
 
 import dash
-from dash import ALL, Dash, Input, Output, callback, clientside_callback, ctx, no_update
+from dash import ALL, Dash, Input, Output, State, callback, clientside_callback, ctx, no_update
 
 from src.components.detail_panel import stadium_detail
 from src.components.filter_panel import legend
 from src.components.flow_layer import flows_for
 from src.components.header_calendar import build_match_calendar
 from src.components.layout import build_layout
-from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, pulse_markers
+from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, filter_pin, pulse_markers
 from src.data.altitudes import AltitudeRepository
 from src.data.distances import DistanceRepository
-from src.data.flows import build_team_flows
+from src.data.flows import build_team_flows, team_cities
 from src.data.host_cities import HostCityRepository
 from src.data.match_calendar import MatchCalendar
 from src.data.matches import MatchRepository, matches_by_stadium
 from src.data.stadiums import StadiumRepository
+from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, team_order
 from src.data.team_continents import grouped_team_options
 from src.data.venues import build_venues
 
@@ -44,6 +45,7 @@ MATCHES_BY_STADIUM = matches_by_stadium(MATCHES)
 
 TEAM_FLOWS = build_team_flows(MATCHES, VENUES, distances=DISTANCES)
 TEAM_OPTIONS = grouped_team_options(sorted(TEAM_FLOWS))
+TEAM_NAMES = team_order(TEAM_FLOWS)
 
 STADIUM_TO_CITY = {v.stadium_name: v.city for v in VENUES}
 MATCH_CALENDAR = MatchCalendar(MATCHES, STADIUM_TO_CITY, today=date.today())
@@ -54,8 +56,13 @@ def flow_children(selected):
 
 app = Dash(__name__)
 app.title = "FIFA World Cup 2026"
+TEAM_CAROUSEL = build_team_carousel(TEAM_NAMES, app.get_asset_url, index=0)
 app.layout = build_layout(
-    VENUES, TEAM_OPTIONS, TEAM_FLOWS, match_calendar=build_match_calendar(MATCH_CALENDAR)
+    VENUES,
+    TEAM_OPTIONS,
+    TEAM_FLOWS,
+    match_calendar=build_match_calendar(MATCH_CALENDAR),
+    team_carousel=TEAM_CAROUSEL,
 )
 
 # Use the white FIFA logo as the browser tab icon (SVG favicon, modern browsers).
@@ -124,31 +131,141 @@ def open_filter_drawer(n_clicks):
 
 @callback(
     Output("flow-layer", "children"),
+    Input("mode-toggle", "checked"),
+    Input("team-filter", "value"),
+    Input("carousel-index", "data"),
+)
+def update_flow_layer(team_mode, filter_value, index):
+    return flow_children_for_mode(team_mode, filter_value, index)
+
+
+@callback(
     Output("filter-legend", "children"),
     Input("team-filter", "value"),
 )
-def update_flows(selected):
-    return flow_children(selected), legend(selected, TEAM_FLOWS)
+def update_filter_legend(selected):
+    return legend(selected, TEAM_FLOWS)
 
 
-def pulses_for_date(selected_date: str | None):
-    """Pulsing overlay rings for stadiums hosting a match on the selected date."""
-    active: set[str] = set()
-    if selected_date:
-        try:
-            day = date.fromisoformat(str(selected_date)[:10])
-            active = MATCH_CALENDAR.active_cities(day)
-        except ValueError:
-            active = set()
+def _active_cities_for_date(selected_date: str | None) -> set[str]:
+    """Host cities with a match on the selected date (Time mode)."""
+    if not selected_date:
+        return set()
+    try:
+        day = date.fromisoformat(str(selected_date)[:10])
+    except ValueError:
+        return set()
+    return MATCH_CALENDAR.active_cities(day)
+
+
+def flow_children_for_mode(
+    team_mode: bool, filter_value: list[str] | None, index: int | None
+) -> list:
+    """Flow-layer children: Team mode uses the centred team; Time mode uses filter_value."""
+    if team_mode:
+        selected = [center_team(TEAM_NAMES, index if index is not None else 0)]
+    else:
+        selected = filter_value
+    return flow_children(selected)
+
+
+def pulse_children_for_mode(
+    team_mode: bool, selected_date: str | None, index: int | None
+) -> list:
+    """Team mode → centered team's cities; Time mode → the date's active cities."""
+    if team_mode:
+        center = center_team(TEAM_NAMES, index if index is not None else 0)
+        active = team_cities(TEAM_FLOWS[center], STADIUM_TO_CITY)
+    else:
+        active = _active_cities_for_date(selected_date)
     return pulse_markers(VENUES, active)
 
 
 @callback(
     Output("pulse-layer", "children"),
+    Input("mode-toggle", "checked"),
     Input("match-calendar", "value"),
+    Input("carousel-index", "data"),
 )
-def highlight_active_stadiums(selected_date):
-    return pulses_for_date(selected_date)
+def update_pulse_layer(team_mode, selected_date, index):
+    return pulse_children_for_mode(team_mode, selected_date, index)
+
+
+@callback(
+    Output("calendar-wrapper", "style"),
+    Output("carousel-wrapper", "style"),
+    Input("mode-toggle", "checked"),
+)
+def toggle_center_widget(team_mode):
+    hidden = {"display": "none"}
+    shown = {"display": "block"}
+    return (hidden, shown) if team_mode else (shown, hidden)
+
+
+@callback(
+    Output("filter-pin-layer", "children"),
+    Input("mode-toggle", "checked"),
+)
+def toggle_filter_pin(team_mode):
+    # Runs on initial load too, so a persisted Team mode hides the pin from the
+    # first render. Re-seeding the pin in Time mode is harmless (Dash diffs the DOM).
+    return [] if team_mode else [filter_pin()]
+
+
+@callback(
+    Output("filter-drawer", "opened", allow_duplicate=True),
+    Input("mode-toggle", "checked"),
+    prevent_initial_call=True,
+)
+def close_filter_drawer_in_team_mode(team_mode):
+    # Entering Team mode closes the (right-side) filter drawer; leaving it alone otherwise.
+    return False if team_mode else no_update
+
+
+@callback(
+    Output("carousel-index", "data"),
+    Input("carousel-prev", "n_clicks"),
+    Input("carousel-next", "n_clicks"),
+    Input("carousel-logo-prev", "n_clicks"),
+    Input("carousel-logo-next", "n_clicks"),
+    Input("carousel-logo-prev2", "n_clicks"),
+    Input("carousel-logo-next2", "n_clicks"),
+    State("carousel-index", "data"),
+    prevent_initial_call=True,
+)
+def move_carousel(_p, _n, _lp, _ln, _lp2, _ln2, index):
+    # Arrows and inner logos step ±1; the outer logos jump ±2 (bring a far team in).
+    deltas = {
+        "carousel-prev": -1,
+        "carousel-logo-prev": -1,
+        "carousel-logo-prev2": -2,
+        "carousel-next": 1,
+        "carousel-logo-next": 1,
+        "carousel-logo-next2": 2,
+    }
+    delta = deltas.get(ctx.triggered_id, 1)
+    return advance(index or 0, delta, len(TEAM_NAMES))
+
+
+@callback(
+    Output("carousel-img-prev2", "src"),
+    Output("carousel-img-prev", "src"),
+    Output("carousel-img-center", "src"),
+    Output("carousel-img-next", "src"),
+    Output("carousel-img-next2", "src"),
+    Output("carousel-name", "children"),
+    Input("carousel-index", "data"),
+)
+def render_carousel(index):
+    view = carousel_view(TEAM_NAMES, index or 0, app.get_asset_url)
+    return (
+        view["prev2_src"],
+        view["prev1_src"],
+        view["center_src"],
+        view["next1_src"],
+        view["next2_src"],
+        view["center_name"],
+    )
 
 
 # Toggling the switch flips both the Mantine color scheme and the base map

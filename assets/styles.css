@@ -132,3 +132,60 @@ body,
 [data-mantine-color-scheme="dark"] .filter-drawer-frosted {
     background-color: rgba(26, 27, 30, 0.8);
 }
+
+/* ---- Team carousel (header centre, Team mode) ---- */
+.team-carousel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    width: 480px; /* fixed width so the nav arrows never shift position */
+    height: 80px; /* fits within the 90px header without reflow */
+}
+
+/* Clickable logo wrappers reset button chrome. */
+.carousel-logo {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Side logos are dimmed in two tiers so the carousel reads with depth:
+   inner neighbours (one away) are clearer than the outer ones (two away).
+   Both brighten on hover. */
+.carousel-logo--side {
+    transition: opacity 0.2s ease;
+}
+.carousel-logo--near {
+    opacity: 0.55;
+}
+.carousel-logo--near:hover {
+    opacity: 0.85;
+}
+.carousel-logo--far {
+    opacity: 0.28;
+}
+.carousel-logo--far:hover {
+    opacity: 0.55;
+}
+
+/* Centre (selected) logo: full brightness, no border/ring — it stands out by
+   size and opacity alone. Fixed-width slot so the variable-length team name
+   below it can never shift the neighbouring logos or the nav arrows. */
+.carousel-logo--center-wrap {
+    cursor: default;
+    width: 120px;
+}
+
+/* Team name under the centre logo: kept on one line within the fixed slot;
+   long names ellipsize instead of widening the carousel. */
+.carousel-name {
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}

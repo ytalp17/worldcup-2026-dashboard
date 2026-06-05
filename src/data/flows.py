@@ -109,3 +109,12 @@ def rank_by_distance(
     longest = ordered[:n]
     shortest = list(reversed(ordered[-n:])) if ordered else []
     return longest, shortest
+
+
+def team_cities(team_flow: TeamFlow, stadium_to_city: dict[str, str]) -> set[str]:
+    """The set of host cities a team plays its group-stage matches in."""
+    return {
+        stadium_to_city[s.stadium_name]
+        for s in team_flow.stops
+        if s.stadium_name in stadium_to_city
+    }
