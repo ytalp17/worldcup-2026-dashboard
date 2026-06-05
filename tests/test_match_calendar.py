@@ -43,3 +43,15 @@ def test_active_cities_for_opening_day():
 def test_active_cities_empty_for_non_match_day():
     cal = _calendar()
     assert cal.active_cities(TODAY) == set()
+
+
+def test_active_cities_user_tz_shifts_match_to_next_day():
+    cal = _calendar()
+    # Opening matches are Jun 11 in venue time; from Tokyo they fall on Jun 12.
+    assert "Mexico City" not in cal.active_cities(date(2026, 6, 11), "Asia/Tokyo")
+    assert "Mexico City" in cal.active_cities(date(2026, 6, 12), "Asia/Tokyo")
+
+
+def test_active_cities_user_tz_none_uses_venue_dates():
+    cal = _calendar()
+    assert cal.active_cities(date(2026, 6, 11), None) == {"Mexico City", "Guadalajara"}
