@@ -123,8 +123,10 @@ def group_rows(group: Group, asset_url) -> list[dict]:
     `flag` uses the RAW team name (country_logos/<raw>.svg); `team` uses display_name."""
 
 def build_group_panel(group: Group | None, asset_url) -> dmc.Box:
-    """id='group-panel': DMC header (Title 'Table' + 'World Cup'/group-name + chevron)
-    -> dag.AgGrid(id='group-grid') -> empty flex:1 Box id='group-extra'."""
+    """Panel body (className='group-panel__body'): DMC header ('Table' + 'World Cup' +
+    group-name id='group-table-title' + decorative chevron) -> dag.AgGrid(id='group-grid')
+    -> empty flex:1 Box id='group-extra'. The visibility wrapper (id='group-panel') is
+    added in layout.py, mirroring the existing carousel-wrapper pattern."""
 ```
 
 - **Grid:** `dag.AgGrid(id="group-grid", columnDefs=COL_DEFS, rowData=group_rows(...),
@@ -241,14 +243,14 @@ Pure functions first (`pytest tests/ -v`, conda base env):
 6. `group_rows` — ranks `1..4`; `team` applies `display_name`; flag url uses the
    **raw** team name (`asset_url("country_logos/Korea Republic.svg")` even though the
    display name is "South Korea"); numeric fields all `0`.
-7. `build_group_panel` — tree contains ids `group-panel`, `group-grid`,
-   `group-table-title`, `group-extra`; grid `columnDefs` include a `team` column with
+7. `build_group_panel` — tree contains ids `group-grid`, `group-table-title`,
+   `group-extra`; grid `columnDefs` include a `team` column with
    `cellRenderer == "TeamCell"`.
 8. `build_group_panel(None, ...)` — renders without error; empty `rowData`; label "—".
 9. `group_panel_payload(index)` — for an index whose centred team is in Group A,
    returns `("Group A", rows)` with 4 rows in official order.
-10. `build_layout(...)` — tree contains `main-split` (className) and `group-panel`;
-    `map-container` still present.
+10. `build_layout(...)` — tree contains className `main-split` and id `group-panel`
+    (the visibility wrapper); `map-container` still present.
 
 Clientside callbacks (visibility/resize, grid theme) and the `TeamCell` renderer are
 verified via Playwright (panel appears in Team mode, map re-tiles after resize, theme
