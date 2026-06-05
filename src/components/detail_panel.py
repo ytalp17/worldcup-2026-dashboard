@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 
+from src.data.kickoff import kickoff_view, venue_offset_tag
 from src.data.matches import Match, is_placeholder
 from src.data.venues import Venue
 
@@ -14,12 +13,6 @@ PLACEHOLDER_TEXT = "Photo unavailable"
 NO_MATCHES_TEXT = "No matches scheduled"
 IMAGE_HEIGHT = 200
 
-
-def _timezone_text(venue: Venue) -> str:
-    """e.g. 'Central Time · UTC-05:00 · America/Chicago'."""
-    offset = datetime.now(ZoneInfo(venue.timezone)).strftime("%z")
-    pretty = f"UTC{offset[:3]}:{offset[3:]}" if offset else "UTC"
-    return f"{venue.tz_label} · {pretty} · {venue.timezone}"
 
 
 def _image_block(venue: Venue):
@@ -73,8 +66,38 @@ def _team_span(name: str):
     return dmc.Text(name, span=True, fw=500)
 
 
-def _match_item(match: Match) -> dmc.TimelineItem:
-    title = f"{match.date.strftime('%b')} {match.date.day} · {_match_label(match)}"
+def _kickoff_line(match: Match, user_tz: str | None):
+    kv = kickoff_view(match, user_tz)
+    if kv.same_clock:
+        return dmc.Group(
+            [
+                DashIconify(icon="tabler:building-stadium", width=14),
+                dmc.Text(f"{kv.venue_time} local", size="xs", c="dimmed"),
+            ],
+            gap=4,
+            align="center",
+            wrap="nowrap",
+        )
+    tag = venue_offset_tag(kv.venue_day_offset)
+    venue_text = f"{kv.venue_time} venue {tag}".strip()
+    return dmc.Group(
+        [
+            DashIconify(icon="tabler:world", width=14),
+            dmc.Text(f"{kv.user_time} your time", size="xs", fw=500),
+            dmc.Text("·", size="xs", c="dimmed"),
+            DashIconify(icon="tabler:building-stadium", width=14),
+            dmc.Text(venue_text, size="xs", c="dimmed"),
+        ],
+        gap=4,
+        align="center",
+        wrap="nowrap",
+    )
+
+
+def _match_item(match: Match, user_tz: str | None) -> dmc.TimelineItem:
+    kv = kickoff_view(match, user_tz)
+    day = kv.user_date or match.date  # user-local date is the anchor when known
+    title = f"{day.strftime('%b')} {day.day} · {_match_label(match)}"
     return dmc.TimelineItem(
         title=title,
         bullet=DashIconify(icon="tabler:ball-football", width=12),
@@ -82,12 +105,13 @@ def _match_item(match: Match) -> dmc.TimelineItem:
             dmc.Text(
                 [_team_span(match.home), " vs ", _team_span(match.away)],
                 size="sm",
-            )
+            ),
+            _kickoff_line(match, user_tz),
         ],
     )
 
 
-def _matches_section(matches: Sequence[Match]):
+def _matches_section(matches: Sequence[Match], user_tz: str | None):
     header = dmc.Group(
         [
             dmc.Text("Matches", fw=600),
@@ -96,38 +120,35 @@ def _matches_section(matches: Sequence[Match]):
         gap="xs",
         align="center",
     )
+    note_text = (
+        f"Times in {user_tz}, with venue time alongside"
+        if user_tz
+        else "Times in venue-local time"
+    )
+    note = dmc.Text(note_text, size="xs", c="dimmed")
     if not matches:
         body = dmc.Text(NO_MATCHES_TEXT, size="sm", c="dimmed")
     else:
         body = dmc.Timeline(
-            [_match_item(m) for m in matches],
+            [_match_item(m, user_tz) for m in matches],
             active=len(matches),
             bulletSize=20,
             lineWidth=2,
         )
-    return dmc.Stack([header, body], gap="sm")
+    return dmc.Stack([header, note, body], gap="sm")
 
 
-def stadium_detail(venue: Venue, matches: Sequence[Match] = ()):
-    """Drawer body: photo, location, key stats, timezone, info, and the
-    schedule of matches at this stadium."""
+def stadium_detail(venue: Venue, matches: Sequence[Match] = (), user_tz: str | None = None):
+    """Drawer body: photo, location, key stats, info, and the schedule of
+    matches at this stadium (kickoffs shown in the user's timezone)."""
     return dmc.Stack(
         [
             _image_block(venue),
             dmc.Text(venue.location, size="sm", c="dimmed"),
             dmc.Group(_stat_badges(venue), gap="sm"),
-            dmc.Group(
-                [
-                    DashIconify(icon="tabler:clock-hour-4", width=16),
-                    dmc.Text(_timezone_text(venue), size="sm", c="dimmed"),
-                ],
-                gap="xs",
-                align="center",
-                wrap="nowrap",
-            ),
             dmc.Text(venue.info, size="sm"),
             dmc.Divider(),
-            _matches_section(matches),
+            _matches_section(matches, user_tz),
         ],
         gap="md",
     )

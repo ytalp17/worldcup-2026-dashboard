@@ -1,5 +1,5 @@
 import dataclasses
-from datetime import date
+from datetime import date, datetime, time
 
 import dash_mantine_components as dmc
 
@@ -8,7 +8,8 @@ from src.data.matches import Match
 from src.data.venues import Venue
 
 
-def _match(number, home, away, group, stage, day):
+def _match(number, home, away, group, stage, day, local="13:00",
+           utc="2026-06-11T19:00:00+00:00"):
     return Match(
         number=number,
         home=home,
@@ -17,6 +18,8 @@ def _match(number, home, away, group, stage, day):
         stage=stage,
         stadium="Dallas Stadium",
         date=date(2026, 6, day),
+        local_time=time.fromisoformat(local),
+        kickoff_utc=datetime.fromisoformat(utc),
     )
 
 
@@ -89,11 +92,11 @@ def test_detail_shows_key_stats_and_info():
     assert "jaw-dropping" in text    # info blurb
 
 
-def test_detail_shows_timezone():
+def test_detail_no_longer_shows_timezone_string():
     content = dmc.Box(stadium_detail(_venue(has_image=True)))
     text = _all_text(content)
-    assert "Central Time" in text       # friendly label
-    assert "America/Chicago" in text    # IANA name
+    assert "America/Chicago" not in text
+    assert "UTC" not in text
 
 
 def test_detail_shows_altitude_badge_when_known():
@@ -160,3 +163,34 @@ def test_detail_without_matches_shows_placeholder():
     content = dmc.Box(stadium_detail(_venue(has_image=True), []))
     assert _timelines(content) == []
     assert NO_MATCHES_TEXT in _all_text(content)
+
+
+def test_match_shows_venue_only_when_tz_unknown():
+    matches = [_match(1, "Mexico", "South Africa", "Group A", "Group Stage", 11)]
+    content = dmc.Box(stadium_detail(_venue(has_image=True), matches, user_tz=None))
+    text = _all_text(content)
+    assert "13:00" in text
+    assert "your time" not in text
+
+
+def test_match_shows_dual_times_with_offset_tag():
+    # 13:00 Mexico-City kickoff seen from Tokyo -> 04:00 next day, venue (-1d).
+    matches = [_match(1, "Mexico", "South Africa", "Group A", "Group Stage", 11)]
+    content = dmc.Box(stadium_detail(_venue(has_image=True), matches, user_tz="Asia/Tokyo"))
+    text = _all_text(content)
+    assert "04:00" in text
+    assert "your time" in text
+    assert "13:00" in text
+    assert "(-1d)" in text
+    assert "Asia/Tokyo" in text
+    assert "Jun 12" in text
+
+
+def test_match_same_zone_shows_single_time():
+    matches = [_match(1, "Mexico", "South Africa", "Group A", "Group Stage", 11)]
+    content = dmc.Box(
+        stadium_detail(_venue(has_image=True), matches, user_tz="America/Mexico_City")
+    )
+    text = _all_text(content)
+    assert text.count("13:00") == 1
+    assert "your time" not in text
