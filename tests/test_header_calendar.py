@@ -14,9 +14,9 @@ def test_minicalendar_has_range_value_and_window():
     mc = build_match_calendar(_FakeCalendar())
     assert isinstance(mc, dmc.MiniCalendar)
     assert mc.id == CALENDAR_ID
-    # Default selected date is today; window opens there too.
     assert mc.value == "2026-05-30"
     assert mc.minDate == "2026-05-30"
-    assert mc.maxDate == "2026-07-19"
-    # Shows a 10-day window.
+    # maxDate is padded one day past the final venue day so user-local edge
+    # dates (late-night kickoffs that roll to the next day) stay selectable.
+    assert mc.maxDate == "2026-07-20"
     assert mc.numberOfDays == 10

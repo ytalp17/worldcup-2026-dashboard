@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import timedelta
+
 import dash_mantine_components as dmc
 
 from src.data.match_calendar import MatchCalendar
@@ -18,7 +20,7 @@ def build_match_calendar(calendar: MatchCalendar) -> dmc.MiniCalendar:
         value=calendar.start.isoformat(),
         defaultDate=calendar.start.isoformat(),
         minDate=calendar.start.isoformat(),
-        maxDate=calendar.end.isoformat(),
+        maxDate=(calendar.end + timedelta(days=1)).isoformat(),
         numberOfDays=CALENDAR_DAYS,
         persistence=True,
     )
