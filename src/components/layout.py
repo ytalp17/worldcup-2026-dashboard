@@ -49,6 +49,7 @@ def build_layout(
     team_flows: dict | None = None,
     match_calendar=None,
     team_carousel=None,
+    group_panel=None,
 ) -> dmc.MantineProvider:
     # Three equal-flex zones so the centre widget sits at the true centre of the
     # header regardless of the brand / controls widths.
@@ -81,7 +82,21 @@ def build_layout(
         )
     )
 
-    main = dmc.AppShellMain(html.Div(build_map(venues), id="map-container"))
+    # Team mode reveals a left-side standings panel; the map fills the rest.
+    # The panel is hidden by default (a clientside callback shows it in Team mode),
+    # mirroring the calendar/carousel wrapper pattern.
+    group_panel_wrapper = dmc.Box(
+        group_panel, id="group-panel", className="group-panel", style={"display": "none"}
+    )
+    main = dmc.AppShellMain(
+        dmc.Box(
+            [
+                html.Div(build_map(venues), id="map-container"),
+                group_panel_wrapper,
+            ],
+            className="main-split",
+        )
+    )
 
     shell = dmc.AppShell(
         [header, main],
@@ -109,6 +124,7 @@ def build_layout(
             filter_drawer,
             dcc.Store(id="carousel-index", data=0, storage_type="local"),
             dcc.Store(id="user-tz"),
+            dcc.Store(id="map-resize-tick"),  # clientside dummy output for Leaflet invalidateSize on mode switch
             dcc.Interval(id="tz-probe", interval=100, max_intervals=1),  # one-shot: fire once just after load to read the browser timezone
         ],
         id="mantine-provider",

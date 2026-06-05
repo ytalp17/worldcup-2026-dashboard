@@ -161,3 +161,29 @@ def test_layout_has_user_tz_store_and_probe():
     intervals = {getattr(n, "id", None) for n in _walk(layout) if isinstance(n, dcc.Interval)}
     assert "user-tz" in stores
     assert "tz-probe" in intervals
+
+
+def test_layout_has_split_with_map_and_group_panel():
+    nodes = list(_walk(build_layout(VENUES, group_panel=dmc.Box("x"))))
+    classnames = {getattr(n, "className", None) for n in nodes}
+    ids = {
+        nid
+        for n in nodes
+        if isinstance((nid := getattr(n, "id", None)), str)
+    }
+    assert "main-split" in classnames
+    assert "group-panel" in ids
+    assert "map-container" in ids
+
+
+def test_group_panel_wrapper_hidden_by_default():
+    panel = next(
+        n for n in _walk(build_layout(VENUES, group_panel=dmc.Box("x")))
+        if getattr(n, "id", None) == "group-panel"
+    )
+    assert panel.style == {"display": "none"}
+
+
+def test_layout_has_map_resize_tick_store():
+    stores = [n for n in _walk(build_layout(VENUES)) if isinstance(n, dcc.Store)]
+    assert "map-resize-tick" in {s.id for s in stores}
