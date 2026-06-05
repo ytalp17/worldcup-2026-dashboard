@@ -23,6 +23,8 @@ stacks vertically (map on top, table below).
 | Flag rendering | Custom `dash-ag-grid` cell renderer (`assets/dashAgGridComponentFunctions.js`) — sized flag SVG + name |
 | Area below the table | Empty `flex:1` placeholder reserved for future infographics |
 | Chevron in header | Decorative only (no behaviour) — YAGNI |
+| Team display names | Shared `display_name` helper: "and" → "&" **and** "Korea Republic" → "South Korea" (applied in table **and** carousel) |
+| Panel width | `flex:0 0 34%` (≈1/3) |
 
 ### CLAUDE.md exception (explicit)
 
@@ -40,7 +42,8 @@ already installed (in `requirements.txt`).
 **Official order is derivable and verified:** scanning a group's matches in
 `match_number` order and collecting each team on first appearance yields the FIFA
 seeding order. Confirmed for Group A → `[Mexico, South Africa, Korea Republic, Czechia]`
-(matches the reference screenshot; "Korea Republic" is FIFA's name for South Korea).
+(matches the reference screenshot). The **raw** team name "Korea Republic" is used for
+data/flag lookup; the **display name** is "South Korea" (see `display_name` below).
 
 ## Architecture
 
@@ -64,6 +67,7 @@ one thing reacts to the index:
 | File | Responsibility |
 |---|---|
 | `src/data/groups.py` | **New.** `GroupStanding`, `Group` dataclasses; `build_groups`, `group_for_team` (pure). |
+| `src/components/team_carousel.py` | Promote `_display_name` → public `display_name`; add "Korea Republic" → "South Korea" override. |
 | `src/components/group_table.py` | **New.** `group_rows`, `build_group_panel` (DMC header + `dag.AgGrid`). |
 | `assets/dashAgGridComponentFunctions.js` | **New.** `TeamCell` cell renderer (flag `<img>` + name). |
 | `src/components/layout.py` | `main` → flex-row `main-split` with `map-container` + `group-panel`; add `dcc.Store(id="map-resize-tick")`. |
@@ -110,12 +114,13 @@ collecting `home` then `away` on first sight to fix the order.
 ## Component: Panel (`src/components/group_table.py`)
 
 ```python
-from src.components.team_carousel import _display_name  # reuse: "and" -> "&"
+from src.components.team_carousel import display_name  # "and" -> "&"; "Korea Republic" -> "South Korea"
 
 COL_DEFS = [...]  # #, Team, MP, W, D, L, GD, Pts (Pts bold via cellStyle)
 
 def group_rows(group: Group, asset_url) -> list[dict]:
-    """rowData dicts: rank 1..n, team (display name), flag (asset url), mp/w/d/l/gd/pts."""
+    """rowData dicts: rank 1..n, team (display name), flag (asset url), mp/w/d/l/gd/pts.
+    `flag` uses the RAW team name (country_logos/<raw>.svg); `team` uses display_name."""
 
 def build_group_panel(group: Group | None, asset_url) -> dmc.Box:
     """id='group-panel': DMC header (Title 'Table' + 'World Cup'/group-name + chevron)
@@ -231,11 +236,11 @@ Pure functions first (`pytest tests/ -v`, conda base env):
 3. `build_groups` order — Group A standings `team` order ==
    `["Mexico", "South Africa", "Korea Republic", "Czechia"]`.
 4. `group_for_team` — known team returns the right group; unknown team returns `None`.
-5. `group_rows` — ranks `1..4`; display name applies `_display_name`
-   ("Bosnia and Herzegovina" → "Bosnia & Herzegovina"); flag url ==
-   `asset_url("country_logos/<raw team>.svg")`; numeric fields all `0`.
-6. `group_rows(group_with_known_team)` — flag url uses the **raw** team name even
-   when the display name differs.
+5. `display_name` — "Bosnia and Herzegovina" → "Bosnia & Herzegovina";
+   "Korea Republic" → "South Korea"; unmapped name returns unchanged.
+6. `group_rows` — ranks `1..4`; `team` applies `display_name`; flag url uses the
+   **raw** team name (`asset_url("country_logos/Korea Republic.svg")` even though the
+   display name is "South Korea"); numeric fields all `0`.
 7. `build_group_panel` — tree contains ids `group-panel`, `group-grid`,
    `group-table-title`, `group-extra`; grid `columnDefs` include a `team` column with
    `cellRenderer == "TeamCell"`.
