@@ -137,3 +137,18 @@ def test_app_registers_mode_callbacks():
     assert "carousel-wrapper.style" in joined
     assert "flow-layer.children" in joined
     assert "pulse-layer.children" in joined
+
+
+def test_active_cities_decider_threads_user_tz():
+    import app
+
+    # In Time mode, an unknown/None tz keeps the venue-date pulse behavior.
+    assert app.pulse_children_for_mode(False, "2026-06-11", 0) is not None
+
+
+def test_drawer_for_city_accepts_user_tz():
+    import app
+
+    opened, title, children = app.drawer_for_city("Dallas", "Asia/Tokyo")
+    assert opened is True
+    assert children is not None

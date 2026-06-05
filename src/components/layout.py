@@ -108,6 +108,8 @@ def build_layout(
             drawer,
             filter_drawer,
             dcc.Store(id="carousel-index", data=0, storage_type="local"),
+            dcc.Store(id="user-tz"),
+            dcc.Interval(id="tz-probe", interval=1, max_intervals=1),
         ],
         id="mantine-provider",
         defaultColorScheme=DEFAULT_COLOR_SCHEME,

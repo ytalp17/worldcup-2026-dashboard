@@ -151,3 +151,13 @@ def test_layout_header_contains_mode_switch():
     }
     assert MODE_SWITCH_ID in switch_ids
     assert "color-scheme-toggle" in switch_ids
+
+
+def test_layout_has_user_tz_store_and_probe():
+    from dash import dcc
+
+    layout = build_layout(VENUES)
+    stores = {getattr(n, "id", None) for n in _walk(layout) if isinstance(n, dcc.Store)}
+    intervals = {getattr(n, "id", None) for n in _walk(layout) if isinstance(n, dcc.Interval)}
+    assert "user-tz" in stores
+    assert "tz-probe" in intervals

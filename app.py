@@ -86,16 +86,13 @@ app.index_string = f"""<!DOCTYPE html>
 </html>"""
 
 
-def drawer_for_city(city: str | None):
-    """Compute the (opened, title, children) drawer state for a clicked city.
-
-    Returns a closed, empty drawer for unknown/None cities.
-    """
+def drawer_for_city(city: str | None, user_tz: str | None = None):
+    """Compute the (opened, title, children) drawer state for a clicked city."""
     venue = VENUES_BY_CITY.get(city) if city else None
     if venue is None:
         return False, no_update, no_update
     matches = MATCHES_BY_STADIUM.get(venue.stadium_name, [])
-    return True, venue.official_name, stadium_detail(venue, matches)
+    return True, venue.official_name, stadium_detail(venue, matches, user_tz)
 
 
 @callback(
@@ -104,15 +101,16 @@ def drawer_for_city(city: str | None):
     Output("stadium-drawer", "children"),
     Output("filter-drawer", "opened", allow_duplicate=True),
     Input({"type": MARKER_TYPE, "index": ALL}, "n_clicks"),
+    State("user-tz", "data"),
     prevent_initial_call=True,
 )
-def open_stadium_drawer(n_clicks):
+def open_stadium_drawer(n_clicks, user_tz):
     # Ignore the callback firing when markers mount with n_clicks=None.
     if not any(n_clicks):
         return no_update, no_update, no_update, no_update
     triggered = ctx.triggered_id
     city = triggered.get("index") if isinstance(triggered, dict) else None
-    opened, title, children = drawer_for_city(city)
+    opened, title, children = drawer_for_city(city, user_tz)
     # Opening the stadium drawer closes the filter drawer (both are left-side).
     return opened, title, children, (False if opened else no_update)
 
@@ -147,15 +145,16 @@ def update_filter_legend(selected):
     return legend(selected, TEAM_FLOWS)
 
 
-def _active_cities_for_date(selected_date: str | None) -> set[str]:
-    """Host cities with a match on the selected date (Time mode)."""
+def _active_cities_for_date(selected_date: str | None, user_tz: str | None) -> set[str]:
+    """Host cities with a match on the selected date, in the user's timezone
+    (falls back to venue dates when the timezone is unknown)."""
     if not selected_date:
         return set()
     try:
         day = date.fromisoformat(str(selected_date)[:10])
     except ValueError:
         return set()
-    return MATCH_CALENDAR.active_cities(day)
+    return MATCH_CALENDAR.active_cities(day, user_tz)
 
 
 def flow_children_for_mode(
@@ -170,14 +169,16 @@ def flow_children_for_mode(
 
 
 def pulse_children_for_mode(
-    team_mode: bool, selected_date: str | None, index: int | None
+    team_mode: bool, selected_date: str | None, index: int | None, user_tz: str | None = None
 ) -> list:
-    """Team mode → centered team's cities; Time mode → the date's active cities."""
+    """Team mode → centered team's cities; Time mode → the date's active cities
+    in the user's timezone. `user_tz` defaults to None so existing 3-arg callers
+    keep the venue-date behavior."""
     if team_mode:
         center = center_team(TEAM_NAMES, index if index is not None else 0)
         active = team_cities(TEAM_FLOWS[center], STADIUM_TO_CITY)
     else:
-        active = _active_cities_for_date(selected_date)
+        active = _active_cities_for_date(selected_date, user_tz)
     return pulse_markers(VENUES, active)
 
 
@@ -186,9 +187,10 @@ def pulse_children_for_mode(
     Input("mode-toggle", "checked"),
     Input("match-calendar", "value"),
     Input("carousel-index", "data"),
+    Input("user-tz", "data"),
 )
-def update_pulse_layer(team_mode, selected_date, index):
-    return pulse_children_for_mode(team_mode, selected_date, index)
+def update_pulse_layer(team_mode, selected_date, index, user_tz):
+    return pulse_children_for_mode(team_mode, selected_date, index, user_tz)
 
 
 @callback(
@@ -285,6 +287,17 @@ clientside_callback(
     _THEME_JS,
     Output("base-tiles", "url"),
     Input("color-scheme-toggle", "checked"),
+)
+
+clientside_callback(
+    """
+    function(_) {
+        try { return Intl.DateTimeFormat().resolvedOptions().timeZone || null; }
+        catch (e) { return null; }
+    }
+    """,
+    Output("user-tz", "data"),
+    Input("tz-probe", "n_intervals"),
 )
 
 if __name__ == "__main__":
