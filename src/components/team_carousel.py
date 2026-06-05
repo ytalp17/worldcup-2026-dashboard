@@ -40,8 +40,15 @@ def _logo_path(team: str) -> str:
     return f"{LOGO_DIR}/{team}.svg"
 
 
-def _display_name(team: str) -> str:
-    """Carousel label for a team: 'and' → '&' to save width (e.g. Bosnia)."""
+# A few teams display under a shorter / more familiar name than their raw FIFA
+# name. Overrides win; otherwise "and" → "&" to save width (e.g. Bosnia).
+_DISPLAY_OVERRIDES = {"Korea Republic": "South Korea"}
+
+
+def display_name(team: str) -> str:
+    """Human-friendly label for a team, used by the carousel and the group table."""
+    if team in _DISPLAY_OVERRIDES:
+        return _DISPLAY_OVERRIDES[team]
     return team.replace(" and ", " & ")
 
 
@@ -54,7 +61,7 @@ def carousel_view(teams: list[str], index: int, asset_url: Callable[[str], str])
         "center_src": asset_url(_logo_path(center_t)),
         "next1_src": asset_url(_logo_path(next1_t)),
         "next2_src": asset_url(_logo_path(next2_t)),
-        "center_name": _display_name(center_t),
+        "center_name": display_name(center_t),
     }
 
 

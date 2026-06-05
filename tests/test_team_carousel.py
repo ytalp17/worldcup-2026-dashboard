@@ -5,6 +5,7 @@ from src.components.team_carousel import (
     build_team_carousel,
     carousel_view,
     center_team,
+    display_name,
     team_order,
     window,
 )
@@ -110,3 +111,9 @@ def test_build_team_carousel_center_image_uses_center_class():
         if isinstance(n, dmc.Image) and getattr(n, "id", None) == "carousel-img-center"
     )
     assert "carousel-logo--center" in (center_img.className or "")
+
+
+def test_display_name_applies_overrides_then_ampersand():
+    assert display_name("Korea Republic") == "South Korea"
+    assert display_name("Bosnia and Herzegovina") == "Bosnia & Herzegovina"
+    assert display_name("Brazil") == "Brazil"
