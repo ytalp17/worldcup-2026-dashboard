@@ -8,6 +8,7 @@ from src.data.matches import Match
 from src.data.venues import Venue
 
 
+# defaults: 19:00 UTC == 13:00 venue (CDT, UTC-6) == 04:00 JST next day
 def _match(number, home, away, group, stage, day, local="13:00",
            utc="2026-06-11T19:00:00+00:00"):
     return Match(

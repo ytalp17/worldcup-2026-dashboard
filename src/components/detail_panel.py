@@ -5,14 +5,13 @@ from collections.abc import Sequence
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
 
-from src.data.kickoff import kickoff_view, venue_offset_tag
+from src.data.kickoff import KickoffView, kickoff_view, venue_offset_tag
 from src.data.matches import Match, is_placeholder
 from src.data.venues import Venue
 
 PLACEHOLDER_TEXT = "Photo unavailable"
 NO_MATCHES_TEXT = "No matches scheduled"
 IMAGE_HEIGHT = 200
-
 
 
 def _image_block(venue: Venue):
@@ -66,8 +65,7 @@ def _team_span(name: str):
     return dmc.Text(name, span=True, fw=500)
 
 
-def _kickoff_line(match: Match, user_tz: str | None):
-    kv = kickoff_view(match, user_tz)
+def _kickoff_line(kv: KickoffView) -> dmc.Group:
     if kv.same_clock:
         return dmc.Group(
             [
@@ -78,8 +76,9 @@ def _kickoff_line(match: Match, user_tz: str | None):
             align="center",
             wrap="nowrap",
         )
+    # same_clock is False here, so the offset is non-zero -> tag is non-empty.
     tag = venue_offset_tag(kv.venue_day_offset)
-    venue_text = f"{kv.venue_time} venue {tag}".strip()
+    venue_text = f"{kv.venue_time} venue {tag}"
     return dmc.Group(
         [
             DashIconify(icon="tabler:world", width=14),
@@ -106,7 +105,7 @@ def _match_item(match: Match, user_tz: str | None) -> dmc.TimelineItem:
                 [_team_span(match.home), " vs ", _team_span(match.away)],
                 size="sm",
             ),
-            _kickoff_line(match, user_tz),
+            _kickoff_line(kv),
         ],
     )
 
