@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime, time
 from pathlib import Path
 
 import pandas as pd
@@ -14,6 +14,8 @@ EXPECTED_COLUMNS = [
     "stage",
     "stadium",
     "match_date",
+    "local_time",
+    "kickoff_utc",
 ]
 
 
@@ -26,6 +28,8 @@ class Match:
     stage: str
     stadium: str  # generic FIFA stadium name, e.g. "Dallas Stadium"
     date: date
+    local_time: time
+    kickoff_utc: datetime
 
 
 class MatchRepository:
@@ -46,6 +50,8 @@ class MatchRepository:
             try:
                 number = int(row["match_number"])
                 match_date = date.fromisoformat(str(row["match_date"]).strip())
+                local_time = time.fromisoformat(str(row["local_time"]).strip())
+                kickoff_utc = datetime.fromisoformat(str(row["kickoff_utc"]).strip())
             except (ValueError, TypeError) as exc:
                 raise ValueError(f"Bad match row: {row.to_dict()}") from exc
 
@@ -59,6 +65,8 @@ class MatchRepository:
                     stage=str(row["stage"]),
                     stadium=str(row["stadium"]),
                     date=match_date,
+                    local_time=local_time,
+                    kickoff_utc=kickoff_utc,
                 )
             )
         return matches

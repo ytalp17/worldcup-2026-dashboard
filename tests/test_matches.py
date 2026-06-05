@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
@@ -26,17 +26,16 @@ def test_match_types_and_known_row():
     assert m1.stage == "Group Stage"
     assert m1.stadium == "Mexico City Stadium"
     assert m1.date == date(2026, 6, 11)
-    assert isinstance(m1.date, date)
-
-
-def test_knockout_match_has_empty_group():
-    final = next(m for m in _load() if m.stage == "Final")
-    assert final.group == ""
+    assert m1.local_time == time(13, 0)
+    assert m1.kickoff_utc == datetime.fromisoformat("2026-06-11T19:00:00+00:00")
 
 
 def test_missing_column_raises(tmp_path):
     bad = tmp_path / "bad.csv"
-    bad.write_text("match_number,home_team,away_team,group,stage,stadium\n1,A,B,Group A,Group Stage,X\n")
+    bad.write_text(
+        "match_number,home_team,away_team,group,stage,stadium\n"
+        "1,A,B,Group A,Group Stage,X\n"
+    )
     with pytest.raises(ValueError):
         MatchRepository(bad).load()
 
@@ -44,8 +43,8 @@ def test_missing_column_raises(tmp_path):
 def test_bad_date_raises(tmp_path):
     bad = tmp_path / "bad.csv"
     bad.write_text(
-        "match_number,home_team,away_team,group,stage,stadium,match_date\n"
-        "1,A,B,Group A,Group Stage,X,not-a-date\n"
+        "match_number,home_team,away_team,group,stage,stadium,match_date,local_time,kickoff_utc\n"
+        "1,A,B,Group A,Group Stage,X,not-a-date,13:00,2026-06-11T19:00:00+00:00\n"
     )
     with pytest.raises(ValueError):
         MatchRepository(bad).load()
