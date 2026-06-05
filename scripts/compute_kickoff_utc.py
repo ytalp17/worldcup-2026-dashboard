@@ -4,10 +4,11 @@ Resolves each match's venue-local kickoff (match_date + local_time in the
 stadium's IANA zone, DST-correct) to an absolute UTC instant, then OVERWRITES
 assets/data/wc2026_matches.csv in place. Re-run whenever the schedule changes:
 
-    ~/anaconda3/bin/conda run -n base python -m scripts.compute_kickoff_utc
+    ~/anaconda3/bin/conda run -n base python scripts/compute_kickoff_utc.py
 """
 from __future__ import annotations
 
+import sys
 from datetime import datetime, time
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -15,6 +16,7 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 DATA = ROOT / "assets" / "data"
 CSV = DATA / "wc2026_matches.csv"
 
@@ -47,7 +49,9 @@ def main() -> None:
         to_utc(row.match_date, row.local_time, tz_by_stadium[row.stadium])
         for row in df.itertuples(index=False)
     ]
-    df.to_csv(CSV, index=False)
+    tmp = CSV.with_suffix(".tmp")
+    df.to_csv(tmp, index=False)
+    tmp.replace(CSV)
     print(f"Wrote kickoff_utc for {len(df)} matches -> {CSV}")
 
 
