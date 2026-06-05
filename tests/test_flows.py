@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
@@ -55,7 +55,13 @@ def test_mexico_flow_doubles_back():
 
 
 def test_unmatched_stadium_raises():
-    bad = [Match(1, "Brazil", "X", "Group A", "Group Stage", "Nowhere Stadium", date(2026, 6, 11))]
+    bad = [
+        Match(
+            1, "Brazil", "X", "Group A", "Group Stage", "Nowhere Stadium",
+            date(2026, 6, 11), time(13, 0),
+            datetime.fromisoformat("2026-06-11T19:00:00+00:00"),
+        )
+    ]
     with pytest.raises(ValueError):
         build_team_flows(bad, [])
 
