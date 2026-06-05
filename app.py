@@ -105,6 +105,7 @@ def drawer_for_city(city: str | None, user_tz: str | None = None):
     prevent_initial_call=True,
 )
 def open_stadium_drawer(n_clicks, user_tz):
+    # user_tz is a State snapshot: if the tz probe hasn't resolved yet, the drawer falls back to venue-local time (window is brief, acceptable per design).
     # Ignore the callback firing when markers mount with n_clicks=None.
     if not any(n_clicks):
         return no_update, no_update, no_update, no_update
@@ -289,13 +290,16 @@ clientside_callback(
     Input("color-scheme-toggle", "checked"),
 )
 
+# Read the browser's IANA timezone once at load (e.g. "Europe/Berlin"); null on failure.
+_TZ_JS = """
+function(_) {
+    try { return Intl.DateTimeFormat().resolvedOptions().timeZone || null; }
+    catch (e) { return null; }
+}
+"""
+
 clientside_callback(
-    """
-    function(_) {
-        try { return Intl.DateTimeFormat().resolvedOptions().timeZone || null; }
-        catch (e) { return null; }
-    }
-    """,
+    _TZ_JS,
     Output("user-tz", "data"),
     Input("tz-probe", "n_intervals"),
 )

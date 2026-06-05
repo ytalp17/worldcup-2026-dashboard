@@ -109,7 +109,7 @@ def build_layout(
             filter_drawer,
             dcc.Store(id="carousel-index", data=0, storage_type="local"),
             dcc.Store(id="user-tz"),
-            dcc.Interval(id="tz-probe", interval=1, max_intervals=1),
+            dcc.Interval(id="tz-probe", interval=100, max_intervals=1),  # one-shot: fire once just after load to read the browser timezone
         ],
         id="mantine-provider",
         defaultColorScheme=DEFAULT_COLOR_SCHEME,
