@@ -35,19 +35,19 @@ def position_code(position: str) -> str:
 # give native horizontal scroll for the 12 columns.
 COL_DEFS = [
     {"headerName": "#", "field": "number", "width": 48, "pinned": "left",
-     "sortable": False, "cellClass": "squad-grid__num"},
+     "sortable": True, "cellClass": "squad-grid__num"},
     {"headerName": "Player", "field": "name", "width": 150, "pinned": "left",
-     "sortable": False},
-    {"headerName": "Pos", "field": "pos", "width": 56, "sortable": False},
-    {"headerName": "DOB", "field": "dob", "width": 96, "sortable": False},
-    {"headerName": "Age", "field": "age", "width": 56, "sortable": False},
-    {"headerName": "Club", "field": "club", "width": 150, "sortable": False},
-    {"headerName": "Ht", "field": "height", "width": 70, "sortable": False},
-    {"headerName": "Foot", "field": "foot", "width": 64, "sortable": False},
-    {"headerName": "Caps", "field": "caps", "width": 56, "sortable": False},
-    {"headerName": "Gls", "field": "goals", "width": 56, "sortable": False},
-    {"headerName": "Debut", "field": "debut", "width": 96, "sortable": False},
-    {"headerName": "Value", "field": "value", "width": 84, "sortable": False},
+     "sortable": True},
+    {"headerName": "Pos", "field": "pos", "width": 56, "sortable": True},
+    {"headerName": "DOB", "field": "dob", "width": 96, "sortable": True},
+    {"headerName": "Age", "field": "age", "width": 56, "sortable": True},
+    {"headerName": "Club", "field": "club", "width": 150, "sortable": True},
+    {"headerName": "Ht", "field": "height", "width": 70, "sortable": True},
+    {"headerName": "Foot", "field": "foot", "width": 64, "sortable": True},
+    {"headerName": "Caps", "field": "caps", "width": 56, "sortable": True},
+    {"headerName": "Gls", "field": "goals", "width": 56, "sortable": True},
+    {"headerName": "Debut", "field": "debut", "width": 96, "sortable": True},
+    {"headerName": "Value", "field": "value", "width": 84, "sortable": True},
 ]
 
 _GRID_OPTIONS = {

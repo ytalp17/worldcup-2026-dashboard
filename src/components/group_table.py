@@ -15,15 +15,15 @@ from src.data.groups import Group
 _NUM_COL = {
     "width": 30,
     "minWidth": 26,
-    "sortable": False,
+    "sortable": True,
     "cellClass": "group-grid__num",
 }
 
 COL_DEFS = [
     {"headerName": "#", "field": "rank", "width": 30, "minWidth": 26,
-     "sortable": False, "cellClass": "group-grid__rank"},
+     "sortable": True, "cellClass": "group-grid__rank"},
     {"headerName": "Team", "field": "team", "cellRenderer": "TeamCell",
-     "width": 96, "minWidth": 58, "sortable": False},
+     "width": 96, "minWidth": 58, "sortable": True},
     {"headerName": "MP", "field": "mp", **_NUM_COL},
     {"headerName": "W", "field": "w", **_NUM_COL},
     {"headerName": "D", "field": "d", **_NUM_COL},
