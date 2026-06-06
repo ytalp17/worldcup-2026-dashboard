@@ -29,7 +29,7 @@ COL_DEFS = [
     {"headerName": "D", "field": "d", **_NUM_COL},
     {"headerName": "L", "field": "l", **_NUM_COL},
     {"headerName": "GD", "field": "gd", **_NUM_COL},
-    {"headerName": "Pts", "field": "pts", **_NUM_COL,
+    {"headerName": "P", "field": "pts", **_NUM_COL,
      "cellStyle": {"fontWeight": 700}},
 ]
 
