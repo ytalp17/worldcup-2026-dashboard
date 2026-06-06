@@ -39,14 +39,16 @@ COL_DEFS = [
     {"headerName": "Player", "field": "name", "width": 150, "pinned": "left",
      "sortable": True},
     {"headerName": "Pos", "field": "pos", "width": 56, "sortable": True},
-    {"headerName": "DOB", "field": "dob", "width": 96, "sortable": True},
+    {"headerName": "DOB", "field": "dob", "width": 96, "sortable": True,
+     "comparator": {"function": "dateComparatorCustom"}},
     {"headerName": "Age", "field": "age", "width": 56, "sortable": True},
     {"headerName": "Club", "field": "club", "width": 150, "sortable": True},
     {"headerName": "Ht", "field": "height", "width": 70, "sortable": True},
     {"headerName": "Foot", "field": "foot", "width": 64, "sortable": True},
     {"headerName": "Caps", "field": "caps", "width": 56, "sortable": True},
     {"headerName": "Gls", "field": "goals", "width": 56, "sortable": True},
-    {"headerName": "Debut", "field": "debut", "width": 96, "sortable": True},
+    {"headerName": "Debut", "field": "debut", "width": 96, "sortable": True,
+     "comparator": {"function": "dateComparatorCustom"}},
     {"headerName": "Value", "field": "value", "width": 84, "sortable": True},
 ]
 
