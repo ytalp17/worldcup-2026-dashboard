@@ -257,17 +257,30 @@ body,
 
 /* --- group standings table (lives in the table card) --- */
 
-.group-panel__body {
+/* Table / Squad cards: a fixed header bar on top, the grid body filling the rest. */
+.group-panel,
+.squad-panel {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 12px 14px;
-    gap: 8px;
     overflow: hidden;
 }
 
-.group-panel__header {
+/* Card header bar: bold label left, live group/team name right, divider below. */
+.bento-card__header {
     flex: 0 0 auto;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--mantine-color-default-border);
+}
+
+.group-panel__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 14px;
+    gap: 8px;
+    overflow: hidden;
 }
 
 /* Compact, borderless grid that blends with the card background. */
@@ -318,16 +331,12 @@ body,
 /* --- squad table (lives in the full-height squad card) --- */
 
 .squad-panel__body {
+    flex: 1 1 auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    padding: 12px 14px;
-    gap: 8px;
+    padding: 8px 10px;
     overflow: hidden;   /* the grid itself scrolls */
-}
-
-.squad-panel__header {
-    flex: 0 0 auto;
 }
 
 /* Compact, transparent grid; scrolls both axes inside the card. */

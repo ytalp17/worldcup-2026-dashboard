@@ -4,7 +4,6 @@ from collections.abc import Callable
 
 import dash_ag_grid as dag
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
 
 from src.components.team_carousel import display_name
 from src.data.groups import Group
@@ -66,22 +65,16 @@ def build_group_panel(group: Group | None, asset_url: Callable[[str], str]) -> d
     name = group.name if group else "—"
     rows = group_rows(group, asset_url) if group else []
 
+    # Card header bar: bold "Table" label left, live group name right, divider below.
     header = dmc.Group(
         [
-            dmc.Stack(
-                [
-                    dmc.Text("Table", fw=700, size="lg"),
-                    dmc.Text("World Cup", size="xs", c="dimmed"),
-                    dmc.Text(name, id="group-table-title", size="xs", c="dimmed"),
-                ],
-                gap=2,
-            ),
-            DashIconify(icon="radix-icons:chevron-right", width=20),
+            dmc.Text("Table", fw=700, size="sm"),
+            dmc.Text(name, id="group-table-title", size="sm", c="dimmed"),
         ],
         justify="space-between",
-        align="flex-start",
+        align="center",
         wrap="nowrap",
-        className="group-panel__header",
+        className="bento-card__header",
     )
 
     grid = dag.AgGrid(
@@ -98,7 +91,8 @@ def build_group_panel(group: Group | None, asset_url: Callable[[str], str]) -> d
         style={"width": "100%"},
     )
 
-    return dmc.Box(
-        [header, grid, dmc.Box(id="group-extra", style={"flex": "1 1 auto"})],
+    body = dmc.Box(
+        [grid, dmc.Box(id="group-extra", style={"flex": "1 1 auto"})],
         className="group-panel__body",
     )
+    return dmc.Box([header, body], className="group-panel")

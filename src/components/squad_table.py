@@ -81,14 +81,16 @@ def build_squad_panel(squad: Squad | None) -> dmc.Box:
     name = squad.name if squad else "—"
     rows = squad_rows(squad) if squad else []
 
-    header = dmc.Stack(
+    # Card header bar: bold "Squad" label left, live team name right, divider below.
+    header = dmc.Group(
         [
-            dmc.Text("Squad", fw=700, size="lg"),
-            dmc.Text("World Cup", size="xs", c="dimmed"),
-            dmc.Text(name, id="squad-table-title", size="xs", c="dimmed"),
+            dmc.Text("Squad", fw=700, size="sm"),
+            dmc.Text(name, id="squad-table-title", size="sm", c="dimmed"),
         ],
-        gap=2,
-        className="squad-panel__header",
+        justify="space-between",
+        align="center",
+        wrap="nowrap",
+        className="bento-card__header",
     )
 
     grid = dag.AgGrid(
@@ -100,4 +102,5 @@ def build_squad_panel(squad: Squad | None) -> dmc.Box:
         style={"width": "100%", "height": "100%"},
     )
 
-    return dmc.Box([header, grid], className="squad-panel__body")
+    body = dmc.Box(grid, className="squad-panel__body")
+    return dmc.Box([header, body], className="squad-panel")
