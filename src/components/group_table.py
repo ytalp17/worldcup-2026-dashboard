@@ -9,14 +9,13 @@ from dash_iconify import DashIconify
 from src.components.team_carousel import display_name
 from src.data.groups import Group
 
-# Narrow, right-aligned numeric column shared by MP/W/D/L/GD/Pts. Kept tight so
+# Narrow, left-aligned numeric column shared by MP/W/D/L/GD/Pts. Kept tight so
 # all six fit alongside the flexible Team column in the ~1/3-width panel without
 # responsiveSizeToFit squeezing them to an ellipsis.
 _NUM_COL = {
     "width": 38,
     "sortable": False,
-    "cellClass": "ag-right-aligned-cell",
-    "headerClass": "ag-right-aligned-header",
+    "cellClass": "group-grid__num",
 }
 
 COL_DEFS = [

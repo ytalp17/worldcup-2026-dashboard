@@ -92,7 +92,7 @@ def main() -> int:
         # intentionally ellipsises long names, so both are excluded here.
         clipped = page.evaluate(
             "() => Array.from(document.querySelectorAll("
-            "'.group-grid .ag-cell.ag-right-aligned-cell'))"
+            "'.group-grid .ag-cell.group-grid__num'))"
             ".filter(c => c.scrollWidth > c.clientWidth + 1).length"
         )
         check("no clipped numeric stat cells", clipped == 0)
