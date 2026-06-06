@@ -22,7 +22,9 @@ from src.data.host_cities import HostCityRepository
 from src.data.match_calendar import MatchCalendar
 from src.data.matches import MatchRepository, matches_by_stadium
 from src.data.stadiums import StadiumRepository
+from src.components.squad_table import build_squad_panel, squad_rows
 from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, team_order
+from src.data.squads import SquadRepository, squad_for_team
 from src.data.team_continents import grouped_team_options
 from src.data.venues import build_venues
 
@@ -49,6 +51,7 @@ TEAM_FLOWS = build_team_flows(MATCHES, VENUES, distances=DISTANCES)
 TEAM_OPTIONS = grouped_team_options(sorted(TEAM_FLOWS))
 TEAM_NAMES = team_order(TEAM_FLOWS)
 GROUPS = build_groups(MATCHES)
+SQUADS = SquadRepository(DATA_DIR / "world_cup_2026_squads.csv").load()
 
 STADIUM_TO_CITY = {v.stadium_name: v.city for v in VENUES}
 MATCH_CALENDAR = MatchCalendar(MATCHES, STADIUM_TO_CITY, today=date.today())
@@ -72,6 +75,15 @@ def group_panel_payload(index):
     return name, rows
 
 
+def squad_panel_payload(index):
+    """(team_name, rowData) for the centred team at `index`."""
+    team = center_team(TEAM_NAMES, index or 0)
+    squad = squad_for_team(SQUADS, team)
+    name = squad.name if squad else "—"
+    rows = squad_rows(squad) if squad else []
+    return name, rows
+
+
 app.layout = build_layout(
     VENUES,
     TEAM_OPTIONS,
@@ -79,6 +91,7 @@ app.layout = build_layout(
     match_calendar=build_match_calendar(MATCH_CALENDAR),
     team_carousel=TEAM_CAROUSEL,
     group_panel=build_group_panel(group_for_team(GROUPS, center_team(TEAM_NAMES, 0)), app.get_asset_url),
+    squad_panel=build_squad_panel(squad_for_team(SQUADS, center_team(TEAM_NAMES, 0))),
 )
 
 # Use the white FIFA logo as the browser tab icon (SVG favicon, modern browsers).
@@ -297,6 +310,16 @@ def update_group_panel(index):
     return rows, name
 
 
+@callback(
+    Output("squad-grid", "rowData"),
+    Output("squad-table-title", "children"),
+    Input("carousel-index", "data"),
+)
+def update_squad_panel(index):
+    name, rows = squad_panel_payload(index)
+    return rows, name
+
+
 # Toggling the switch flips both the Mantine color scheme and the base map
 # tiles in one clientside callback (checked => dark). The tile URLs contain
 # Leaflet's {s}/{z}/{x}/{y} placeholders, so inject them via json.dumps rather
@@ -356,6 +379,17 @@ _GRID_THEME_JS = """
 clientside_callback(
     _GRID_THEME_JS,
     Output("group-grid", "className"),
+    Input("color-scheme-toggle", "checked"),
+)
+
+_SQUAD_GRID_THEME_JS = """
+(checked) => (checked ? 'ag-theme-quartz-dark squad-grid'
+                      : 'ag-theme-quartz squad-grid')
+"""
+
+clientside_callback(
+    _SQUAD_GRID_THEME_JS,
+    Output("squad-grid", "className"),
     Input("color-scheme-toggle", "checked"),
 )
 
