@@ -88,9 +88,9 @@ def main() -> int:
         check("exactly 4 standings rows", len(rows) == 4)
         check("4 team flags rendered", len(flags) == 4)
         check("group title looks like 'Group X'", title.startswith("Group ") and len(title) <= 8)
-        # All four empty placeholder cards are now visible.
-        empties = [page.query_selector(f"#bento-e{i}") for i in range(1, 5)]
-        check("4 empty cards visible in team mode", all(e and e.is_visible() for e in empties))
+        # All seven empty placeholder cards are now visible.
+        empties = [page.query_selector(f"#bento-e{i}") for i in range(1, 8)]
+        check("7 empty cards visible in team mode", all(e and e.is_visible() for e in empties))
 
         # No numeric DATA cell clips its stat to an ellipsis (the regression we
         # fixed: quartz's wide padding made "0" render as "0…"). Header cells have

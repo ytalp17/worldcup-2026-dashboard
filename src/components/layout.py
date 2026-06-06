@@ -92,10 +92,11 @@ def build_layout(
         className="bento-card bento-card--map",
     )
     table_card = dmc.Box(group_panel, className="bento-card bento-card--table")
-    # Empty cards the user fills with future infographics, one by one.
+    # Seven uniform (single-cell) empty cards the user fills with future
+    # infographics, one by one — no over-long horizontal cards.
     empty_cards = [
         dmc.Box(className="bento-card bento-card--empty", id=f"bento-e{i}")
-        for i in range(1, 5)
+        for i in range(1, 8)
     ]
     main = dmc.AppShellMain(
         dmc.Box(

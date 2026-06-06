@@ -224,13 +224,14 @@ body,
    empty placeholder cards wrapping along the right and bottom. */
 .main-split--team {
     /* col 3 (the table) is wider so all eight standings columns fit; the map
-       still spans cols 1-2 (and rows 1-2), keeping it the largest tile. */
+       spans cols 1-2 (and rows 1-2), keeping it the largest tile. Every other
+       card is a single cell — no over-long horizontal cards. */
     grid-template-columns: 1fr 1fr 1.4fr 1fr;
     grid-template-rows: 1.5fr 1fr 1fr;
     grid-template-areas:
         "map map table e1"
-        "map map e2    e2"
-        "e3  e4  e4    e4";
+        "map map e2    e3"
+        "e4  e5   e6   e7";
     gap: 12px;
     padding: 12px;
 }
@@ -246,6 +247,9 @@ body,
 .main-split--team #bento-e2 { grid-area: e2; }
 .main-split--team #bento-e3 { grid-area: e3; }
 .main-split--team #bento-e4 { grid-area: e4; }
+.main-split--team #bento-e5 { grid-area: e5; }
+.main-split--team #bento-e6 { grid-area: e6; }
+.main-split--team #bento-e7 { grid-area: e7; }
 
 /* Empty placeholders read as "to be filled" without competing for attention. */
 .bento-card--empty {
@@ -323,7 +327,10 @@ body,
             "e1"
             "e2"
             "e3"
-            "e4";
+            "e4"
+            "e5"
+            "e6"
+            "e7";
         overflow-y: auto;
     }
     .main-split--team .bento-card--map {

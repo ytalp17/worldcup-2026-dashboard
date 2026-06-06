@@ -181,8 +181,8 @@ def test_layout_has_bento_with_map_table_and_empty_cards():
     # The map and table both live in bento cards ...
     assert "bento-card--map" in classes
     assert "bento-card--table" in classes
-    # ... plus four empty placeholder cards to fill later.
-    for i in range(1, 5):
+    # ... plus seven single-cell empty placeholder cards to fill later.
+    for i in range(1, 8):
         assert f"bento-e{i}" in ids
 
 
