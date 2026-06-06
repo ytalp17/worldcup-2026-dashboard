@@ -330,20 +330,20 @@ clientside_callback(
     Input("tz-probe", "n_intervals"),
 )
 
-# Show the standings panel in Team mode; hide it (map fills the width) in Time
-# mode. After the CSS width transition, dispatch a window resize so Leaflet runs
-# invalidateSize() and re-tiles the resized map (otherwise the newly-exposed
-# strip renders gray).
+# Reveal the standings panel in Team mode by adding the --open modifier; the CSS
+# flex-basis transition gives the swift slide-in. After the transition, dispatch
+# a window resize so Leaflet runs invalidateSize() and re-tiles the now-2/3-width
+# map (and the responsive grid re-fits its columns).
 _PANEL_JS = """
 (checked) => {
     setTimeout(() => window.dispatchEvent(new Event('resize')), 350);
-    return checked ? {display: 'flex'} : {display: 'none'};
+    return checked ? 'group-panel group-panel--open' : 'group-panel';
 }
 """
 
 clientside_callback(
     _PANEL_JS,
-    Output("group-panel", "style"),
+    Output("group-panel", "className"),
     Input("mode-toggle", "checked"),
 )
 

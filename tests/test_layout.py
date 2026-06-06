@@ -176,14 +176,11 @@ def test_layout_has_split_with_map_and_group_panel():
     assert "map-container" in ids
 
 
-def test_group_panel_wrapper_hidden_by_default():
+def test_group_panel_wrapper_collapsed_by_default():
     panel = next(
         n for n in _walk(build_layout(VENUES, group_panel=dmc.Box("x")))
         if getattr(n, "id", None) == "group-panel"
     )
-    assert panel.style == {"display": "none"}
-
-
-def test_layout_has_map_resize_tick_store():
-    stores = [n for n in _walk(build_layout(VENUES)) if isinstance(n, dcc.Store)]
-    assert "map-resize-tick" in {s.id for s in stores}
+    # Collapsed by default: base class only, no --open modifier until Team mode.
+    assert panel.className == "group-panel"
+    assert getattr(panel, "style", None) in (None, {})

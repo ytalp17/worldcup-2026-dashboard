@@ -83,10 +83,10 @@ def build_layout(
     )
 
     # Team mode reveals a left-side standings panel; the map fills the rest.
-    # The panel is hidden by default (a clientside callback shows it in Team mode),
-    # mirroring the calendar/carousel wrapper pattern.
+    # The panel is collapsed by default (CSS); a clientside callback adds the
+    # `group-panel--open` modifier in Team mode, animating the flex-basis.
     group_panel_wrapper = dmc.Box(
-        group_panel, id="group-panel", className="group-panel", style={"display": "none"}
+        group_panel, id="group-panel", className="group-panel"
     )
     main = dmc.AppShellMain(
         dmc.Box(
@@ -124,7 +124,6 @@ def build_layout(
             filter_drawer,
             dcc.Store(id="carousel-index", data=0, storage_type="local"),
             dcc.Store(id="user-tz"),
-            dcc.Store(id="map-resize-tick"),  # clientside dummy output for Leaflet invalidateSize on mode switch
             dcc.Interval(id="tz-probe", interval=100, max_intervals=1),  # one-shot: fire once just after load to read the browser timezone
         ],
         id="mantine-provider",
