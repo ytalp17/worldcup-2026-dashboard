@@ -3,16 +3,28 @@
 **Date:** 2026-06-06
 **Status:** Implemented (see note below)
 
-> **Implementation note (post-build):** The shipped code refined a few mechanisms
-> from this draft. The panel is revealed by toggling a `group-panel--open` class
-> animating `flex-basis` (not an inline `display` style), so there is **no
-> `map-resize-tick` store** — the resize is dispatched from the panel clientside
-> callback. The grid uses **no `columnSize`** (fixed-width numeric columns + a
-> flexible Team column) instead of `sizeToFit`, plus a direct cell-padding
-> override, so stats don't clip; `rowHeight` is 40 / `headerHeight` 36. The
-> renderer file registers `dagcomponentfuncs.TeamCell`. The implementation plan
-> (`docs/superpowers/plans/2026-06-06-team-mode-group-standings.md`) reflects the
-> final design.
+> **Implementation note (post-build):** Two things evolved from this draft.
+>
+> **(1) Grid mechanics:** the table uses **no `columnSize`** (fixed-width numeric
+> columns + a flexible Team column) instead of `sizeToFit`, with a direct
+> cell-padding override so stats don't clip; numeric headers/cells are
+> **left-aligned**; `rowHeight` 40 / `headerHeight` 36; the renderer registers
+> `dagcomponentfuncs.TeamCell`.
+>
+> **(2) Layout redesign (supersedes the "left panel / 2-3 split" sections below):**
+> Team mode now lays the main area out as a **bento CSS grid** of cards rather
+> than a 2/3-1/3 flex split. `#main-split` is the grid; a clientside callback
+> toggles `main-split--team`. Cards: a **map hero** (top-left, spans 2×2 — the
+> largest tile), the **group-table card** (top-right, its grid column widened so
+> all eight columns fit), and **four empty placeholder cards** (`#bento-e1..e4`)
+> wrapping the right and bottom for future infographics. Time mode collapses the
+> grid to a single full-screen map card (other cards hidden). Mobile stacks every
+> card in one column (map first). There is **no `group-panel` wrapper** and **no
+> `map-resize-tick` store** (the resize is dispatched from the team-toggle
+> callback). Sections below describing the left-side panel, `group-panel--open`
+> animation, 34% width, and the split layout are the original draft and no longer
+> match the shipped UI; the standings data layer, `group_rows`/`build_group_panel`,
+> the content/theme callbacks, and the testing approach are unchanged.
 
 ## Goal
 
