@@ -50,6 +50,7 @@ def build_layout(
     match_calendar=None,
     team_carousel=None,
     group_panel=None,
+    squad_panel=None,
 ) -> dmc.MantineProvider:
     # Three equal-flex zones so the centre widget sits at the true centre of the
     # header regardless of the brand / controls widths.
@@ -92,15 +93,16 @@ def build_layout(
         className="bento-card bento-card--map",
     )
     table_card = dmc.Box(group_panel, className="bento-card bento-card--table")
-    # Seven uniform (single-cell) empty cards the user fills with future
-    # infographics, one by one — no over-long horizontal cards.
+    squad_card = dmc.Box(squad_panel, className="bento-card bento-card--squad")
+    # Four uniform (single-cell) empty cards the user fills with future
+    # infographics, one by one — the squad card now fills the right strip.
     empty_cards = [
         dmc.Box(className="bento-card bento-card--empty", id=f"bento-e{i}")
-        for i in range(1, 8)
+        for i in range(1, 5)
     ]
     main = dmc.AppShellMain(
         dmc.Box(
-            [map_card, table_card, *empty_cards],
+            [map_card, table_card, squad_card, *empty_cards],
             id="main-split",
             className="main-split",
         )
