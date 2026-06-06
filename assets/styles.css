@@ -240,8 +240,16 @@ body,
     --ag-header-background-color: transparent;
     --ag-borders: none;
     --ag-row-border-width: 0;
-    --ag-cell-horizontal-padding: 8px;
     --ag-font-size: 13px;
+}
+
+/* The quartz theme hardcodes ~15px cell padding, which clips the compact numeric
+   columns to an ellipsis ("0…"). Override it directly (higher specificity than
+   the theme's variable-driven padding). */
+.group-grid .ag-cell,
+.group-grid .ag-header-cell {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
 }
 
 .group-grid__rank {

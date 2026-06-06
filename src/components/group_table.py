@@ -9,19 +9,21 @@ from dash_iconify import DashIconify
 from src.components.team_carousel import display_name
 from src.data.groups import Group
 
-# Narrow, right-aligned numeric column shared by MP/W/D/L/GD/Pts.
+# Narrow, right-aligned numeric column shared by MP/W/D/L/GD/Pts. Kept tight so
+# all six fit alongside the flexible Team column in the ~1/3-width panel without
+# responsiveSizeToFit squeezing them to an ellipsis.
 _NUM_COL = {
-    "width": 46,
+    "width": 38,
     "sortable": False,
     "cellClass": "ag-right-aligned-cell",
     "headerClass": "ag-right-aligned-header",
 }
 
 COL_DEFS = [
-    {"headerName": "#", "field": "rank", "width": 42, "sortable": False,
+    {"headerName": "#", "field": "rank", "width": 34, "sortable": False,
      "cellClass": "group-grid__rank"},
     {"headerName": "Team", "field": "team", "cellRenderer": "TeamCell",
-     "flex": 1, "minWidth": 130, "sortable": False},
+     "flex": 1, "minWidth": 90, "sortable": False},
     {"headerName": "MP", "field": "mp", **_NUM_COL},
     {"headerName": "W", "field": "w", **_NUM_COL},
     {"headerName": "D", "field": "d", **_NUM_COL},
@@ -87,7 +89,10 @@ def build_group_panel(group: Group | None, asset_url: Callable[[str], str]) -> d
         id="group-grid",
         columnDefs=COL_DEFS,
         rowData=rows,
-        columnSize="responsiveSizeToFit",
+        # No columnSize: the numeric columns keep their fixed widths and the Team
+        # column (flex:1) absorbs the slack and re-flows on resize. sizeToFit was
+        # avoided because it treats `width` as a ratio and shrinks the numeric
+        # columns to an ellipsis in the narrow panel.
         # Dark theme by default; a clientside callback swaps quartz <-> quartz-dark to follow the app color scheme.
         className="ag-theme-quartz-dark group-grid",
         dashGridOptions=_GRID_OPTIONS,

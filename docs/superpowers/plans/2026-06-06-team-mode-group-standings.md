@@ -359,19 +359,20 @@ from dash_iconify import DashIconify
 from src.components.team_carousel import display_name
 from src.data.groups import Group
 
-# Narrow, right-aligned numeric column shared by MP/W/D/L/GD/Pts.
+# Narrow, right-aligned numeric column shared by MP/W/D/L/GD/Pts. Kept tight so
+# all six fit alongside the flexible Team column in the ~1/3-width panel.
 _NUM_COL = {
-    "width": 46,
+    "width": 38,
     "sortable": False,
     "cellClass": "ag-right-aligned-cell",
     "headerClass": "ag-right-aligned-header",
 }
 
 COL_DEFS = [
-    {"headerName": "#", "field": "rank", "width": 42, "sortable": False,
+    {"headerName": "#", "field": "rank", "width": 34, "sortable": False,
      "cellClass": "group-grid__rank"},
     {"headerName": "Team", "field": "team", "cellRenderer": "TeamCell",
-     "flex": 1, "minWidth": 130, "sortable": False},
+     "flex": 1, "minWidth": 90, "sortable": False},
     {"headerName": "MP", "field": "mp", **_NUM_COL},
     {"headerName": "W", "field": "w", **_NUM_COL},
     {"headerName": "D", "field": "d", **_NUM_COL},
@@ -849,8 +850,16 @@ Append to `assets/styles.css`:
     --ag-header-background-color: transparent;
     --ag-borders: none;
     --ag-row-border-width: 0;
-    --ag-cell-horizontal-padding: 8px;
     --ag-font-size: 13px;
+}
+
+/* The quartz theme hardcodes ~15px cell padding, which clips the compact numeric
+   columns to an ellipsis ("0…"). Override it directly (higher specificity than
+   the theme's variable-driven padding). */
+.group-grid .ag-cell,
+.group-grid .ag-header-cell {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
 }
 
 .group-grid__rank {

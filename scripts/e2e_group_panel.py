@@ -86,6 +86,17 @@ def main() -> int:
         check("4 team flags rendered", len(flags) == 4)
         check("group title looks like 'Group X'", title.startswith("Group ") and len(title) <= 8)
 
+        # No numeric DATA cell clips its stat to an ellipsis (the regression we
+        # fixed: quartz's wide padding made "0" render as "0…"). Header cells have
+        # ~3px internal wrapper overflow that doesn't clip text, and the Team cell
+        # intentionally ellipsises long names, so both are excluded here.
+        clipped = page.evaluate(
+            "() => Array.from(document.querySelectorAll("
+            "'.group-grid .ag-cell.ag-right-aligned-cell'))"
+            ".filter(c => c.scrollWidth > c.clientWidth + 1).length"
+        )
+        check("no clipped numeric stat cells", clipped == 0)
+
         # map shrank to roughly 2/3, panel took ~1/3, tiles still loaded
         map_box1 = page.query_selector("#map-container").bounding_box()
         panel_box1 = page.query_selector("#group-panel").bounding_box()
