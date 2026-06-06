@@ -1,7 +1,18 @@
 # Team-Mode Group Standings Panel — Design
 
 **Date:** 2026-06-06
-**Status:** Approved (pending written-spec review)
+**Status:** Implemented (see note below)
+
+> **Implementation note (post-build):** The shipped code refined a few mechanisms
+> from this draft. The panel is revealed by toggling a `group-panel--open` class
+> animating `flex-basis` (not an inline `display` style), so there is **no
+> `map-resize-tick` store** — the resize is dispatched from the panel clientside
+> callback. The grid uses **no `columnSize`** (fixed-width numeric columns + a
+> flexible Team column) instead of `sizeToFit`, plus a direct cell-padding
+> override, so stats don't clip; `rowHeight` is 40 / `headerHeight` 36. The
+> renderer file registers `dagcomponentfuncs.TeamCell`. The implementation plan
+> (`docs/superpowers/plans/2026-06-06-team-mode-group-standings.md`) reflects the
+> final design.
 
 ## Goal
 
