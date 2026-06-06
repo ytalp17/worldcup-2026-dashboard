@@ -189,3 +189,108 @@ body,
     text-overflow: ellipsis;
     text-align: center;
 }
+
+/* ===== Team-mode group standings panel ===== */
+
+.main-split {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+#map-container {
+    flex: 1 1 0;
+    min-width: 0;   /* allow the map to shrink below its content width */
+    height: 100%;
+}
+
+/* Collapsed by default (Time mode). A clientside callback adds
+   `group-panel--open` in Team mode; the flex-basis transition gives the swift
+   slide-in. `display` is NOT animatable, which is why we animate flex-basis. */
+.group-panel {
+    flex: 0 0 0;
+    height: 100%;
+    overflow: hidden;
+    border-left: 1px solid var(--mantine-color-default-border);
+    transition: flex-basis 0.3s ease;
+}
+
+.group-panel--open {
+    flex-basis: 34%;
+}
+
+.group-panel__body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 16px 18px;
+    gap: 12px;
+}
+
+.group-panel__header {
+    flex: 0 0 auto;
+}
+
+/* Compact, borderless grid that blends with the panel background. */
+.group-grid {
+    flex: 0 0 auto;
+    --ag-background-color: transparent;
+    --ag-odd-row-background-color: transparent;
+    --ag-header-background-color: transparent;
+    --ag-borders: none;
+    --ag-row-border-width: 0;
+    --ag-cell-horizontal-padding: 8px;
+    --ag-font-size: 13px;
+}
+
+.group-grid__rank {
+    color: var(--mantine-color-dimmed);
+}
+
+.team-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+}
+
+.team-cell__flag {
+    width: 20px;
+    height: 14px;
+    object-fit: contain;
+    border-radius: 2px;
+    flex: 0 0 auto;
+}
+
+.team-cell__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Mobile: stack the map on top and the table below; no horizontal overflow.
+   No width animation here — collapse via display, expand below the map. */
+@media (max-width: 768px) {
+    .main-split {
+        flex-direction: column;
+    }
+    #map-container {
+        height: 55vh;
+        flex: 0 0 auto;
+    }
+    .group-panel {
+        flex: 0 0 auto;
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--mantine-color-default-border);
+        overflow: auto;
+        transition: none;
+    }
+    .group-panel:not(.group-panel--open) {
+        display: none;
+    }
+    .group-panel--open {
+        display: flex;
+        flex: 1 1 auto;
+    }
+}
