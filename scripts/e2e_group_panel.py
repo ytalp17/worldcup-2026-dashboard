@@ -63,28 +63,34 @@ def main() -> int:
         page.wait_for_selector(".leaflet-marker-icon", timeout=15000)
         time.sleep(1)
 
-        # --- Time mode (default): panel collapsed, not open ---
+        # --- Time mode (default): bento collapsed, map fills the screen ---
         print("Time mode:")
-        panel_class = page.get_attribute("#group-panel", "class") or ""
-        check("panel present", page.query_selector("#group-panel") is not None)
-        check("panel NOT open by default", "group-panel--open" not in panel_class)
+        split_class = page.get_attribute("#main-split", "class") or ""
+        check("main-split present", page.query_selector("#main-split") is not None)
+        check("bento NOT in team mode by default", "main-split--team" not in split_class)
+        # Empty placeholder cards are hidden in Time mode.
+        e1 = page.query_selector("#bento-e1")
+        check("empty cards hidden in time mode", e1 is not None and not e1.is_visible())
         map_box0 = page.query_selector("#map-container").bounding_box()
         check("map ~full width in time mode", map_box0["width"] > 1100)
 
         # --- Toggle Team mode ---
         print("Toggle Team mode:")
         page.locator("#mode-toggle").click(force=True)
-        page.wait_for_selector("#group-panel.group-panel--open", timeout=8000)
+        page.wait_for_selector("#main-split.main-split--team", timeout=8000)
         page.wait_for_selector(".group-grid .ag-row", timeout=8000)
-        time.sleep(1.5)  # allow the flex-basis transition + resize to settle
+        time.sleep(1.5)  # allow the layout swap + resize to settle
 
         rows = page.query_selector_all(".group-grid .ag-row")
         flags = page.query_selector_all(".team-cell__flag")
         title = (page.inner_text("#group-table-title") or "").strip()
-        check("panel opened", page.query_selector("#group-panel.group-panel--open") is not None)
+        check("bento entered team mode", page.query_selector("#main-split.main-split--team") is not None)
         check("exactly 4 standings rows", len(rows) == 4)
         check("4 team flags rendered", len(flags) == 4)
         check("group title looks like 'Group X'", title.startswith("Group ") and len(title) <= 8)
+        # All four empty placeholder cards are now visible.
+        empties = [page.query_selector(f"#bento-e{i}") for i in range(1, 5)]
+        check("4 empty cards visible in team mode", all(e and e.is_visible() for e in empties))
 
         # No numeric DATA cell clips its stat to an ellipsis (the regression we
         # fixed: quartz's wide padding made "0" render as "0…"). Header cells have
@@ -97,14 +103,28 @@ def main() -> int:
         )
         check("no clipped numeric stat cells", clipped == 0)
 
-        # map shrank to roughly 2/3, panel took ~1/3, tiles still loaded
+        # The whole table (through the Pts column) fits inside the table card —
+        # i.e. no column is clipped off the right edge by the card's overflow.
+        pts_fits = page.evaluate(
+            "() => {"
+            " const card = document.querySelector('.bento-card--table');"
+            " const hdrs = Array.from(document.querySelectorAll('.group-grid .ag-header-cell'));"
+            " const pts = hdrs.find(h => h.innerText.trim() === 'Pts');"
+            " if (!card || !pts) return false;"
+            " return pts.getBoundingClientRect().right <= card.getBoundingClientRect().right + 1;"
+            "}"
+        )
+        check("Pts column fits inside the table card", pts_fits)
+
+        # map card is the largest tile; table card sits to its right; tiles loaded
         map_box1 = page.query_selector("#map-container").bounding_box()
-        panel_box1 = page.query_selector("#group-panel").bounding_box()
+        table_box1 = page.query_selector(".bento-card--table").bounding_box()
         tiles = page.query_selector_all(".leaflet-tile-loaded")
-        check("map shrank from full width", map_box1["width"] < map_box0["width"] - 200)
-        check("panel width is ~1/3 (300-520px)", 300 <= panel_box1["width"] <= 520)
+        check("map shrank into its card", map_box1["width"] < map_box0["width"] - 200)
+        check("map card is wider than the table card", map_box1["width"] > table_box1["width"])
+        check("map card is taller than the table card", map_box1["height"] > table_box1["height"])
         check("map tiles still loaded after resize", len(tiles) > 0)
-        check("panel is left of map", panel_box1["x"] < map_box1["x"])
+        check("table card is right of the map", table_box1["x"] > map_box1["x"])
 
         # --- Navigate carousel: table should follow ---
         print("Carousel navigation:")
@@ -142,13 +162,13 @@ def main() -> int:
         overflow = page.evaluate(
             "() => document.documentElement.scrollWidth <= window.innerWidth + 1"
         )
-        m_map = page.query_selector("#map-container").bounding_box()
-        m_panel = page.query_selector("#group-panel").bounding_box()
+        m_map = page.query_selector(".bento-card--map").bounding_box()
+        m_table = page.query_selector(".bento-card--table").bounding_box()
         check("no horizontal overflow on mobile", overflow)
-        if m_panel:
-            check("panel stacked below map on mobile", m_panel["y"] >= m_map["y"] + m_map["height"] - 5)
+        if m_table:
+            check("table stacked below map on mobile", m_table["y"] >= m_map["y"] + m_map["height"] - 5)
         else:
-            check("panel stacked below map on mobile", False)
+            check("table stacked below map on mobile", False)
 
         browser.close()
 

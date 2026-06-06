@@ -163,24 +163,33 @@ def test_layout_has_user_tz_store_and_probe():
     assert "tz-probe" in intervals
 
 
-def test_layout_has_split_with_map_and_group_panel():
+def _classnames(nodes):
+    out = set()
+    for n in nodes:
+        cn = getattr(n, "className", None)
+        if isinstance(cn, str):
+            out.update(cn.split())
+    return out
+
+
+def test_layout_has_bento_with_map_table_and_empty_cards():
     nodes = list(_walk(build_layout(VENUES, group_panel=dmc.Box("x"))))
-    classnames = {getattr(n, "className", None) for n in nodes}
-    ids = {
-        nid
-        for n in nodes
-        if isinstance((nid := getattr(n, "id", None)), str)
-    }
-    assert "main-split" in classnames
-    assert "group-panel" in ids
+    classes = _classnames(nodes)
+    ids = {nid for n in nodes if isinstance((nid := getattr(n, "id", None)), str)}
+    assert "main-split" in classes
     assert "map-container" in ids
+    # The map and table both live in bento cards ...
+    assert "bento-card--map" in classes
+    assert "bento-card--table" in classes
+    # ... plus four empty placeholder cards to fill later.
+    for i in range(1, 5):
+        assert f"bento-e{i}" in ids
 
 
-def test_group_panel_wrapper_collapsed_by_default():
-    panel = next(
+def test_main_split_defaults_to_time_mode_class():
+    split = next(
         n for n in _walk(build_layout(VENUES, group_panel=dmc.Box("x")))
-        if getattr(n, "id", None) == "group-panel"
+        if getattr(n, "id", None) == "main-split"
     )
-    # Collapsed by default: base class only, no --open modifier until Team mode.
-    assert panel.className == "group-panel"
-    assert getattr(panel, "style", None) in (None, {})
+    # Time mode by default: base class only, no --team until the switch flips.
+    assert split.className == "main-split"

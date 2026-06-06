@@ -83,17 +83,24 @@ def build_layout(
     )
 
     # Team mode reveals a left-side standings panel; the map fills the rest.
-    # The panel is collapsed by default (CSS); a clientside callback adds the
-    # `group-panel--open` modifier in Team mode, animating the flex-basis.
-    group_panel_wrapper = dmc.Box(
-        group_panel, id="group-panel", className="group-panel"
+    # Team mode lays the main area out as a bento grid of cards (map hero +
+    # group table + empty placeholders to fill later); Time mode collapses the
+    # grid so the map card fills the screen. A clientside callback adds the
+    # `main-split--team` modifier in Team mode (CSS swaps the grid template).
+    map_card = dmc.Box(
+        html.Div(build_map(venues), id="map-container"),
+        className="bento-card bento-card--map",
     )
+    table_card = dmc.Box(group_panel, className="bento-card bento-card--table")
+    # Empty cards the user fills with future infographics, one by one.
+    empty_cards = [
+        dmc.Box(className="bento-card bento-card--empty", id=f"bento-e{i}")
+        for i in range(1, 5)
+    ]
     main = dmc.AppShellMain(
         dmc.Box(
-            [
-                html.Div(build_map(venues), id="map-container"),
-                group_panel_wrapper,
-            ],
+            [map_card, table_card, *empty_cards],
+            id="main-split",
             className="main-split",
         )
     )

@@ -190,49 +190,84 @@ body,
     text-align: center;
 }
 
-/* ===== Team-mode group standings panel ===== */
+/* ===== Team-mode bento dashboard ===== */
 
+/* Time mode: a single-cell grid so the map card fills the whole main area. */
 .main-split {
-    display: flex;
+    display: grid;
+    height: 100%;
+    width: 100%;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "map";
+}
+
+.bento-card {
+    overflow: hidden;
+}
+
+.bento-card--map {
+    grid-area: map;
+}
+
+#map-container {
     height: 100%;
     width: 100%;
 }
 
-#map-container {
-    flex: 1 1 0;
-    min-width: 0;   /* allow the map to shrink below its content width */
-    height: 100%;
+/* Time mode: only the map card is shown (fills the screen). */
+.main-split:not(.main-split--team) .bento-card:not(.bento-card--map) {
+    display: none;
 }
 
-/* Collapsed by default (Time mode). A clientside callback adds
-   `group-panel--open` in Team mode; the flex-basis transition gives the swift
-   slide-in. `display` is NOT animatable, which is why we animate flex-basis. */
-.group-panel {
-    order: -1;   /* render on the LEFT of the map (DOM order is map-first for the mobile stack) */
-    flex: 0 0 0;
-    height: 100%;
-    overflow: hidden;
-    border-right: 1px solid var(--mantine-color-default-border);
-    transition: flex-basis 0.3s ease;
+/* Team mode: bento grid — map hero (top-left 2x2), table top-right, and four
+   empty placeholder cards wrapping along the right and bottom. */
+.main-split--team {
+    /* col 3 (the table) is wider so all eight standings columns fit; the map
+       still spans cols 1-2 (and rows 1-2), keeping it the largest tile. */
+    grid-template-columns: 1fr 1fr 1.4fr 1fr;
+    grid-template-rows: 1.5fr 1fr 1fr;
+    grid-template-areas:
+        "map map table e1"
+        "map map e2    e2"
+        "e3  e4  e4    e4";
+    gap: 12px;
+    padding: 12px;
 }
 
-.group-panel--open {
-    flex-basis: 34%;
+.main-split--team .bento-card {
+    background: var(--mantine-color-default);
+    border: 1px solid var(--mantine-color-default-border);
+    border-radius: 12px;
 }
+
+.main-split--team .bento-card--table { grid-area: table; }
+.main-split--team #bento-e1 { grid-area: e1; }
+.main-split--team #bento-e2 { grid-area: e2; }
+.main-split--team #bento-e3 { grid-area: e3; }
+.main-split--team #bento-e4 { grid-area: e4; }
+
+/* Empty placeholders read as "to be filled" without competing for attention. */
+.bento-card--empty {
+    opacity: 0.5;
+}
+
+/* --- group standings table (lives in the table card) --- */
 
 .group-panel__body {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 16px 18px;
-    gap: 12px;
+    padding: 12px 14px;
+    gap: 8px;
+    overflow: hidden;
 }
 
 .group-panel__header {
     flex: 0 0 auto;
 }
 
-/* Compact, borderless grid that blends with the panel background. */
+/* Compact, borderless grid that blends with the card background. */
 .group-grid {
     flex: 0 0 auto;
     --ag-background-color: transparent;
@@ -277,30 +312,24 @@ body,
     white-space: nowrap;
 }
 
-/* Mobile: stack the map on top and the table below; no horizontal overflow.
-   No width animation here — collapse via display, expand below the map. */
+/* Mobile: stack every card in one column (map first), scrolling vertically. */
 @media (max-width: 768px) {
-    .main-split {
-        flex-direction: column;
+    .main-split--team {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-template-areas:
+            "map"
+            "table"
+            "e1"
+            "e2"
+            "e3"
+            "e4";
+        overflow-y: auto;
     }
-    #map-container {
+    .main-split--team .bento-card--map {
         height: 55vh;
-        flex: 0 0 auto;
     }
-    .group-panel {
-        order: 0;   /* stacked: follow DOM order so the map stays on top */
-        flex: 0 0 auto;
-        width: 100%;
-        border-right: none;
-        border-top: 1px solid var(--mantine-color-default-border);
-        overflow: auto;
-        transition: none;
-    }
-    .group-panel:not(.group-panel--open) {
-        display: none;
-    }
-    .group-panel--open {
-        display: flex;
-        flex: 1 1 auto;
+    .main-split--team .bento-card--empty {
+        min-height: 150px;
     }
 }
