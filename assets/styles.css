@@ -228,7 +228,7 @@ body,
        column (its many rows scroll vertically, its many columns scroll
        horizontally). Four single-cell placeholders remain to fill later. */
     grid-template-columns: 1.3fr 1.3fr 1fr 1.4fr;
-    grid-template-rows: 1.4fr 1fr 1fr;
+    grid-template-rows: 1.1fr 1fr 1fr;
     grid-template-areas:
         "map  map  table squad"
         "map  map  e1    squad"

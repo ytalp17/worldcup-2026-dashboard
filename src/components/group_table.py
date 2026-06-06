@@ -8,20 +8,22 @@ import dash_mantine_components as dmc
 from src.components.team_carousel import display_name
 from src.data.groups import Group
 
-# Narrow, left-aligned numeric column shared by MP/W/D/L/GD/Pts. Kept tight so
-# all six fit alongside the flexible Team column in the ~1/3-width panel without
-# responsiveSizeToFit squeezing them to an ellipsis.
+# Narrow numeric column shared by MP/W/D/L/GD/Pts. Widths are proportional hints
+# for responsiveSizeToFit (below): the grid scales every column to fill the card
+# width exactly — no horizontal scroll — while minWidth keeps single-digit values
+# readable.
 _NUM_COL = {
-    "width": 38,
+    "width": 30,
+    "minWidth": 26,
     "sortable": False,
     "cellClass": "group-grid__num",
 }
 
 COL_DEFS = [
-    {"headerName": "#", "field": "rank", "width": 34, "sortable": False,
-     "cellClass": "group-grid__rank"},
+    {"headerName": "#", "field": "rank", "width": 30, "minWidth": 26,
+     "sortable": False, "cellClass": "group-grid__rank"},
     {"headerName": "Team", "field": "team", "cellRenderer": "TeamCell",
-     "flex": 1, "minWidth": 90, "sortable": False},
+     "width": 96, "minWidth": 58, "sortable": False},
     {"headerName": "MP", "field": "mp", **_NUM_COL},
     {"headerName": "W", "field": "w", **_NUM_COL},
     {"headerName": "D", "field": "d", **_NUM_COL},
@@ -81,10 +83,10 @@ def build_group_panel(group: Group | None, asset_url: Callable[[str], str]) -> d
         id="group-grid",
         columnDefs=COL_DEFS,
         rowData=rows,
-        # No columnSize: the numeric columns keep their fixed widths and the Team
-        # column (flex:1) absorbs the slack and re-flows on resize. sizeToFit was
-        # avoided because it treats `width` as a ratio and shrinks the numeric
-        # columns to an ellipsis in the narrow panel.
+        # Fit all eight columns to the card width exactly (no horizontal scroll);
+        # re-fits on resize. minWidths (in COL_DEFS) stop the numeric columns from
+        # collapsing to an ellipsis.
+        columnSize="responsiveSizeToFit",
         # Dark theme by default; a clientside callback swaps quartz <-> quartz-dark to follow the app color scheme.
         className="ag-theme-quartz-dark group-grid",
         dashGridOptions=_GRID_OPTIONS,
