@@ -817,10 +817,11 @@ Append to `assets/styles.css`:
    `group-panel--open` in Team mode; the flex-basis transition gives the swift
    slide-in. `display` is NOT animatable, which is why we animate flex-basis. */
 .group-panel {
+    order: -1;   /* render on the LEFT of the map (DOM order is map-first for the mobile stack) */
     flex: 0 0 0;
     height: 100%;
     overflow: hidden;
-    border-left: 1px solid var(--mantine-color-default-border);
+    border-right: 1px solid var(--mantine-color-default-border);
     transition: flex-basis 0.3s ease;
 }
 
@@ -888,9 +889,10 @@ Append to `assets/styles.css`:
         flex: 0 0 auto;
     }
     .group-panel {
+        order: 0;   /* stacked: follow DOM order so the map stays on top */
         flex: 0 0 auto;
         width: 100%;
-        border-left: none;
+        border-right: none;
         border-top: 1px solid var(--mantine-color-default-border);
         overflow: auto;
         transition: none;
