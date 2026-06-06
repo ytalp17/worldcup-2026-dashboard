@@ -588,7 +588,7 @@ with:
     # The panel is hidden by default (a clientside callback shows it in Team mode),
     # mirroring the calendar/carousel wrapper pattern.
     group_panel_wrapper = dmc.Box(
-        group_panel, id="group-panel", className="group-panel", style={"display": "none"}
+        group_panel, id="group-panel", className="group-panel"
     )
     main = dmc.AppShellMain(
         dmc.Box(
@@ -601,22 +601,13 @@ with:
     )
 ```
 
-Then add the resize-tick store to the `MantineProvider` children list — change:
+(The `MantineProvider` children list is unchanged. An earlier draft added a
+`map-resize-tick` store, but the final design dispatches the resize directly from
+the panel clientside callback, so no extra store is needed.)
 
-```python
-            dcc.Store(id="carousel-index", data=0, storage_type="local"),
-            dcc.Store(id="user-tz"),
-            dcc.Interval(id="tz-probe", interval=100, max_intervals=1),  # one-shot: fire once just after load to read the browser timezone
-```
-
-to:
-
-```python
-            dcc.Store(id="carousel-index", data=0, storage_type="local"),
-            dcc.Store(id="user-tz"),
-            dcc.Store(id="map-resize-tick"),  # clientside dummy output for Leaflet invalidateSize on mode switch
-            dcc.Interval(id="tz-probe", interval=100, max_intervals=1),  # one-shot: fire once just after load to read the browser timezone
-```
+The group-panel wrapper carries `className="group-panel"` only (no inline display
+style); it is collapsed by default via CSS and a clientside callback adds the
+`group-panel--open` modifier in Team mode (see Task 6 / Task 7).
 
 - [ ] **Step 4: Run tests to verify they pass**
 
@@ -754,13 +745,13 @@ Add the two clientside callbacks. After the existing `_TZ_JS` clientside_callbac
 _PANEL_JS = """
 (checked) => {
     setTimeout(() => window.dispatchEvent(new Event('resize')), 350);
-    return checked ? {display: 'flex'} : {display: 'none'};
+    return checked ? 'group-panel group-panel--open' : 'group-panel';
 }
 """
 
 clientside_callback(
     _PANEL_JS,
-    Output("group-panel", "style"),
+    Output("group-panel", "className"),
     Input("mode-toggle", "checked"),
 )
 
@@ -822,12 +813,19 @@ Append to `assets/styles.css`:
     height: 100%;
 }
 
+/* Collapsed by default (Time mode). A clientside callback adds
+   `group-panel--open` in Team mode; the flex-basis transition gives the swift
+   slide-in. `display` is NOT animatable, which is why we animate flex-basis. */
 .group-panel {
-    flex: 0 0 34%;
+    flex: 0 0 0;
     height: 100%;
     overflow: hidden;
     border-left: 1px solid var(--mantine-color-default-border);
-    transition: flex-basis 0.3s ease, width 0.3s ease;
+    transition: flex-basis 0.3s ease;
+}
+
+.group-panel--open {
+    flex-basis: 34%;
 }
 
 .group-panel__body {
@@ -879,7 +877,8 @@ Append to `assets/styles.css`:
     white-space: nowrap;
 }
 
-/* Mobile: stack the map on top and the table below; no horizontal overflow. */
+/* Mobile: stack the map on top and the table below; no horizontal overflow.
+   No width animation here — collapse via display, expand below the map. */
 @media (max-width: 768px) {
     .main-split {
         flex-direction: column;
@@ -889,11 +888,19 @@ Append to `assets/styles.css`:
         flex: 0 0 auto;
     }
     .group-panel {
-        flex: 1 1 auto;
+        flex: 0 0 auto;
         width: 100%;
         border-left: none;
         border-top: 1px solid var(--mantine-color-default-border);
         overflow: auto;
+        transition: none;
+    }
+    .group-panel:not(.group-panel--open) {
+        display: none;
+    }
+    .group-panel--open {
+        display: flex;
+        flex: 1 1 auto;
     }
 }
 ```
