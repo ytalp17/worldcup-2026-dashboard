@@ -25,6 +25,9 @@ _JOURNEY_GRID_OPTIONS = {
     "headerHeight": 38,
     "pagination": True,
     "paginationPageSize": 12,
+    # Minimal footer: no page-size dropdown (and CSS hides the text so only the
+    # navigation arrows remain).
+    "paginationPageSizeSelector": False,
     # Colour each selected team's row in that team's own flow colour; a callback
     # keeps every row's `selected` flag + `color` in sync with the dropdown.
     "getRowStyle": {"function": "journeyRowStyle(params)"},
@@ -100,7 +103,7 @@ def build_filter_drawer(
                         offLabel="km",
                         onLabel="mi",
                         checked=False,
-                        size="sm",
+                        size="md",
                         color="gray",
                         persistence=True,
                     ),

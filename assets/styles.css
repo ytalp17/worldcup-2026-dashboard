@@ -382,14 +382,16 @@ body,
 /* Selected rows are tinted in each team's own flow colour via the getRowStyle
    function (journeyRowStyle in dashAgGridFunctions.js), not a static class. */
 
-/* Compact pagination footer (page counts, range, size selector + arrows). */
+/* Minimal pagination footer: navigation arrows only — hide the row-range
+   summary, the "Page X of Y" text and the page-size selector. */
 .journey-grid .ag-paging-panel {
-    font-size: 11px;
     min-height: 30px;
     height: 34px;
 }
-.journey-grid .ag-paging-panel .ag-icon {
-    font-size: 14px;
+.journey-grid .ag-paging-row-summary-panel,
+.journey-grid .ag-paging-description,
+.journey-grid .ag-paging-page-size {
+    display: none !important;
 }
 
 /* Mobile: stack every card in one column (map first), scrolling vertically. */
