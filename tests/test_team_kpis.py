@@ -1,0 +1,59 @@
+import dash_mantine_components as dmc
+
+from src.components.team_kpis import build_kpi_strip, kpi_cards, stat_card
+from src.data.team_stats import TeamStats
+
+
+def _walk(node):
+    yield node
+    children = getattr(node, "children", None)
+    if isinstance(children, (list, tuple)):
+        for c in children:
+            yield from _walk(c)
+    elif children is not None:
+        yield from _walk(children)
+
+
+REAL = TeamStats(
+    avg_age=29.8, avg_height=1.84, squad_value=32_000_000, value_display="€32M",
+    foot_right_pct=81, foot_left_pct=15, squad_size=26,
+)
+
+
+def _texts(node):
+    return [n.children for n in _walk(node)
+            if isinstance(n, dmc.Text) and isinstance(n.children, str)]
+
+
+def test_stat_card_renders_label_value_sub():
+    card = stat_card("tabler:user", "Avg age", "29.8", sub="years")
+    texts = _texts(card)
+    assert "Avg age" in texts
+    assert "29.8" in texts
+    assert "years" in texts
+
+
+def test_kpi_cards_has_seven_with_real_and_placeholder_values():
+    cards = kpi_cards(REAL)
+    assert len(cards) == 7
+    all_text = " ".join(t for c in cards for t in _texts(c))
+    # Real, computed values
+    assert "29.8" in all_text
+    assert "1.84" in all_text
+    assert "€32M" in all_text
+    # Placeholders for the three we have no data for
+    assert all_text.count("—") >= 3
+
+
+def test_foot_card_uses_ring_progress():
+    cards = kpi_cards(REAL)
+    rings = [n for c in cards for n in _walk(c) if isinstance(n, dmc.RingProgress)]
+    assert len(rings) == 1
+    assert rings[0].sections[0]["value"] == 81
+
+
+def test_build_kpi_strip_has_id():
+    strip = build_kpi_strip(REAL)
+    assert strip.id == "kpi-strip"
+    cards = [n for n in _walk(strip) if getattr(n, "className", "") == "stat-card"]
+    assert len(cards) == 7
