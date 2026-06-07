@@ -226,12 +226,15 @@ body,
    with the Squad as the tall right column. The travel map is no longer the hero
    here — it only fills the screen in Time mode. */
 .main-split--team {
-    grid-template-columns: 1.15fr 1.1fr 1.25fr;
-    grid-template-rows: auto 1fr 1fr;
+    /* Row 1: KPI strip. Row 2: the group Table (wide) next to the Formation
+       pitch at equal height. Row 3 (taller): Leaders + the small host-cities
+       Map. Squad is the full-height right column. */
+    grid-template-columns: 1.5fr 1fr 1.25fr;
+    grid-template-rows: auto 1fr 1.3fr;
     grid-template-areas:
-        "kpi        kpi    kpi"
-        "leaders    table  squad"
-        "formation  map    squad";
+        "kpi      kpi        kpi"
+        "table    formation  squad"
+        "leaders  map        squad";
     gap: 12px;
     padding: 12px;
 }
@@ -249,27 +252,10 @@ body,
 .main-split--team .bento-card--map { grid-area: map; }
 .main-split--team .bento-card--squad { grid-area: squad; }
 
-/* Table and Formation hug their content (a 4-row standings grid / a landscape
-   pitch) instead of stretching to fill their cell — they sit at the top of
-   their grid cell, snug around the content. No max-height: the cards size to
-   their content so nothing is clipped. */
-.main-split--team .bento-card--table {
-    align-self: start;
-    max-height: 100%;
-}
-/* The pitch keeps a sensible size (capped by height) and the card shrink-wraps
-   its width around it, centred in the cell — so the whole pitch shows (never
-   clipped) and the container is only as wide as the pitch needs. */
-.main-split--team .bento-card--formation {
-    align-self: start;
-    justify-self: center;
-    width: fit-content;
-    max-width: 100%;
-}
-.main-split--team .bento-card--table .group-panel,
-.main-split--team .bento-card--formation .formation-panel {
-    height: auto;
-}
+/* Table (wide) and Formation share row 2 at equal height — both fill their
+   cell. The pitch scales to fit entirely (object-fit: contain), centred, so it
+   is never clipped; the standings grid sits at the top with its spacer filling
+   any remainder. */
 .main-split--team .bento-card--formation .formation-panel__body {
     align-items: center;
     justify-content: center;
@@ -280,8 +266,8 @@ body,
     display: block;
     width: auto;
     height: auto;
-    max-height: 26vh;          /* preserve a sensible pitch size */
     max-width: 100%;
+    max-height: 100%;
     aspect-ratio: 1473 / 985;
     object-fit: contain;
 }
@@ -526,9 +512,9 @@ body,
         grid-template-rows: auto;
         grid-template-areas:
             "kpi"
-            "leaders"
             "table"
             "formation"
+            "leaders"
             "map"
             "squad";
         overflow-y: auto;
