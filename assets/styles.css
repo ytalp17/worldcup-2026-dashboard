@@ -226,17 +226,18 @@ body,
    with the Squad as the tall right column. The travel map is no longer the hero
    here — it only fills the screen in Time mode. */
 .main-split--team {
-    /* Row 1: KPI strip. The left column is wide (group Table over the
-       host-cities Map); the right column is narrow (Formation pitch over the
-       Leaders card). Row 2 (Table + Formation) is equal-height; row 3 (Map +
-       Leaders) is taller. Squad is the full-height right column. fr units keep
-       it fluid across widths. */
-    grid-template-columns: 1.85fr 0.9fr 1.25fr;
+    /* Four fluid tracks (+ squad) let each row split independently via spanning,
+       so the columns are NOT uniform:
+         Row 2: Table spans tracks 1-2 (wide) · Formation in track 3 (narrow)
+         Row 3: Leaders in track 1 (narrow) · Map spans tracks 2-3 (widest)
+       Row 2 (Table + Formation) is equal-height; row 3 (Leaders + Map) taller.
+       Squad is the full-height right column. */
+    grid-template-columns: 1.3fr 0.85fr 0.85fr 1.25fr;
     grid-template-rows: auto 1fr 1.3fr;
     grid-template-areas:
-        "kpi    kpi        kpi"
-        "table  formation  squad"
-        "map    leaders    squad";
+        "kpi      kpi   kpi        kpi"
+        "table    table formation  squad"
+        "leaders  map   map        squad";
     gap: 12px;
     padding: 12px;
 }
