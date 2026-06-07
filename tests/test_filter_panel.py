@@ -83,8 +83,10 @@ def test_drawer_has_journey_grid_with_pagination_and_selection():
     # Minimal footer: no page-size selector.
     assert grid.dashGridOptions["paginationPageSizeSelector"] is False
     assert len(grid.rowData) == 3
-    # The grid is the selector: multi-row selection drives the map.
+    # The grid is the selector: multi-row selection drives the map, with a
+    # header checkbox for select-all / clear-all.
     assert grid.dashGridOptions["rowSelection"]["mode"] == "multiRow"
+    assert grid.dashGridOptions["rowSelection"]["headerCheckbox"] is True
     # Selected rows are tinted per-team via a getRowStyle function.
     assert "getRowStyle" in grid.dashGridOptions
     # A Continent column is present.

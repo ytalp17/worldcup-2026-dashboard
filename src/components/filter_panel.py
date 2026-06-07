@@ -51,7 +51,8 @@ _JOURNEY_GRID_OPTIONS = {
     "rowSelection": {
         "mode": "multiRow",
         "checkboxes": True,
-        "headerCheckbox": False,
+        # Header checkbox = select-all / clear-all across every team.
+        "headerCheckbox": True,
         "enableClickSelection": True,
         "enableSelectionWithoutKeys": True,
     },
