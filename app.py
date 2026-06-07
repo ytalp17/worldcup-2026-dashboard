@@ -8,7 +8,7 @@ import dash
 from dash import ALL, Dash, Input, Output, State, callback, clientside_callback, ctx, no_update
 
 from src.components.detail_panel import stadium_detail
-from src.components.filter_panel import journey_rows, legend
+from src.components.filter_panel import journey_rows
 from src.components.flow_layer import flows_for
 from src.components.group_table import build_group_panel, group_rows
 from src.components.header_calendar import build_match_calendar
@@ -166,14 +166,6 @@ def open_filter_drawer(n_clicks):
 )
 def update_flow_layer(team_mode, filter_value, index):
     return flow_children_for_mode(team_mode, filter_value, index)
-
-
-@callback(
-    Output("filter-legend", "children"),
-    Input("team-filter", "value"),
-)
-def update_filter_legend(selected):
-    return legend(selected, TEAM_FLOWS)
 
 
 @callback(
@@ -413,6 +405,26 @@ clientside_callback(
     _JOURNEY_GRID_THEME_JS,
     Output("journey-grid", "className"),
     Input("color-scheme-toggle", "checked"),
+)
+
+# Switch the journey grid's Distance unit (km <-> mi). The formatDistance value
+# formatter reads window.__journeyUnit; we set it and refresh just that column so
+# the current sort and page are preserved (no rowData/columnDefs churn).
+_UNIT_JS = """
+async function(toMiles) {
+    window.__journeyUnit = toMiles ? 'mi' : 'km';
+    try {
+        const api = await dash_ag_grid.getApiAsync('journey-grid');
+        if (api) api.refreshCells({force: true, columns: ['distance_km']});
+    } catch (e) {}
+    return toMiles ? 'mi' : 'km';
+}
+"""
+
+clientside_callback(
+    _UNIT_JS,
+    Output("unit-store", "data"),
+    Input("unit-toggle", "checked"),
 )
 
 if __name__ == "__main__":

@@ -26,14 +26,36 @@ dagfuncs.dateComparatorCustom = function (date1, date2) {
     return n1 - n2;
 };
 
-// Format a numeric kilometre distance as "1,840 km / 1,143 mi" (mirrors the
-// Python format_distance used by the travel legend). Used by the journey grid's
-// Distance column so it sorts numerically yet displays the friendly string.
-dagfuncs.formatDistanceKm = function (params) {
-    if (params.value === null || params.value === undefined || params.value === "") {
-        return "";
+// Format a numeric kilometre distance in the unit chosen by the #unit-toggle
+// switch (window.__journeyUnit, set by a clientside callback). Sorting still uses
+// the raw numeric value, so it's correct regardless of the displayed unit.
+dagfuncs.formatDistance = function (params) {
+    var v = params.value;
+    if (v === null || v === undefined || v === "") return "";
+    if ((window.__journeyUnit || "km") === "mi") {
+        return Math.round(v * 0.621371).toLocaleString() + " mi";
     }
-    var km = params.value;
-    var mi = km * 0.621371;
-    return Math.round(km).toLocaleString() + " km / " + Math.round(mi).toLocaleString() + " mi";
+    return Math.round(v).toLocaleString() + " km";
+};
+
+// Translucent rgba from a #rrggbb (or #rgb) hex; null if unparseable.
+function hexToRgba(hex, alpha) {
+    hex = String(hex || "").replace("#", "");
+    if (hex.length === 3) hex = hex.split("").map(function (c) { return c + c; }).join("");
+    var r = parseInt(hex.substr(0, 2), 16);
+    var g = parseInt(hex.substr(2, 2), 16);
+    var b = parseInt(hex.substr(4, 2), 16);
+    if (isNaN(r) || isNaN(g) || isNaN(b)) return null;
+    return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+}
+
+// Highlight a selected team's row in that team's own flow colour (the colour
+// formerly shown as the legend dot). Unselected rows get no override.
+dagfuncs.journeyRowStyle = function (params) {
+    if (!params.data || !params.data.selected) return null;
+    var c = params.data.color || "#339af0";
+    return {
+        backgroundColor: hexToRgba(c, 0.32) || "rgba(51,154,240,0.28)",
+        boxShadow: "inset 3px 0 0 0 " + c,
+    };
 };

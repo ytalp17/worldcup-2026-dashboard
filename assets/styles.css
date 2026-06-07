@@ -379,11 +379,8 @@ body,
     padding-right: 6px !important;
 }
 
-/* Rows whose team is picked in the dropdown light up (kept in sync via callback). */
-.journey-grid .ag-row.journey-row--selected {
-    background-color: rgba(51, 154, 240, 0.28) !important;
-    box-shadow: inset 3px 0 0 0 var(--mantine-color-blue-5);
-}
+/* Selected rows are tinted in each team's own flow colour via the getRowStyle
+   function (journeyRowStyle in dashAgGridFunctions.js), not a static class. */
 
 /* Mobile: stack every card in one column (map first), scrolling vertically. */
 @media (max-width: 768px) {

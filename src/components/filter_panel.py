@@ -6,17 +6,17 @@ import dash_ag_grid as dag
 import dash_mantine_components as dmc
 
 from src.components.team_carousel import display_name
-from src.data.flows import TeamFlow, format_distance
+from src.data.flows import TeamFlow
 
 # Travel-distance grid columns. Team uses the shared TeamCell renderer (flag +
-# name); Distance is numeric (so it sorts correctly) but displays the friendly
-# "km / mi" string via the formatDistanceKm function in dashAgGridFunctions.js.
+# name); Distance is numeric (so it sorts correctly) but displays in the unit
+# chosen by the #unit-toggle switch via formatDistance in dashAgGridFunctions.js.
 _JOURNEY_COL_DEFS = [
     {"headerName": "Team", "field": "team", "cellRenderer": "TeamCell",
      "flex": 1, "minWidth": 120, "sortable": True},
     {"headerName": "Distance", "field": "distance_km",
-     "valueFormatter": {"function": "formatDistanceKm(params)"},
-     "width": 150, "minWidth": 120, "sort": "desc", "sortable": True},
+     "valueFormatter": {"function": "formatDistance(params)"},
+     "width": 130, "minWidth": 110, "sort": "desc", "sortable": True},
 ]
 
 _JOURNEY_GRID_OPTIONS = {
@@ -25,9 +25,9 @@ _JOURNEY_GRID_OPTIONS = {
     "headerHeight": 38,
     "pagination": True,
     "paginationPageSize": 12,
-    # Colour the rows whose team is selected in the #team-filter dropdown; a
-    # callback keeps each row's `selected` flag in sync with the selection.
-    "rowClassRules": {"journey-row--selected": "params.data.selected"},
+    # Colour each selected team's row in that team's own flow colour; a callback
+    # keeps every row's `selected` flag + `color` in sync with the dropdown.
+    "getRowStyle": {"function": "journeyRowStyle(params)"},
 }
 
 
@@ -46,6 +46,7 @@ def journey_rows(
             "team_raw": f.team,
             "flag": asset_url(f"country_logos/{f.team}.svg"),
             "distance_km": f.distance_km,
+            "color": f.color,
             "selected": f.team in selected_set,
         })
     return rows
@@ -83,13 +84,32 @@ def build_filter_drawer(
             # drawer paints over the options and intercepts clicks.
             comboboxProps={"zIndex": 3000},
         ),
-        dmc.Stack(id="filter-legend", gap="xs", mt="md"),
     ]
-    # All-teams travel-distance grid (replaces the old longest/shortest cards):
-    # paginated, sortable, with selected rows highlighted in sync with the dropdown.
+    # All-teams travel-distance grid (replaces the old longest/shortest cards and
+    # the selected-team legend): paginated, sortable, with each selected team's
+    # row tinted in its own flow colour, in sync with the dropdown. The header
+    # carries a km <-> mi unit switch.
     if team_flows and asset_url:
         children.append(dmc.Divider(my="md"))
-        children.append(dmc.Text("Travel distances", size="sm", fw=600, mb="xs"))
+        children.append(
+            dmc.Group(
+                [
+                    dmc.Text("Travel distances", size="sm", fw=600),
+                    dmc.Switch(
+                        id="unit-toggle",
+                        offLabel="km",
+                        onLabel="mi",
+                        checked=False,
+                        size="sm",
+                        color="gray",
+                        persistence=True,
+                    ),
+                ],
+                justify="space-between",
+                align="center",
+                mb="xs",
+            )
+        )
         children.append(build_journey_grid(team_flows, asset_url))
     return dmc.Drawer(
         id="filter-drawer",
@@ -110,32 +130,3 @@ def build_filter_drawer(
         },
         children=children,
     )
-
-
-def legend(selected, team_flows: dict[str, TeamFlow]) -> list:
-    rows: list = []
-    for team in selected or []:
-        flow = team_flows.get(team)
-        if flow is None:
-            continue
-        rows.append(
-            dmc.Group(
-                [
-                    dmc.Box(
-                        w=12,
-                        h=12,
-                        style={
-                            "background": flow.color,
-                            "borderRadius": "50%",
-                            "flex": "0 0 auto",
-                        },
-                    ),
-                    dmc.Text(
-                        f"{team} — {format_distance(flow.distance_km)}", size="sm"
-                    ),
-                ],
-                gap="xs",
-                align="center",
-            )
-        )
-    return rows

@@ -2,7 +2,7 @@ from datetime import date
 
 import dash_mantine_components as dmc
 
-from src.components.filter_panel import build_filter_drawer, legend
+from src.components.filter_panel import build_filter_drawer
 from src.data.flows import FlowStop, TeamFlow
 
 
@@ -43,30 +43,6 @@ def test_filter_drawer_has_multiselect_with_grouped_data():
     assert selects[0].data == options
 
 
-def test_legend_lists_selected_teams_with_color():
-    flow = TeamFlow(
-        "Brazil", "South America", "#22c55e",
-        (FlowStop(0, 0, "S", date(2026, 6, 1), 1),),
-    )
-    rows = legend(["Brazil"], {"Brazil": flow})
-    texts = [n.children for n in _walk(dmc.Box(rows)) if isinstance(n, dmc.Text)]
-    assert any(isinstance(t, str) and "Brazil" in t for t in texts)
-    assert legend([], {"Brazil": flow}) == []
-
-
-def test_legend_row_includes_formatted_distance():
-    flow = TeamFlow(
-        "Brazil", "South America", "#22c55e",
-        (FlowStop(0, 0, "S", date(2026, 6, 1), 1),),
-        1839.7,
-    )
-    rows = legend(["Brazil"], {"Brazil": flow})
-    texts = [n.children for n in _walk(dmc.Box(rows)) if isinstance(n, dmc.Text)]
-    joined = " ".join(t for t in texts if isinstance(t, str))
-    assert "Brazil" in joined
-    assert "1,840 km / 1,143 mi" in joined
-
-
 def _asset(path):
     return "/assets/" + path
 
@@ -89,6 +65,8 @@ def test_journey_rows_all_teams_sorted_by_distance_desc():
     assert [r["team"] for r in rows] == ["Faraway", "Midway", "Nearby"]
     assert rows[0]["distance_km"] == 9000.0
     assert rows[0]["flag"].endswith("country_logos/Faraway.svg")
+    # Each row carries the team's flow colour (used to tint selected rows).
+    assert rows[0]["color"] == "#fff"
     # Nothing selected by default.
     assert all(r["selected"] is False for r in rows)
 
@@ -112,8 +90,21 @@ def test_drawer_has_journey_grid_with_pagination_of_12():
     assert grid.dashGridOptions["pagination"] is True
     assert grid.dashGridOptions["paginationPageSize"] == 12
     assert len(grid.rowData) == 3
-    # Selected rows are highlighted via a row-class rule synced to the dropdown.
-    assert "journey-row--selected" in grid.dashGridOptions["rowClassRules"]
+    # Selected rows are tinted per-team via a getRowStyle function (not a class).
+    assert "getRowStyle" in grid.dashGridOptions
+
+
+def test_drawer_has_unit_switch_and_no_external_legend():
+    drawer = build_filter_drawer([], _flows_for_grid(), _asset)
+    ids = {getattr(n, "id", None) for n in _walk(drawer)}
+    # A km/mi unit switch lives in the drawer ...
+    assert "unit-toggle" in ids
+    switch = next(n for n in _walk(drawer)
+                  if isinstance(n, dmc.Switch) and n.id == "unit-toggle")
+    assert switch.offLabel == "km"
+    assert switch.onLabel == "mi"
+    # ... and the old selected-teams legend is gone (colours moved onto the grid).
+    assert "filter-legend" not in ids
 
 
 def test_journey_grid_all_columns_sortable():
