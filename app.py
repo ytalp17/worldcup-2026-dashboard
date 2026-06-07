@@ -348,12 +348,16 @@ clientside_callback(
 )
 
 # Switch the main area into the Team-mode bento grid by adding `--team`; Time
-# mode (no modifier) collapses the grid so the map card fills the screen. After
-# the layout change, dispatch a window resize so Leaflet runs invalidateSize()
-# and re-tiles the resized map card.
+# mode (no modifier) collapses the grid so the map card fills the screen. The
+# grid layout snaps instantly (no CSS transition), so re-tile the map as soon as
+# the new layout is applied: fire a window resize on the next animation frames
+# (Leaflet's invalidateSize) plus a short fallback. A long delay would leave the
+# map mis-tiled (e.g. a grey band when it expands) until the resize fired.
 _PANEL_JS = """
 (checked) => {
-    setTimeout(() => window.dispatchEvent(new Event('resize')), 350);
+    const fire = () => window.dispatchEvent(new Event('resize'));
+    requestAnimationFrame(() => requestAnimationFrame(fire));
+    setTimeout(fire, 120);
     return checked ? 'main-split main-split--team' : 'main-split';
 }
 """
