@@ -84,17 +84,17 @@ def render_team(key: str, data: dict, theme: dict, name: str, outdir) -> Path:
               for i in range(len(xi))]
     pitch.formation(
         formation, kind="scatter", ax=ax,
-        s=1700, color=colors, edgecolors="white", linewidth=2.0, zorder=3,
+        s=2600, color=colors, edgecolors="white", linewidth=2.4, zorder=3,
     )
 
     # Shirt number centred in each node; surname just beneath it. On a
     # horizontal pitch "beneath" is a smaller y.
     for pos, (surname, num) in zip(positions, xi):
         pitch.annotate(str(num), xy=(pos.x, pos.y), ax=ax, ha="center",
-                       va="center", color=theme["number_color"], fontsize=16,
+                       va="center", color=theme["number_color"], fontsize=20,
                        fontweight="bold", zorder=4)
-        pitch.annotate(surname, xy=(pos.x, pos.y - 6.2), ax=ax, ha="center",
-                       va="top", color=theme["text_color"], fontsize=12.5,
+        pitch.annotate(surname, xy=(pos.x, pos.y - 7.6), ax=ax, ha="center",
+                       va="top", color=theme["text_color"], fontsize=14,
                        fontweight="medium", zorder=4)
 
     outdir.mkdir(parents=True, exist_ok=True)
