@@ -50,6 +50,8 @@ def build_layout(
     match_calendar=None,
     team_carousel=None,
     group_panel=None,
+    squad_panel=None,
+    asset_url=None,
 ) -> dmc.MantineProvider:
     # Three equal-flex zones so the centre widget sits at the true centre of the
     # header regardless of the brand / controls widths.
@@ -92,15 +94,16 @@ def build_layout(
         className="bento-card bento-card--map",
     )
     table_card = dmc.Box(group_panel, className="bento-card bento-card--table")
-    # Seven uniform (single-cell) empty cards the user fills with future
-    # infographics, one by one — no over-long horizontal cards.
+    squad_card = dmc.Box(squad_panel, className="bento-card bento-card--squad")
+    # Four uniform (single-cell) empty cards the user fills with future
+    # infographics, one by one — the squad card now fills the right strip.
     empty_cards = [
         dmc.Box(className="bento-card bento-card--empty", id=f"bento-e{i}")
-        for i in range(1, 8)
+        for i in range(1, 5)
     ]
     main = dmc.AppShellMain(
         dmc.Box(
-            [map_card, table_card, *empty_cards],
+            [map_card, table_card, squad_card, *empty_cards],
             id="main-split",
             className="main-split",
         )
@@ -123,7 +126,7 @@ def build_layout(
         zIndex=DRAWER_Z_INDEX,
     )
 
-    filter_drawer = build_filter_drawer(team_options or [], team_flows or {})
+    filter_drawer = build_filter_drawer(team_flows or {}, asset_url)
 
     return dmc.MantineProvider(
         [
@@ -132,6 +135,8 @@ def build_layout(
             filter_drawer,
             dcc.Store(id="carousel-index", data=0, storage_type="local"),
             dcc.Store(id="user-tz"),
+            dcc.Store(id="unit-store"),  # journey-grid distance unit (km/mi)
+            dcc.Store(id="journey-redraw"),  # ping target for the selection redraw
             dcc.Interval(id="tz-probe", interval=100, max_intervals=1),  # one-shot: fire once just after load to read the browser timezone
         ],
         id="mantine-provider",

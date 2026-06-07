@@ -172,18 +172,21 @@ def _classnames(nodes):
     return out
 
 
-def test_layout_has_bento_with_map_table_and_empty_cards():
-    nodes = list(_walk(build_layout(VENUES, group_panel=dmc.Box("x"))))
+def test_layout_has_bento_with_map_table_squad_and_empty_cards():
+    nodes = list(_walk(build_layout(
+        VENUES, group_panel=dmc.Box("x"), squad_panel=dmc.Box("y"),
+    )))
     classes = _classnames(nodes)
     ids = {nid for n in nodes if isinstance((nid := getattr(n, "id", None)), str)}
     assert "main-split" in classes
     assert "map-container" in ids
-    # The map and table both live in bento cards ...
     assert "bento-card--map" in classes
     assert "bento-card--table" in classes
-    # ... plus seven single-cell empty placeholder cards to fill later.
-    for i in range(1, 8):
+    assert "bento-card--squad" in classes
+    # Four single-cell empty placeholder cards remain (down from seven).
+    for i in range(1, 5):
         assert f"bento-e{i}" in ids
+    assert "bento-e5" not in ids
 
 
 def test_main_split_defaults_to_time_mode_class():

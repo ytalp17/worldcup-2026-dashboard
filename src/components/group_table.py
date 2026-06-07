@@ -4,31 +4,32 @@ from collections.abc import Callable
 
 import dash_ag_grid as dag
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
 
 from src.components.team_carousel import display_name
 from src.data.groups import Group
 
-# Narrow, left-aligned numeric column shared by MP/W/D/L/GD/Pts. Kept tight so
-# all six fit alongside the flexible Team column in the ~1/3-width panel without
-# responsiveSizeToFit squeezing them to an ellipsis.
+# Narrow numeric column shared by MP/W/D/L/GD/Pts. Widths are proportional hints
+# for responsiveSizeToFit (below): the grid scales every column to fill the card
+# width exactly — no horizontal scroll — while minWidth keeps single-digit values
+# readable.
 _NUM_COL = {
-    "width": 38,
-    "sortable": False,
+    "width": 30,
+    "minWidth": 26,
+    "sortable": True,
     "cellClass": "group-grid__num",
 }
 
 COL_DEFS = [
-    {"headerName": "#", "field": "rank", "width": 34, "sortable": False,
-     "cellClass": "group-grid__rank"},
+    {"headerName": "#", "field": "rank", "width": 30, "minWidth": 26,
+     "sortable": True, "cellClass": "group-grid__rank"},
     {"headerName": "Team", "field": "team", "cellRenderer": "TeamCell",
-     "flex": 1, "minWidth": 90, "sortable": False},
+     "width": 96, "minWidth": 58, "sortable": True},
     {"headerName": "MP", "field": "mp", **_NUM_COL},
     {"headerName": "W", "field": "w", **_NUM_COL},
     {"headerName": "D", "field": "d", **_NUM_COL},
     {"headerName": "L", "field": "l", **_NUM_COL},
     {"headerName": "GD", "field": "gd", **_NUM_COL},
-    {"headerName": "Pts", "field": "pts", **_NUM_COL,
+    {"headerName": "P", "field": "pts", **_NUM_COL,
      "cellStyle": {"fontWeight": 700}},
 ]
 
@@ -66,39 +67,34 @@ def build_group_panel(group: Group | None, asset_url: Callable[[str], str]) -> d
     name = group.name if group else "—"
     rows = group_rows(group, asset_url) if group else []
 
+    # Card header bar: bold "Table" label left, live group name right, divider below.
     header = dmc.Group(
         [
-            dmc.Stack(
-                [
-                    dmc.Text("Table", fw=700, size="lg"),
-                    dmc.Text("World Cup", size="xs", c="dimmed"),
-                    dmc.Text(name, id="group-table-title", size="xs", c="dimmed"),
-                ],
-                gap=2,
-            ),
-            DashIconify(icon="radix-icons:chevron-right", width=20),
+            dmc.Text("Table", fw=700, size="sm"),
+            dmc.Text(name, id="group-table-title", size="sm", c="dimmed"),
         ],
         justify="space-between",
-        align="flex-start",
+        align="center",
         wrap="nowrap",
-        className="group-panel__header",
+        className="bento-card__header",
     )
 
     grid = dag.AgGrid(
         id="group-grid",
         columnDefs=COL_DEFS,
         rowData=rows,
-        # No columnSize: the numeric columns keep their fixed widths and the Team
-        # column (flex:1) absorbs the slack and re-flows on resize. sizeToFit was
-        # avoided because it treats `width` as a ratio and shrinks the numeric
-        # columns to an ellipsis in the narrow panel.
+        # Fit all eight columns to the card width exactly (no horizontal scroll);
+        # re-fits on resize. minWidths (in COL_DEFS) stop the numeric columns from
+        # collapsing to an ellipsis.
+        columnSize="responsiveSizeToFit",
         # Dark theme by default; a clientside callback swaps quartz <-> quartz-dark to follow the app color scheme.
         className="ag-theme-quartz-dark group-grid",
         dashGridOptions=_GRID_OPTIONS,
         style={"width": "100%"},
     )
 
-    return dmc.Box(
-        [header, grid, dmc.Box(id="group-extra", style={"flex": "1 1 auto"})],
+    body = dmc.Box(
+        [grid, dmc.Box(id="group-extra", style={"flex": "1 1 auto"})],
         className="group-panel__body",
     )
+    return dmc.Box([header, body], className="group-panel")

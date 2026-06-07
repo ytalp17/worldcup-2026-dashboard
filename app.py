@@ -8,7 +8,6 @@ import dash
 from dash import ALL, Dash, Input, Output, State, callback, clientside_callback, ctx, no_update
 
 from src.components.detail_panel import stadium_detail
-from src.components.filter_panel import legend
 from src.components.flow_layer import flows_for
 from src.components.group_table import build_group_panel, group_rows
 from src.components.header_calendar import build_match_calendar
@@ -22,7 +21,9 @@ from src.data.host_cities import HostCityRepository
 from src.data.match_calendar import MatchCalendar
 from src.data.matches import MatchRepository, matches_by_stadium
 from src.data.stadiums import StadiumRepository
+from src.components.squad_table import build_squad_panel, squad_rows
 from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, team_order
+from src.data.squads import SquadRepository, squad_for_team
 from src.data.team_continents import grouped_team_options
 from src.data.venues import build_venues
 
@@ -49,6 +50,7 @@ TEAM_FLOWS = build_team_flows(MATCHES, VENUES, distances=DISTANCES)
 TEAM_OPTIONS = grouped_team_options(sorted(TEAM_FLOWS))
 TEAM_NAMES = team_order(TEAM_FLOWS)
 GROUPS = build_groups(MATCHES)
+SQUADS = SquadRepository(DATA_DIR / "world_cup_2026_squads.csv").load()
 
 STADIUM_TO_CITY = {v.stadium_name: v.city for v in VENUES}
 MATCH_CALENDAR = MatchCalendar(MATCHES, STADIUM_TO_CITY, today=date.today())
@@ -72,6 +74,15 @@ def group_panel_payload(index):
     return name, rows
 
 
+def squad_panel_payload(index):
+    """(team_name, rowData) for the centred team at `index`."""
+    team = center_team(TEAM_NAMES, index or 0)
+    squad = squad_for_team(SQUADS, team)
+    name = squad.name if squad else "—"
+    rows = squad_rows(squad) if squad else []
+    return name, rows
+
+
 app.layout = build_layout(
     VENUES,
     TEAM_OPTIONS,
@@ -79,6 +90,8 @@ app.layout = build_layout(
     match_calendar=build_match_calendar(MATCH_CALENDAR),
     team_carousel=TEAM_CAROUSEL,
     group_panel=build_group_panel(group_for_team(GROUPS, center_team(TEAM_NAMES, 0)), app.get_asset_url),
+    squad_panel=build_squad_panel(squad_for_team(SQUADS, center_team(TEAM_NAMES, 0))),
+    asset_url=app.get_asset_url,
 )
 
 # Use the white FIFA logo as the browser tab icon (SVG favicon, modern browsers).
@@ -147,19 +160,13 @@ def open_filter_drawer(n_clicks):
 @callback(
     Output("flow-layer", "children"),
     Input("mode-toggle", "checked"),
-    Input("team-filter", "value"),
+    Input("journey-grid", "selectedRows"),
     Input("carousel-index", "data"),
 )
-def update_flow_layer(team_mode, filter_value, index):
-    return flow_children_for_mode(team_mode, filter_value, index)
-
-
-@callback(
-    Output("filter-legend", "children"),
-    Input("team-filter", "value"),
-)
-def update_filter_legend(selected):
-    return legend(selected, TEAM_FLOWS)
+def update_flow_layer(team_mode, selected_rows, index):
+    # Time mode: the teams selected in the journey grid drive the map flows.
+    selected = [r["team_raw"] for r in (selected_rows or [])]
+    return flow_children_for_mode(team_mode, selected, index)
 
 
 def _active_cities_for_date(selected_date: str | None, user_tz: str | None) -> set[str]:
@@ -297,6 +304,16 @@ def update_group_panel(index):
     return rows, name
 
 
+@callback(
+    Output("squad-grid", "rowData"),
+    Output("squad-table-title", "children"),
+    Input("carousel-index", "data"),
+)
+def update_squad_panel(index):
+    name, rows = squad_panel_payload(index)
+    return rows, name
+
+
 # Toggling the switch flips both the Mantine color scheme and the base map
 # tiles in one clientside callback (checked => dark). The tile URLs contain
 # Leaflet's {s}/{z}/{x}/{y} placeholders, so inject them via json.dumps rather
@@ -357,6 +374,67 @@ clientside_callback(
     _GRID_THEME_JS,
     Output("group-grid", "className"),
     Input("color-scheme-toggle", "checked"),
+)
+
+_SQUAD_GRID_THEME_JS = """
+(checked) => (checked ? 'ag-theme-quartz-dark squad-grid'
+                      : 'ag-theme-quartz squad-grid')
+"""
+
+clientside_callback(
+    _SQUAD_GRID_THEME_JS,
+    Output("squad-grid", "className"),
+    Input("color-scheme-toggle", "checked"),
+)
+
+_JOURNEY_GRID_THEME_JS = """
+(checked) => (checked ? 'ag-theme-quartz-dark journey-grid'
+                      : 'ag-theme-quartz journey-grid')
+"""
+
+clientside_callback(
+    _JOURNEY_GRID_THEME_JS,
+    Output("journey-grid", "className"),
+    Input("color-scheme-toggle", "checked"),
+)
+
+# Switch the journey grid's Distance unit (km <-> mi). The formatDistance value
+# formatter reads window.__journeyUnit; we set it and refresh just that column so
+# the current sort and page are preserved (no rowData/columnDefs churn).
+_UNIT_JS = """
+async function(toMiles) {
+    window.__journeyUnit = toMiles ? 'mi' : 'km';
+    try {
+        const api = await dash_ag_grid.getApiAsync('journey-grid');
+        if (api) api.refreshCells({force: true, columns: ['distance_km']});
+    } catch (e) {}
+    return toMiles ? 'mi' : 'km';
+}
+"""
+
+clientside_callback(
+    _UNIT_JS,
+    Output("unit-store", "data"),
+    Input("unit-toggle", "checked"),
+)
+
+# Selected teams are tinted in their own flow colour via the grid's getRowStyle,
+# which only re-runs on a redraw — so redraw the rows whenever the selection
+# changes. (The selection also drives the map flows via update_flow_layer.)
+_JOURNEY_REDRAW_JS = """
+async function(selectedRows) {
+    try {
+        const api = await dash_ag_grid.getApiAsync('journey-grid');
+        if (api) api.redrawRows();
+    } catch (e) {}
+    return window.dash_clientside.no_update;
+}
+"""
+
+clientside_callback(
+    _JOURNEY_REDRAW_JS,
+    Output("journey-redraw", "data"),
+    Input("journey-grid", "selectedRows"),
 )
 
 if __name__ == "__main__":

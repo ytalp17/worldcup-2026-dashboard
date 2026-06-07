@@ -173,3 +173,21 @@ def test_group_panel_payload_handles_none_index():
     # index 0 resolves to the first team alphabetically; it has a real group.
     assert name != "—"
     assert len(rows) == 4
+
+
+def test_squad_panel_payload_returns_name_and_rows():
+    import app
+
+    name, rows = app.squad_panel_payload(0)
+    assert isinstance(name, str) and name != ""
+    assert isinstance(rows, list) and len(rows) > 0
+    assert "name" in rows[0] and "pos" in rows[0]
+
+
+def test_squad_panel_payload_matches_centered_team():
+    import app
+    from src.components.team_carousel import center_team
+
+    name, rows = app.squad_panel_payload(0)
+    expected = center_team(app.TEAM_NAMES, 0)
+    assert name == expected
