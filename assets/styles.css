@@ -382,6 +382,16 @@ body,
 /* Selected rows are tinted in each team's own flow colour via the getRowStyle
    function (journeyRowStyle in dashAgGridFunctions.js), not a static class. */
 
+/* Compact pagination footer (page counts, range, size selector + arrows). */
+.journey-grid .ag-paging-panel {
+    font-size: 11px;
+    min-height: 30px;
+    height: 34px;
+}
+.journey-grid .ag-paging-panel .ag-icon {
+    font-size: 14px;
+}
+
 /* Mobile: stack every card in one column (map first), scrolling vertically. */
 @media (max-width: 768px) {
     .main-split--team {
