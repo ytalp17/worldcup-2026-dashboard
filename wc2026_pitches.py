@@ -91,11 +91,11 @@ def render_team(key: str, data: dict, theme: dict, name: str, outdir) -> Path:
     # horizontal pitch "beneath" is a smaller y.
     for pos, (surname, num) in zip(positions, xi):
         pitch.annotate(str(num), xy=(pos.x, pos.y), ax=ax, ha="center",
-                       va="center", color=theme["number_color"], fontsize=20,
+                       va="center", color=theme["number_color"], fontsize=23,
                        fontweight="bold", zorder=4)
-        pitch.annotate(surname, xy=(pos.x, pos.y - 7.6), ax=ax, ha="center",
-                       va="top", color=theme["text_color"], fontsize=14,
-                       fontweight="medium", zorder=4)
+        pitch.annotate(surname, xy=(pos.x, pos.y - 7.8), ax=ax, ha="center",
+                       va="top", color=theme["text_color"], fontsize=17,
+                       fontweight="bold", zorder=4)
 
     outdir.mkdir(parents=True, exist_ok=True)
     out = outdir / f"{key}-{name}.png"
