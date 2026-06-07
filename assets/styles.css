@@ -249,6 +249,29 @@ body,
 .main-split--team .bento-card--map { grid-area: map; }
 .main-split--team .bento-card--squad { grid-area: squad; }
 
+/* Table and Formation hug their content (a 4-row standings grid / a landscape
+   pitch) instead of stretching to fill their cell — they sit at the top of
+   their grid cell, snug around the content. */
+.main-split--team .bento-card--table,
+.main-split--team .bento-card--formation {
+    align-self: start;
+    max-height: 100%;
+}
+.main-split--team .bento-card--table .group-panel,
+.main-split--team .bento-card--formation .formation-panel {
+    height: auto;
+}
+/* The pitch fills the card width; the card height follows the image. */
+.main-split--team .bento-card--formation .formation-panel__body {
+    align-items: stretch;
+}
+.main-split--team .bento-card--formation #formation-img,
+.main-split--team .bento-card--formation .formation-panel__body .mantine-Image-root {
+    width: 100%;
+    height: auto;
+    max-height: none;
+}
+
 /* --- KPI strip: seven small stat cards across the top --- */
 .kpi-strip {
     display: flex;
