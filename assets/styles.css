@@ -251,25 +251,34 @@ body,
 
 /* Table and Formation hug their content (a 4-row standings grid / a landscape
    pitch) instead of stretching to fill their cell — they sit at the top of
-   their grid cell, snug around the content. */
-.main-split--team .bento-card--table,
-.main-split--team .bento-card--formation {
+   their grid cell, snug around the content. No max-height: the cards size to
+   their content so nothing is clipped. */
+.main-split--team .bento-card--table {
     align-self: start;
     max-height: 100%;
+}
+.main-split--team .bento-card--formation {
+    align-self: start;
 }
 .main-split--team .bento-card--table .group-panel,
 .main-split--team .bento-card--formation .formation-panel {
     height: auto;
 }
-/* The pitch fills the card width; the card height follows the image. */
+/* The pitch image fills the card width and the image box uses the PNG's exact
+   aspect ratio (1473x985), so the whole pitch shows with no letterbox and the
+   card height follows it precisely. */
 .main-split--team .bento-card--formation .formation-panel__body {
     align-items: stretch;
+    padding: 8px;
 }
 .main-split--team .bento-card--formation #formation-img,
 .main-split--team .bento-card--formation .formation-panel__body .mantine-Image-root {
+    display: block;
     width: 100%;
     height: auto;
     max-height: none;
+    aspect-ratio: 1473 / 985;
+    object-fit: contain;
 }
 
 /* --- KPI strip: seven small stat cards across the top --- */
