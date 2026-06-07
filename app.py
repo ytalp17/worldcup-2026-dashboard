@@ -22,10 +22,13 @@ from src.data.match_calendar import MatchCalendar
 from src.data.matches import MatchRepository, matches_by_stadium
 from src.data.stadiums import StadiumRepository
 from src.components.formation_pitch import build_formation_panel, formation_title, pitch_src
+from src.components.leaders_card import build_leaders_card
 from src.components.squad_table import build_squad_panel, squad_rows
+from src.components.team_kpis import build_kpi_strip, kpi_cards
 from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, team_order
 from src.data.lineups import LineupRepository, lineup_for_team
-from src.data.squads import SquadRepository, squad_for_team
+from src.data.squads import Squad, SquadRepository, squad_for_team
+from src.data.team_stats import compute_team_stats
 from src.data.team_continents import grouped_team_options
 from src.data.venues import build_venues
 
@@ -86,6 +89,13 @@ def squad_panel_payload(index):
     return name, rows
 
 
+def team_stats_payload(index):
+    """TeamStats (KPI strip values) for the centred team at `index`."""
+    team = center_team(TEAM_NAMES, index or 0)
+    squad = squad_for_team(SQUADS, team) or Squad(team, ())
+    return compute_team_stats(squad)
+
+
 def formation_panel_payload(index, dark):
     """(header_title, team, image_src) for the centred team's estimated XI.
     `dark` (the color-scheme-toggle state) picks the dark/light pitch image."""
@@ -109,6 +119,8 @@ app.layout = build_layout(
         app.get_asset_url,
         dark=True,
     ),
+    kpi_strip=build_kpi_strip(team_stats_payload(0)),
+    leaders_panel=build_leaders_card(),
     asset_url=app.get_asset_url,
 )
 
@@ -343,6 +355,14 @@ def update_formation_panel(index, dark):
     # and on theme change (dark/light), so the two never race for the src.
     title, _team, src = formation_panel_payload(index, dark)
     return src, title
+
+
+@callback(
+    Output("kpi-strip", "children"),
+    Input("carousel-index", "data"),
+)
+def update_kpi_strip(index):
+    return kpi_cards(team_stats_payload(index))
 
 
 # Toggling the switch flips both the Mantine color scheme and the base map

@@ -61,6 +61,19 @@ def test_app_team_names_alphabetical_48():
     assert app.TEAM_NAMES == sorted(app.TEAM_NAMES, key=str.casefold)
 
 
+def test_team_stats_payload_for_centered_team():
+    import app
+    from src.data.team_stats import TeamStats
+
+    stats = app.team_stats_payload(0)
+    assert isinstance(stats, TeamStats)
+    assert stats.squad_size > 0
+    assert stats.value_display.startswith("€")
+    # KPI strip rebuilds to 7 cards for any team index.
+    cards = app.kpi_cards(app.team_stats_payload(5))
+    assert len(cards) == 7
+
+
 def test_formation_panel_payload_is_theme_aware():
     import app
 

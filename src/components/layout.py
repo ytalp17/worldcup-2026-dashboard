@@ -52,6 +52,8 @@ def build_layout(
     group_panel=None,
     squad_panel=None,
     formation_panel=None,
+    kpi_strip=None,
+    leaders_panel=None,
     asset_url=None,
 ) -> dmc.MantineProvider:
     # Three equal-flex zones so the centre widget sits at the true centre of the
@@ -85,28 +87,24 @@ def build_layout(
         )
     )
 
-    # Team mode reveals a left-side standings panel; the map fills the rest.
-    # Team mode lays the main area out as a bento grid of cards (map hero +
-    # group table + empty placeholders to fill later); Time mode collapses the
-    # grid so the map card fills the screen. A clientside callback adds the
-    # `main-split--team` modifier in Team mode (CSS swaps the grid template).
+    # Team mode lays the main area out as a team dashboard: a full-width KPI
+    # strip on top, then Leaders + group Table, the estimated-XI pitch and a
+    # small host-cities map, with the Squad as the tall right column. Time mode
+    # collapses everything except the map card, which fills the screen. A
+    # clientside callback adds the `main-split--team` modifier in Team mode (CSS
+    # swaps the grid template); the map keeps `bento-card--map` so the Time-mode
+    # hide rule leaves it visible.
     map_card = dmc.Box(
         html.Div(build_map(venues), id="map-container"),
         className="bento-card bento-card--map",
     )
     table_card = dmc.Box(group_panel, className="bento-card bento-card--table")
     squad_card = dmc.Box(squad_panel, className="bento-card bento-card--squad")
-    # The estimated starting XI pitch fills cell e2 (bottom-left).
     formation_card = dmc.Box(formation_panel, className="bento-card bento-card--formation")
-    # Three uniform (single-cell) empty cards the user fills with future
-    # infographics, one by one (e1, e3, e4 — e2 now holds the formation pitch).
-    empty_cards = [
-        dmc.Box(className="bento-card bento-card--empty", id=f"bento-e{i}")
-        for i in (1, 3, 4)
-    ]
+    leaders_card = dmc.Box(leaders_panel, className="bento-card bento-card--leaders")
     main = dmc.AppShellMain(
         dmc.Box(
-            [map_card, table_card, squad_card, formation_card, *empty_cards],
+            [kpi_strip, leaders_card, table_card, formation_card, map_card, squad_card],
             id="main-split",
             className="main-split",
         )

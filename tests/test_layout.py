@@ -172,26 +172,28 @@ def _classnames(nodes):
     return out
 
 
-def test_layout_has_bento_with_map_table_squad_formation_and_empty_cards():
+def test_layout_team_dashboard_has_all_cards():
     nodes = list(_walk(build_layout(
         VENUES, group_panel=dmc.Box("x"), squad_panel=dmc.Box("y"),
         formation_panel=dmc.Box(dmc.Image(id="formation-img"), id="fp"),
+        kpi_strip=dmc.Box("k", id="kpi-strip"),
+        leaders_panel=dmc.Box("l", className="leaders-panel"),
     )))
     classes = _classnames(nodes)
     ids = {nid for n in nodes if isinstance((nid := getattr(n, "id", None)), str)}
     assert "main-split" in classes
     assert "map-container" in ids
-    assert "bento-card--map" in classes
+    # All six dashboard regions present: KPI strip, leaders, table, formation,
+    # map (kept as bento-card--map so Time mode still shows only the map), squad.
+    assert "kpi-strip" in ids
+    assert "leaders-panel" in classes
     assert "bento-card--table" in classes
-    assert "bento-card--squad" in classes
-    # The formation pitch occupies cell e2; the panel is mounted inside it.
     assert "bento-card--formation" in classes
     assert "formation-img" in ids
-    # Three single-cell empty placeholders remain (e1, e3, e4); e2 is taken.
-    for i in (1, 3, 4):
-        assert f"bento-e{i}" in ids
-    assert "bento-e2" not in ids
-    assert "bento-e5" not in ids
+    assert "bento-card--map" in classes
+    assert "bento-card--squad" in classes
+    # The old empty placeholder cards are gone.
+    assert not any(isinstance(i, str) and i.startswith("bento-e") for i in ids)
 
 
 def test_main_split_defaults_to_time_mode_class():

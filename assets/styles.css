@@ -215,24 +215,23 @@ body,
     width: 100%;
 }
 
-/* Time mode: only the map card is shown (fills the screen). */
-.main-split:not(.main-split--team) .bento-card:not(.bento-card--map) {
+/* Time mode: only the map card is shown (fills the screen). Hides every other
+   direct child of the split (KPI strip, leaders, table, formation, squad). */
+.main-split:not(.main-split--team) > *:not(.bento-card--map) {
     display: none;
 }
 
-/* Team mode: bento grid — map hero (top-left 2x2), table top-right, and four
-   empty placeholder cards wrapping along the right and bottom. */
+/* Team mode: a team dashboard. A full-width KPI strip on top; then Leaders +
+   group Table (top), the estimated-XI pitch + a small host-cities Map (bottom),
+   with the Squad as the tall right column. The travel map is no longer the hero
+   here — it only fills the screen in Time mode. */
 .main-split--team {
-    /* The map spans cols 1-2 (rows 1-2), staying the largest tile. The group
-       standings sit top-center; the squad table takes the full-height right
-       column (its many rows scroll vertically, its many columns scroll
-       horizontally). Four single-cell placeholders remain to fill later. */
-    grid-template-columns: 1.3fr 1.3fr 1fr 1.4fr;
-    grid-template-rows: 1.1fr 1fr 1fr;
+    grid-template-columns: 1.15fr 1.1fr 1.25fr;
+    grid-template-rows: auto 1fr 1fr;
     grid-template-areas:
-        "map  map  table squad"
-        "map  map  e1    squad"
-        "e2   e3   e4    squad";
+        "kpi        kpi    kpi"
+        "leaders    table  squad"
+        "formation  map    squad";
     gap: 12px;
     padding: 12px;
 }
@@ -243,16 +242,77 @@ body,
     border-radius: 12px;
 }
 
+.main-split--team .kpi-strip { grid-area: kpi; }
+.main-split--team .bento-card--leaders { grid-area: leaders; }
 .main-split--team .bento-card--table { grid-area: table; }
+.main-split--team .bento-card--formation { grid-area: formation; }
+.main-split--team .bento-card--map { grid-area: map; }
 .main-split--team .bento-card--squad { grid-area: squad; }
-.main-split--team .bento-card--formation { grid-area: e2; }
-.main-split--team #bento-e1 { grid-area: e1; }
-.main-split--team #bento-e3 { grid-area: e3; }
-.main-split--team #bento-e4 { grid-area: e4; }
 
-/* Empty placeholders read as "to be filled" without competing for attention. */
-.bento-card--empty {
-    opacity: 0.5;
+/* --- KPI strip: seven small stat cards across the top --- */
+.kpi-strip {
+    display: flex;
+    gap: 12px;
+    min-height: 0;
+}
+
+.stat-card {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 10px 12px;
+    background: var(--mantine-color-default);
+    border: 1px solid var(--mantine-color-default-border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.stat-card__icon {
+    color: var(--mantine-color-dimmed);
+    flex: 0 0 auto;
+}
+
+.stat-card__value {
+    font-size: 22px;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-card__sub {
+    margin-top: -2px;
+}
+
+/* --- Leaders card (placeholder until matches start) --- */
+.leaders-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.leaders-panel__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 14px;
+    overflow: hidden;
+}
+
+.leaders-empty {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.leaders-empty__icon {
+    color: var(--mantine-color-dimmed);
+    opacity: 0.7;
 }
 
 /* --- group standings table (lives in the table card) --- */
@@ -428,25 +488,31 @@ body,
         grid-template-columns: 1fr;
         grid-template-rows: auto;
         grid-template-areas:
-            "map"
+            "kpi"
+            "leaders"
             "table"
-            "squad"
-            "e1"
-            "e2"
-            "e3"
-            "e4";
+            "formation"
+            "map"
+            "squad";
         overflow-y: auto;
     }
+    /* KPI cards wrap onto multiple rows instead of squeezing across one line. */
+    .main-split--team .kpi-strip {
+        flex-wrap: wrap;
+    }
+    .main-split--team .kpi-strip .stat-card {
+        flex: 1 1 30%;
+    }
+    .main-split--team .bento-card--leaders {
+        min-height: 200px;
+    }
     .main-split--team .bento-card--map {
-        height: 55vh;
+        height: 45vh;
     }
     .main-split--team .bento-card--squad {
         height: 60vh;   /* fixed height so the squad grid scrolls internally */
     }
     .main-split--team .bento-card--formation {
         height: 42vh;   /* give the pitch image room when stacked */
-    }
-    .main-split--team .bento-card--empty {
-        min-height: 150px;
     }
 }
