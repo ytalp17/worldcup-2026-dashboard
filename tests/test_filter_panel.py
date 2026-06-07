@@ -79,7 +79,7 @@ def test_drawer_has_journey_grid_with_pagination_and_selection():
     grid = grids[0]
     assert grid.id == "journey-grid"
     assert grid.dashGridOptions["pagination"] is True
-    assert grid.dashGridOptions["paginationPageSize"] == 12
+    assert grid.dashGridOptions["paginationPageSize"] == 20
     # Minimal footer: no page-size selector.
     assert grid.dashGridOptions["paginationPageSizeSelector"] is False
     assert len(grid.rowData) == 3

@@ -41,7 +41,7 @@ _JOURNEY_GRID_OPTIONS = {
     "rowHeight": 38,
     "headerHeight": 38,
     "pagination": True,
-    "paginationPageSize": 12,
+    "paginationPageSize": 20,
     # Minimal footer: no page-size dropdown (and CSS hides the text so only the
     # navigation arrows remain).
     "paginationPageSizeSelector": False,
