@@ -8,7 +8,6 @@ import dash
 from dash import ALL, Dash, Input, Output, State, callback, clientside_callback, ctx, no_update
 
 from src.components.detail_panel import stadium_detail
-from src.components.filter_panel import journey_rows
 from src.components.flow_layer import flows_for
 from src.components.group_table import build_group_panel, group_rows
 from src.components.header_calendar import build_match_calendar
@@ -161,21 +160,13 @@ def open_filter_drawer(n_clicks):
 @callback(
     Output("flow-layer", "children"),
     Input("mode-toggle", "checked"),
-    Input("team-filter", "value"),
+    Input("journey-grid", "selectedRows"),
     Input("carousel-index", "data"),
 )
-def update_flow_layer(team_mode, filter_value, index):
-    return flow_children_for_mode(team_mode, filter_value, index)
-
-
-@callback(
-    Output("journey-grid", "rowData"),
-    Input("team-filter", "value"),
-)
-def highlight_journey_rows(selected):
-    # Recompute the (48-row) travel grid so each row's `selected` flag tracks the
-    # dropdown; rowClassRules then colours the matching rows.
-    return journey_rows(TEAM_FLOWS, app.get_asset_url, selected)
+def update_flow_layer(team_mode, selected_rows, index):
+    # Time mode: the teams selected in the journey grid drive the map flows.
+    selected = [r["team_raw"] for r in (selected_rows or [])]
+    return flow_children_for_mode(team_mode, selected, index)
 
 
 def _active_cities_for_date(selected_date: str | None, user_tz: str | None) -> set[str]:
@@ -425,6 +416,25 @@ clientside_callback(
     _UNIT_JS,
     Output("unit-store", "data"),
     Input("unit-toggle", "checked"),
+)
+
+# Selected teams are tinted in their own flow colour via the grid's getRowStyle,
+# which only re-runs on a redraw — so redraw the rows whenever the selection
+# changes. (The selection also drives the map flows via update_flow_layer.)
+_JOURNEY_REDRAW_JS = """
+async function(selectedRows) {
+    try {
+        const api = await dash_ag_grid.getApiAsync('journey-grid');
+        if (api) api.redrawRows();
+    } catch (e) {}
+    return window.dash_clientside.no_update;
+}
+"""
+
+clientside_callback(
+    _JOURNEY_REDRAW_JS,
+    Output("journey-redraw", "data"),
+    Input("journey-grid", "selectedRows"),
 )
 
 if __name__ == "__main__":

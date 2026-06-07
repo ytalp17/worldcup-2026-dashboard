@@ -8,15 +8,32 @@ import dash_mantine_components as dmc
 from src.components.team_carousel import display_name
 from src.data.flows import TeamFlow
 
+# Continent -> short code shown in the Continent column.
+CONTINENT_ABBR = {
+    "North America": "NAM",
+    "South America": "SAM",
+    "Europe": "EUR",
+    "Africa": "AFR",
+    "Asia": "ASI",
+    "Oceania": "OCE",
+}
+
+
+def continent_abbr(continent: str) -> str:
+    return CONTINENT_ABBR.get(continent, (continent or "")[:3].upper())
+
+
 # Travel-distance grid columns. Team uses the shared TeamCell renderer (flag +
 # name); Distance is numeric (so it sorts correctly) but displays in the unit
 # chosen by the #unit-toggle switch via formatDistance in dashAgGridFunctions.js.
 _JOURNEY_COL_DEFS = [
     {"headerName": "Team", "field": "team", "cellRenderer": "TeamCell",
-     "flex": 1, "minWidth": 120, "sortable": True},
+     "flex": 1, "minWidth": 110, "sortable": True},
+    {"headerName": "Cont", "field": "continent", "width": 64, "minWidth": 56,
+     "sortable": True},
     {"headerName": "Distance", "field": "distance_km",
      "valueFormatter": {"function": "formatDistance(params)"},
-     "width": 130, "minWidth": 110, "sort": "desc", "sortable": True},
+     "width": 120, "minWidth": 104, "sort": "desc", "sortable": True},
 ]
 
 _JOURNEY_GRID_OPTIONS = {
@@ -28,8 +45,18 @@ _JOURNEY_GRID_OPTIONS = {
     # Minimal footer: no page-size dropdown (and CSS hides the text so only the
     # navigation arrows remain).
     "paginationPageSizeSelector": False,
-    # Colour each selected team's row in that team's own flow colour; a callback
-    # keeps every row's `selected` flag + `color` in sync with the dropdown.
+    # The grid IS the selector: tick (or click) teams to drive the map flows.
+    # enableSelectionWithoutKeys makes a plain click toggle a row (and keep the
+    # others), so multi-select works without holding Ctrl/Cmd.
+    "rowSelection": {
+        "mode": "multiRow",
+        "checkboxes": True,
+        "headerCheckbox": False,
+        "enableClickSelection": True,
+        "enableSelectionWithoutKeys": True,
+    },
+    # Tint each selected team's row in its own flow colour (re-applied via a
+    # clientside redrawRows on selection change).
     "getRowStyle": {"function": "journeyRowStyle(params)"},
 }
 
@@ -37,20 +64,17 @@ _JOURNEY_GRID_OPTIONS = {
 def journey_rows(
     team_flows: dict[str, TeamFlow],
     asset_url: Callable[[str], str],
-    selected: list[str] | None = None,
 ) -> list[dict]:
-    """ag-grid rowData for every team, longest journey first. `selected` (the
-    dropdown value) marks rows for live highlighting."""
-    selected_set = set(selected or [])
+    """ag-grid rowData for every team, longest journey first."""
     rows: list[dict] = []
     for f in sorted(team_flows.values(), key=lambda x: x.distance_km, reverse=True):
         rows.append({
             "team": display_name(f.team),
             "team_raw": f.team,
             "flag": asset_url(f"country_logos/{f.team}.svg"),
+            "continent": continent_abbr(f.continent),
             "distance_km": f.distance_km,
             "color": f.color,
-            "selected": f.team in selected_set,
         })
     return rows
 
@@ -63,6 +87,8 @@ def build_journey_grid(
         columnDefs=_JOURNEY_COL_DEFS,
         rowData=journey_rows(team_flows, asset_url),
         columnSize="responsiveSizeToFit",
+        # Stable row ids keep selection intact across re-renders.
+        getRowId="params.data.team_raw",
         # Dark theme by default; a clientside callback swaps quartz <-> quartz-dark.
         className="ag-theme-quartz-dark journey-grid",
         dashGridOptions=_JOURNEY_GRID_OPTIONS,
@@ -71,33 +97,18 @@ def build_journey_grid(
 
 
 def build_filter_drawer(
-    options: list[dict],
     team_flows: dict | None = None,
     asset_url: Callable[[str], str] | None = None,
 ) -> dmc.Drawer:
-    children = [
-        dmc.MultiSelect(
-            id="team-filter",
-            data=options,
-            searchable=True,
-            clearable=True,
-            placeholder="Select teams…",
-            maxDropdownHeight=320,
-            # Float the dropdown above the drawer (zIndex 2500); otherwise the
-            # drawer paints over the options and intercepts clicks.
-            comboboxProps={"zIndex": 3000},
-        ),
-    ]
-    # All-teams travel-distance grid (replaces the old longest/shortest cards and
-    # the selected-team legend): paginated, sortable, with each selected team's
-    # row tinted in its own flow colour, in sync with the dropdown. The header
-    # carries a km <-> mi unit switch.
+    # The grid is the only control now: ticking/clicking team rows drives the map
+    # flows directly (no separate dropdown). Each selected team's row is tinted in
+    # its own flow colour; the header carries a km <-> mi unit switch.
+    children: list = []
     if team_flows and asset_url:
-        children.append(dmc.Divider(my="md"))
         children.append(
             dmc.Group(
                 [
-                    dmc.Text("Travel distances", size="sm", fw=600),
+                    dmc.Text("Select teams to map their travel", size="sm", fw=600),
                     dmc.Switch(
                         id="unit-toggle",
                         offLabel="km",
@@ -111,6 +122,7 @@ def build_filter_drawer(
                 justify="space-between",
                 align="center",
                 mb="xs",
+                wrap="nowrap",
             )
         )
         children.append(build_journey_grid(team_flows, asset_url))

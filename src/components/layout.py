@@ -126,7 +126,7 @@ def build_layout(
         zIndex=DRAWER_Z_INDEX,
     )
 
-    filter_drawer = build_filter_drawer(team_options or [], team_flows or {}, asset_url)
+    filter_drawer = build_filter_drawer(team_flows or {}, asset_url)
 
     return dmc.MantineProvider(
         [
@@ -136,6 +136,7 @@ def build_layout(
             dcc.Store(id="carousel-index", data=0, storage_type="local"),
             dcc.Store(id="user-tz"),
             dcc.Store(id="unit-store"),  # journey-grid distance unit (km/mi)
+            dcc.Store(id="journey-redraw"),  # ping target for the selection redraw
             dcc.Interval(id="tz-probe", interval=100, max_intervals=1),  # one-shot: fire once just after load to read the browser timezone
         ],
         id="mantine-provider",

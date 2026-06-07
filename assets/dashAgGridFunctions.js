@@ -49,11 +49,12 @@ function hexToRgba(hex, alpha) {
     return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
 }
 
-// Highlight a selected team's row in that team's own flow colour (the colour
-// formerly shown as the legend dot). Unselected rows get no override.
+// Tint a grid-selected team's row in that team's own flow colour (the same
+// colour drawn on the map). Selection is the grid's own row selection; a
+// clientside redrawRows() re-runs this on every selection change.
 dagfuncs.journeyRowStyle = function (params) {
-    if (!params.data || !params.data.selected) return null;
-    var c = params.data.color || "#339af0";
+    if (!params.node || !params.node.isSelected()) return null;
+    var c = (params.data && params.data.color) || "#339af0";
     return {
         backgroundColor: hexToRgba(c, 0.32) || "rgba(51,154,240,0.28)",
         boxShadow: "inset 3px 0 0 0 " + c,

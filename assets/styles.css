@@ -371,6 +371,9 @@ body,
     --ag-borders: none;
     --ag-row-border-width: 0;
     --ag-font-size: 13px;
+    /* Selected rows are tinted per-team via getRowStyle, so suppress the theme's
+       own flat selection colour. */
+    --ag-selected-row-background-color: transparent;
 }
 
 .journey-grid .ag-cell,
