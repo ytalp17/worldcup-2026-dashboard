@@ -257,26 +257,31 @@ body,
     align-self: start;
     max-height: 100%;
 }
+/* The pitch keeps a sensible size (capped by height) and the card shrink-wraps
+   its width around it, centred in the cell — so the whole pitch shows (never
+   clipped) and the container is only as wide as the pitch needs. */
 .main-split--team .bento-card--formation {
     align-self: start;
+    justify-self: center;
+    width: fit-content;
+    max-width: 100%;
 }
 .main-split--team .bento-card--table .group-panel,
 .main-split--team .bento-card--formation .formation-panel {
     height: auto;
 }
-/* The pitch image fills the card width and the image box uses the PNG's exact
-   aspect ratio (1473x985), so the whole pitch shows with no letterbox and the
-   card height follows it precisely. */
 .main-split--team .bento-card--formation .formation-panel__body {
-    align-items: stretch;
+    align-items: center;
+    justify-content: center;
     padding: 8px;
 }
 .main-split--team .bento-card--formation #formation-img,
 .main-split--team .bento-card--formation .formation-panel__body .mantine-Image-root {
     display: block;
-    width: 100%;
+    width: auto;
     height: auto;
-    max-height: none;
+    max-height: 26vh;          /* preserve a sensible pitch size */
+    max-width: 100%;
     aspect-ratio: 1473 / 985;
     object-fit: contain;
 }
