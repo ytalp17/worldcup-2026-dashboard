@@ -8,7 +8,7 @@ import dash
 from dash import ALL, Dash, Input, Output, State, callback, clientside_callback, ctx, no_update
 
 from src.components.detail_panel import stadium_detail
-from src.components.filter_panel import legend
+from src.components.filter_panel import journey_rows, legend
 from src.components.flow_layer import flows_for
 from src.components.group_table import build_group_panel, group_rows
 from src.components.header_calendar import build_match_calendar
@@ -92,6 +92,7 @@ app.layout = build_layout(
     team_carousel=TEAM_CAROUSEL,
     group_panel=build_group_panel(group_for_team(GROUPS, center_team(TEAM_NAMES, 0)), app.get_asset_url),
     squad_panel=build_squad_panel(squad_for_team(SQUADS, center_team(TEAM_NAMES, 0))),
+    asset_url=app.get_asset_url,
 )
 
 # Use the white FIFA logo as the browser tab icon (SVG favicon, modern browsers).
@@ -173,6 +174,16 @@ def update_flow_layer(team_mode, filter_value, index):
 )
 def update_filter_legend(selected):
     return legend(selected, TEAM_FLOWS)
+
+
+@callback(
+    Output("journey-grid", "rowData"),
+    Input("team-filter", "value"),
+)
+def highlight_journey_rows(selected):
+    # Recompute the (48-row) travel grid so each row's `selected` flag tracks the
+    # dropdown; rowClassRules then colours the matching rows.
+    return journey_rows(TEAM_FLOWS, app.get_asset_url, selected)
 
 
 def _active_cities_for_date(selected_date: str | None, user_tz: str | None) -> set[str]:
@@ -390,6 +401,17 @@ _SQUAD_GRID_THEME_JS = """
 clientside_callback(
     _SQUAD_GRID_THEME_JS,
     Output("squad-grid", "className"),
+    Input("color-scheme-toggle", "checked"),
+)
+
+_JOURNEY_GRID_THEME_JS = """
+(checked) => (checked ? 'ag-theme-quartz-dark journey-grid'
+                      : 'ag-theme-quartz journey-grid')
+"""
+
+clientside_callback(
+    _JOURNEY_GRID_THEME_JS,
+    Output("journey-grid", "className"),
     Input("color-scheme-toggle", "checked"),
 )
 

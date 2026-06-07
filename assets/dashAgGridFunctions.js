@@ -25,3 +25,15 @@ dagfuncs.dateComparatorCustom = function (date1, date2) {
     if (n2 === null) return -1;
     return n1 - n2;
 };
+
+// Format a numeric kilometre distance as "1,840 km / 1,143 mi" (mirrors the
+// Python format_distance used by the travel legend). Used by the journey grid's
+// Distance column so it sorts numerically yet displays the friendly string.
+dagfuncs.formatDistanceKm = function (params) {
+    if (params.value === null || params.value === undefined || params.value === "") {
+        return "";
+    }
+    var km = params.value;
+    var mi = km * 0.621371;
+    return Math.round(km).toLocaleString() + " km / " + Math.round(mi).toLocaleString() + " mi";
+};

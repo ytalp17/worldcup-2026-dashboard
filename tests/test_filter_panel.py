@@ -67,7 +67,11 @@ def test_legend_row_includes_formatted_distance():
     assert "1,840 km / 1,143 mi" in joined
 
 
-def _flows_for_leaderboard():
+def _asset(path):
+    return "/assets/" + path
+
+
+def _flows_for_grid():
     def mk(team, km):
         return TeamFlow(team, "Europe", "#fff",
                         (FlowStop(0, 0, "S", date(2026, 6, 1), 1),), km)
@@ -78,27 +82,52 @@ def _flows_for_leaderboard():
     }
 
 
-def test_drawer_renders_longest_and_shortest_leaderboard():
-    drawer = build_filter_drawer([], _flows_for_leaderboard())
-    texts = [n.children for n in _walk(drawer) if isinstance(n, dmc.Text)]
-    joined = " ".join(t for t in texts if isinstance(t, str))
-    assert "Longest journeys" in joined
-    assert "Shortest journeys" in joined
-    assert "Faraway" in joined
-    assert "Nearby" in joined
-    assert "9,000 km" in joined
+def test_journey_rows_all_teams_sorted_by_distance_desc():
+    from src.components.filter_panel import journey_rows
+    rows = journey_rows(_flows_for_grid(), _asset)
+    # Longest first (replaces the old "Longest journeys" card).
+    assert [r["team"] for r in rows] == ["Faraway", "Midway", "Nearby"]
+    assert rows[0]["distance_km"] == 9000.0
+    assert rows[0]["flag"].endswith("country_logos/Faraway.svg")
+    # Nothing selected by default.
+    assert all(r["selected"] is False for r in rows)
 
 
-def test_leaderboard_sections_are_wrapped_in_cards():
-    drawer = build_filter_drawer([], _flows_for_leaderboard())
-    cards = [n for n in _walk(drawer) if isinstance(n, dmc.Card)]
-    # One card per section: Longest journeys + Shortest journeys.
-    assert len(cards) == 2
-    for card in cards:
-        assert card.withBorder is True
-        # Each card still carries its section's content.
-        card_texts = [n.children for n in _walk(card) if isinstance(n, dmc.Text)]
-        assert any(isinstance(t, str) and "journeys" in t for t in card_texts)
+def test_journey_rows_marks_selected_in_sync_with_dropdown():
+    from src.components.filter_panel import journey_rows
+    rows = journey_rows(_flows_for_grid(), _asset, selected=["Nearby"])
+    by_team = {r["team_raw"]: r["selected"] for r in rows}
+    assert by_team["Nearby"] is True
+    assert by_team["Faraway"] is False
+    assert by_team["Midway"] is False
+
+
+def test_drawer_has_journey_grid_with_pagination_of_12():
+    import dash_ag_grid as dag
+    drawer = build_filter_drawer([], _flows_for_grid(), _asset)
+    grids = [n for n in _walk(drawer) if isinstance(n, dag.AgGrid)]
+    assert len(grids) == 1
+    grid = grids[0]
+    assert grid.id == "journey-grid"
+    assert grid.dashGridOptions["pagination"] is True
+    assert grid.dashGridOptions["paginationPageSize"] == 12
+    assert len(grid.rowData) == 3
+    # Selected rows are highlighted via a row-class rule synced to the dropdown.
+    assert "journey-row--selected" in grid.dashGridOptions["rowClassRules"]
+
+
+def test_journey_grid_all_columns_sortable():
+    import dash_ag_grid as dag
+    drawer = build_filter_drawer([], _flows_for_grid(), _asset)
+    grid = next(n for n in _walk(drawer) if isinstance(n, dag.AgGrid))
+    assert all(c.get("sortable") for c in grid.columnDefs)
+
+
+def test_drawer_without_asset_url_skips_grid():
+    # Cannot build flag URLs without asset_url -> no grid (drawer still builds).
+    import dash_ag_grid as dag
+    drawer = build_filter_drawer([], _flows_for_grid())
+    assert not [n for n in _walk(drawer) if isinstance(n, dag.AgGrid)]
 
 
 def test_filter_drawer_content_is_frosted():

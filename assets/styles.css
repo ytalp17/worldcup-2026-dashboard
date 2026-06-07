@@ -361,6 +361,30 @@ body,
     color: var(--mantine-color-dimmed);
 }
 
+/* --- travel-distance grid (lives in the filter drawer, Time mode) --- */
+
+/* Transparent so the frosted drawer shows through, like the other grids. */
+.journey-grid {
+    --ag-background-color: transparent;
+    --ag-odd-row-background-color: transparent;
+    --ag-header-background-color: transparent;
+    --ag-borders: none;
+    --ag-row-border-width: 0;
+    --ag-font-size: 13px;
+}
+
+.journey-grid .ag-cell,
+.journey-grid .ag-header-cell {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
+/* Rows whose team is picked in the dropdown light up (kept in sync via callback). */
+.journey-grid .ag-row.journey-row--selected {
+    background-color: rgba(51, 154, 240, 0.28) !important;
+    box-shadow: inset 3px 0 0 0 var(--mantine-color-blue-5);
+}
+
 /* Mobile: stack every card in one column (map first), scrolling vertically. */
 @media (max-width: 768px) {
     .main-split--team {

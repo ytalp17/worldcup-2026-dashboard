@@ -51,6 +51,7 @@ def build_layout(
     team_carousel=None,
     group_panel=None,
     squad_panel=None,
+    asset_url=None,
 ) -> dmc.MantineProvider:
     # Three equal-flex zones so the centre widget sits at the true centre of the
     # header regardless of the brand / controls widths.
@@ -125,7 +126,7 @@ def build_layout(
         zIndex=DRAWER_Z_INDEX,
     )
 
-    filter_drawer = build_filter_drawer(team_options or [], team_flows or {})
+    filter_drawer = build_filter_drawer(team_options or [], team_flows or {}, asset_url)
 
     return dmc.MantineProvider(
         [

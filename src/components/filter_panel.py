@@ -1,56 +1,75 @@
 from __future__ import annotations
 
+from collections.abc import Callable
+
+import dash_ag_grid as dag
 import dash_mantine_components as dmc
 
-from src.data.flows import TeamFlow, format_distance, rank_by_distance
+from src.components.team_carousel import display_name
+from src.data.flows import TeamFlow, format_distance
+
+# Travel-distance grid columns. Team uses the shared TeamCell renderer (flag +
+# name); Distance is numeric (so it sorts correctly) but displays the friendly
+# "km / mi" string via the formatDistanceKm function in dashAgGridFunctions.js.
+_JOURNEY_COL_DEFS = [
+    {"headerName": "Team", "field": "team", "cellRenderer": "TeamCell",
+     "flex": 1, "minWidth": 120, "sortable": True},
+    {"headerName": "Distance", "field": "distance_km",
+     "valueFormatter": {"function": "formatDistanceKm(params)"},
+     "width": 150, "minWidth": 120, "sort": "desc", "sortable": True},
+]
+
+_JOURNEY_GRID_OPTIONS = {
+    "suppressCellFocus": True,
+    "rowHeight": 38,
+    "headerHeight": 38,
+    "pagination": True,
+    "paginationPageSize": 12,
+    # Colour the rows whose team is selected in the #team-filter dropdown; a
+    # callback keeps each row's `selected` flag in sync with the selection.
+    "rowClassRules": {"journey-row--selected": "params.data.selected"},
+}
 
 
-def _leaderboard_section(title: str, flows: list[TeamFlow]) -> dmc.Card:
-    rows = [
-        dmc.Group(
-            [
-                dmc.Box(
-                    w=10,
-                    h=10,
-                    style={
-                        "background": f.color,
-                        "borderRadius": "50%",
-                        "flex": "0 0 auto",
-                    },
-                ),
-                dmc.Text(f"{f.team} — {format_distance(f.distance_km)}", size="xs"),
-            ],
-            gap="xs",
-            align="center",
-        )
-        for f in flows
-    ]
-    return dmc.Card(
-        children=dmc.Stack(
-            [dmc.Text(title, size="sm", fw=600), *rows],
-            gap=4,
-        ),
-        withBorder=True,
-        radius="md",
-        shadow="sm",
-        padding="sm",
-    )
+def journey_rows(
+    team_flows: dict[str, TeamFlow],
+    asset_url: Callable[[str], str],
+    selected: list[str] | None = None,
+) -> list[dict]:
+    """ag-grid rowData for every team, longest journey first. `selected` (the
+    dropdown value) marks rows for live highlighting."""
+    selected_set = set(selected or [])
+    rows: list[dict] = []
+    for f in sorted(team_flows.values(), key=lambda x: x.distance_km, reverse=True):
+        rows.append({
+            "team": display_name(f.team),
+            "team_raw": f.team,
+            "flag": asset_url(f"country_logos/{f.team}.svg"),
+            "distance_km": f.distance_km,
+            "selected": f.team in selected_set,
+        })
+    return rows
 
 
-def _leaderboard(team_flows: dict[str, TeamFlow]) -> dmc.Stack:
-    longest, shortest = rank_by_distance(team_flows, n=5)
-    return dmc.Stack(
-        [
-            _leaderboard_section("Longest journeys", longest),
-            _leaderboard_section("Shortest journeys", shortest),
-        ],
-        gap="md",
-        mt="lg",
+def build_journey_grid(
+    team_flows: dict[str, TeamFlow], asset_url: Callable[[str], str]
+) -> dag.AgGrid:
+    return dag.AgGrid(
+        id="journey-grid",
+        columnDefs=_JOURNEY_COL_DEFS,
+        rowData=journey_rows(team_flows, asset_url),
+        columnSize="responsiveSizeToFit",
+        # Dark theme by default; a clientside callback swaps quartz <-> quartz-dark.
+        className="ag-theme-quartz-dark journey-grid",
+        dashGridOptions=_JOURNEY_GRID_OPTIONS,
+        style={"height": "560px", "width": "100%"},
     )
 
 
 def build_filter_drawer(
-    options: list[dict], team_flows: dict | None = None
+    options: list[dict],
+    team_flows: dict | None = None,
+    asset_url: Callable[[str], str] | None = None,
 ) -> dmc.Drawer:
     children = [
         dmc.MultiSelect(
@@ -66,9 +85,12 @@ def build_filter_drawer(
         ),
         dmc.Stack(id="filter-legend", gap="xs", mt="md"),
     ]
-    if team_flows:
+    # All-teams travel-distance grid (replaces the old longest/shortest cards):
+    # paginated, sortable, with selected rows highlighted in sync with the dropdown.
+    if team_flows and asset_url:
         children.append(dmc.Divider(my="md"))
-        children.append(_leaderboard(team_flows))
+        children.append(dmc.Text("Travel distances", size="sm", fw=600, mb="xs"))
+        children.append(build_journey_grid(team_flows, asset_url))
     return dmc.Drawer(
         id="filter-drawer",
         title="Team Travel Map",
