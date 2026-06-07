@@ -84,7 +84,7 @@ def render_team(key: str, data: dict, theme: dict, name: str, outdir) -> Path:
               for i in range(len(xi))]
     pitch.formation(
         formation, kind="scatter", ax=ax,
-        s=1800, color=colors, edgecolors="white", linewidth=2.4, zorder=3,
+        s=2100, color=colors, edgecolors="white", linewidth=2.4, zorder=3,
     )
 
     # Shirt number centred in each node; surname just beneath it. On a
