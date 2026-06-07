@@ -51,6 +51,7 @@ def build_layout(
     team_carousel=None,
     group_panel=None,
     squad_panel=None,
+    formation_panel=None,
     asset_url=None,
 ) -> dmc.MantineProvider:
     # Three equal-flex zones so the centre widget sits at the true centre of the
@@ -95,15 +96,17 @@ def build_layout(
     )
     table_card = dmc.Box(group_panel, className="bento-card bento-card--table")
     squad_card = dmc.Box(squad_panel, className="bento-card bento-card--squad")
-    # Four uniform (single-cell) empty cards the user fills with future
-    # infographics, one by one — the squad card now fills the right strip.
+    # The estimated starting XI pitch fills cell e2 (bottom-left).
+    formation_card = dmc.Box(formation_panel, className="bento-card bento-card--formation")
+    # Three uniform (single-cell) empty cards the user fills with future
+    # infographics, one by one (e1, e3, e4 — e2 now holds the formation pitch).
     empty_cards = [
         dmc.Box(className="bento-card bento-card--empty", id=f"bento-e{i}")
-        for i in range(1, 5)
+        for i in (1, 3, 4)
     ]
     main = dmc.AppShellMain(
         dmc.Box(
-            [map_card, table_card, squad_card, *empty_cards],
+            [map_card, table_card, squad_card, formation_card, *empty_cards],
             id="main-split",
             className="main-split",
         )

@@ -245,8 +245,8 @@ body,
 
 .main-split--team .bento-card--table { grid-area: table; }
 .main-split--team .bento-card--squad { grid-area: squad; }
+.main-split--team .bento-card--formation { grid-area: e2; }
 .main-split--team #bento-e1 { grid-area: e1; }
-.main-split--team #bento-e2 { grid-area: e2; }
 .main-split--team #bento-e3 { grid-area: e3; }
 .main-split--team #bento-e4 { grid-area: e4; }
 
@@ -257,9 +257,10 @@ body,
 
 /* --- group standings table (lives in the table card) --- */
 
-/* Table / Squad cards: a fixed header bar on top, the grid body filling the rest. */
+/* Table / Squad / Formation cards: a fixed header bar on top, the body filling the rest. */
 .group-panel,
-.squad-panel {
+.squad-panel,
+.formation-panel {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -281,6 +282,30 @@ body,
     padding: 12px 14px;
     gap: 8px;
     overflow: hidden;
+}
+
+/* --- estimated starting XI pitch (lives in cell e2) --- */
+
+/* Body centres the pitch image; object-fit:contain letterboxes the landscape
+   PNG to whatever shape the cell takes without overflow or distortion. */
+.formation-panel__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    overflow: hidden;
+}
+
+.formation-panel__body .mantine-Image-root,
+#formation-img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
 }
 
 /* Compact, borderless grid that blends with the card background. */
@@ -417,6 +442,9 @@ body,
     }
     .main-split--team .bento-card--squad {
         height: 60vh;   /* fixed height so the squad grid scrolls internally */
+    }
+    .main-split--team .bento-card--formation {
+        height: 42vh;   /* give the pitch image room when stacked */
     }
     .main-split--team .bento-card--empty {
         min-height: 150px;
