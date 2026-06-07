@@ -21,8 +21,10 @@ from src.data.host_cities import HostCityRepository
 from src.data.match_calendar import MatchCalendar
 from src.data.matches import MatchRepository, matches_by_stadium
 from src.data.stadiums import StadiumRepository
+from src.components.formation_pitch import build_formation_panel, formation_title, pitch_src
 from src.components.squad_table import build_squad_panel, squad_rows
 from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, team_order
+from src.data.lineups import LineupRepository, lineup_for_team
 from src.data.squads import SquadRepository, squad_for_team
 from src.data.team_continents import grouped_team_options
 from src.data.venues import build_venues
@@ -51,6 +53,7 @@ TEAM_OPTIONS = grouped_team_options(sorted(TEAM_FLOWS))
 TEAM_NAMES = team_order(TEAM_FLOWS)
 GROUPS = build_groups(MATCHES)
 SQUADS = SquadRepository(DATA_DIR / "world_cup_2026_squads.csv").load()
+LINEUPS = LineupRepository(DATA_DIR / "estimated_starting_eleven.json").load()
 
 STADIUM_TO_CITY = {v.stadium_name: v.city for v in VENUES}
 MATCH_CALENDAR = MatchCalendar(MATCHES, STADIUM_TO_CITY, today=date.today())
@@ -83,6 +86,16 @@ def squad_panel_payload(index):
     return name, rows
 
 
+def formation_panel_payload(index, dark):
+    """(header_title, team, image_src) for the centred team's estimated XI.
+    `dark` (the color-scheme-toggle state) picks the dark/light pitch image."""
+    team = center_team(TEAM_NAMES, index or 0)
+    lineup = lineup_for_team(LINEUPS, team)
+    title = formation_title(lineup)
+    src = pitch_src(lineup.slug, app.get_asset_url, dark) if lineup else ""
+    return title, team, src
+
+
 app.layout = build_layout(
     VENUES,
     TEAM_OPTIONS,
@@ -91,6 +104,11 @@ app.layout = build_layout(
     team_carousel=TEAM_CAROUSEL,
     group_panel=build_group_panel(group_for_team(GROUPS, center_team(TEAM_NAMES, 0)), app.get_asset_url),
     squad_panel=build_squad_panel(squad_for_team(SQUADS, center_team(TEAM_NAMES, 0))),
+    formation_panel=build_formation_panel(
+        lineup_for_team(LINEUPS, center_team(TEAM_NAMES, 0)),
+        app.get_asset_url,
+        dark=True,
+    ),
     asset_url=app.get_asset_url,
 )
 
@@ -312,6 +330,19 @@ def update_group_panel(index):
 def update_squad_panel(index):
     name, rows = squad_panel_payload(index)
     return rows, name
+
+
+@callback(
+    Output("formation-img", "src"),
+    Output("formation-title", "children"),
+    Input("carousel-index", "data"),
+    Input("color-scheme-toggle", "checked"),
+)
+def update_formation_panel(index, dark):
+    # Single owner of the pitch image src: re-renders on team change (carousel)
+    # and on theme change (dark/light), so the two never race for the src.
+    title, _team, src = formation_panel_payload(index, dark)
+    return src, title
 
 
 # Toggling the switch flips both the Mantine color scheme and the base map

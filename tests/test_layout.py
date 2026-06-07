@@ -172,9 +172,10 @@ def _classnames(nodes):
     return out
 
 
-def test_layout_has_bento_with_map_table_squad_and_empty_cards():
+def test_layout_has_bento_with_map_table_squad_formation_and_empty_cards():
     nodes = list(_walk(build_layout(
         VENUES, group_panel=dmc.Box("x"), squad_panel=dmc.Box("y"),
+        formation_panel=dmc.Box(dmc.Image(id="formation-img"), id="fp"),
     )))
     classes = _classnames(nodes)
     ids = {nid for n in nodes if isinstance((nid := getattr(n, "id", None)), str)}
@@ -183,9 +184,13 @@ def test_layout_has_bento_with_map_table_squad_and_empty_cards():
     assert "bento-card--map" in classes
     assert "bento-card--table" in classes
     assert "bento-card--squad" in classes
-    # Four single-cell empty placeholder cards remain (down from seven).
-    for i in range(1, 5):
+    # The formation pitch occupies cell e2; the panel is mounted inside it.
+    assert "bento-card--formation" in classes
+    assert "formation-img" in ids
+    # Three single-cell empty placeholders remain (e1, e3, e4); e2 is taken.
+    for i in (1, 3, 4):
         assert f"bento-e{i}" in ids
+    assert "bento-e2" not in ids
     assert "bento-e5" not in ids
 
 

@@ -61,6 +61,19 @@ def test_app_team_names_alphabetical_48():
     assert app.TEAM_NAMES == sorted(app.TEAM_NAMES, key=str.casefold)
 
 
+def test_formation_panel_payload_is_theme_aware():
+    import app
+
+    disp, team, src_dark = app.formation_panel_payload(0, True)
+    src_light = app.formation_panel_payload(0, False)[2]
+    # The centred team at index 0 (alphabetical) has a hyphenated formation
+    # and a theme-correct pitch image src.
+    assert "-" in disp
+    assert team == app.center_team(app.TEAM_NAMES, 0)
+    assert src_dark.endswith("-dark.png")
+    assert src_light.endswith("-light.png")
+
+
 def test_flow_children_for_mode_team_uses_centered_team():
     import dash_leaflet as dl
 

@@ -1,0 +1,2450 @@
+{
+  "algeria": {
+    "name": "Algeria",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Zidane",
+        23
+      ],
+      [
+        "Ait Nouri",
+        15
+      ],
+      [
+        "Bensebaini",
+        21
+      ],
+      [
+        "Mandi",
+        2
+      ],
+      [
+        "Aouar",
+        8
+      ],
+      [
+        "Belghali",
+        17
+      ],
+      [
+        "Boudaoui",
+        14
+      ],
+      [
+        "Chaïbi",
+        10
+      ],
+      [
+        "Amoura",
+        18
+      ],
+      [
+        "Gouiri",
+        9
+      ],
+      [
+        "Mahrez",
+        7
+      ]
+    ]
+  },
+  "argentina": {
+    "name": "Argentina",
+    "formation": "433",
+    "coach": "",
+    "xi": [
+      [
+        "Martínez",
+        23
+      ],
+      [
+        "Martínez",
+        6
+      ],
+      [
+        "Molina",
+        26
+      ],
+      [
+        "Otamendi",
+        19
+      ],
+      [
+        "Tagliafico",
+        3
+      ],
+      [
+        "De Paul",
+        7
+      ],
+      [
+        "Fernández",
+        24
+      ],
+      [
+        "González",
+        15
+      ],
+      [
+        "Mac Allister",
+        20
+      ],
+      [
+        "Álvarez",
+        9
+      ],
+      [
+        "Messi",
+        10
+      ]
+    ]
+  },
+  "australia": {
+    "name": "Australia",
+    "formation": "3421",
+    "coach": "",
+    "xi": [
+      [
+        "Ryan",
+        1
+      ],
+      [
+        "Bos",
+        5
+      ],
+      [
+        "Burgess",
+        21
+      ],
+      [
+        "Circati",
+        3
+      ],
+      [
+        "Souttar",
+        19
+      ],
+      [
+        "Hrustic",
+        10
+      ],
+      [
+        "Irvine",
+        22
+      ],
+      [
+        "Italiano",
+        4
+      ],
+      [
+        "Metcalfe",
+        8
+      ],
+      [
+        "Touré",
+        9
+      ],
+      [
+        "Volpato",
+        20
+      ]
+    ]
+  },
+  "austria": {
+    "name": "Austria",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Schlager",
+        1
+      ],
+      [
+        "Alaba",
+        8
+      ],
+      [
+        "Laimer",
+        20
+      ],
+      [
+        "Lienhart",
+        15
+      ],
+      [
+        "Mwene",
+        16
+      ],
+      [
+        "Sabitzer",
+        9
+      ],
+      [
+        "Schlager",
+        4
+      ],
+      [
+        "Schmid",
+        18
+      ],
+      [
+        "Seiwald",
+        6
+      ],
+      [
+        "Arnautovic",
+        7
+      ],
+      [
+        "Gregoritsch",
+        11
+      ]
+    ]
+  },
+  "belgium": {
+    "name": "Belgium",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Courtois",
+        1
+      ],
+      [
+        "De Cuyper",
+        5
+      ],
+      [
+        "De Winter",
+        16
+      ],
+      [
+        "Meunier",
+        15
+      ],
+      [
+        "Theate",
+        3
+      ],
+      [
+        "De Bruyne",
+        7
+      ],
+      [
+        "De Ketelaere",
+        17
+      ],
+      [
+        "Onana",
+        24
+      ],
+      [
+        "Tielemans",
+        8
+      ],
+      [
+        "Doku",
+        11
+      ],
+      [
+        "Trossard",
+        10
+      ]
+    ]
+  },
+  "bosnia-and-herzegovina": {
+    "name": "Bosnia and Herzegovina",
+    "formation": "442",
+    "coach": "",
+    "xi": [
+      [
+        "Vasilj",
+        1
+      ],
+      [
+        "Dedic",
+        7
+      ],
+      [
+        "Katic",
+        18
+      ],
+      [
+        "Kolasinac",
+        5
+      ],
+      [
+        "Muharemovic",
+        4
+      ],
+      [
+        "Memic",
+        15
+      ],
+      [
+        "Sunjic",
+        14
+      ],
+      [
+        "Tahirovic",
+        6
+      ],
+      [
+        "Bajraktarevic",
+        20
+      ],
+      [
+        "Demirovic",
+        10
+      ],
+      [
+        "Dzeko",
+        11
+      ]
+    ]
+  },
+  "brazil": {
+    "name": "Brazil",
+    "formation": "442",
+    "coach": "",
+    "xi": [
+      [
+        "Alisson",
+        1
+      ],
+      [
+        "Gabriel",
+        3
+      ],
+      [
+        "Marquinhos",
+        4
+      ],
+      [
+        "Sandro",
+        6
+      ],
+      [
+        "Casemiro",
+        5
+      ],
+      [
+        "Guimarães",
+        8
+      ],
+      [
+        "Wesley",
+        2
+      ],
+      [
+        "Cunha",
+        9
+      ],
+      [
+        "Martinelli",
+        22
+      ],
+      [
+        "Raphinha",
+        11
+      ],
+      [
+        "Vinicius",
+        7
+      ]
+    ]
+  },
+  "canada": {
+    "name": "Canada",
+    "formation": "442",
+    "coach": "",
+    "xi": [
+      [
+        "Crépeau",
+        16
+      ],
+      [
+        "Bombito",
+        15
+      ],
+      [
+        "Cornelius",
+        13
+      ],
+      [
+        "Johnston",
+        2
+      ],
+      [
+        "Laryea",
+        22
+      ],
+      [
+        "Buchanan",
+        17
+      ],
+      [
+        "Eustaquio",
+        7
+      ],
+      [
+        "Koné",
+        8
+      ],
+      [
+        "David",
+        10
+      ],
+      [
+        "Larin",
+        9
+      ],
+      [
+        "Millar",
+        11
+      ]
+    ]
+  },
+  "cape-verde": {
+    "name": "Cape Verde",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Vozinha",
+        1
+      ],
+      [
+        "Costa",
+        5
+      ],
+      [
+        "Lopes",
+        4
+      ],
+      [
+        "Moreira",
+        22
+      ],
+      [
+        "Monteiro",
+        10
+      ],
+      [
+        "Paulo",
+        8
+      ],
+      [
+        "Pina",
+        6
+      ],
+      [
+        "Semedo",
+        16
+      ],
+      [
+        "Cabral",
+        7
+      ],
+      [
+        "Livramento",
+        19
+      ],
+      [
+        "Mendes",
+        20
+      ]
+    ]
+  },
+  "colombia": {
+    "name": "Colombia",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Vargas",
+        12
+      ],
+      [
+        "Lucumí",
+        3
+      ],
+      [
+        "Mojica",
+        17
+      ],
+      [
+        "Sánchez",
+        23
+      ],
+      [
+        "Lerma",
+        16
+      ],
+      [
+        "Muñoz",
+        2
+      ],
+      [
+        "Ríos",
+        6
+      ],
+      [
+        "Rodríguez",
+        10
+      ],
+      [
+        "Arias",
+        11
+      ],
+      [
+        "Luis Diaz",
+        7
+      ],
+      [
+        "Suárez",
+        25
+      ]
+    ]
+  },
+  "croatia": {
+    "name": "Croatia",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Livakovic",
+        1
+      ],
+      [
+        "Caleta-Car",
+        5
+      ],
+      [
+        "Gvardiol",
+        4
+      ],
+      [
+        "Stanisic",
+        2
+      ],
+      [
+        "Vuskovic",
+        22
+      ],
+      [
+        "Kovacic",
+        8
+      ],
+      [
+        "Kramaric",
+        9
+      ],
+      [
+        "Modric",
+        10
+      ],
+      [
+        "Pasalic",
+        15
+      ],
+      [
+        "Budimir",
+        11
+      ],
+      [
+        "Perisic",
+        14
+      ]
+    ]
+  },
+  "curacao": {
+    "name": "Curacao",
+    "formation": "433",
+    "coach": "",
+    "xi": [
+      [
+        "Room",
+        1
+      ],
+      [
+        "Floranus",
+        5
+      ],
+      [
+        "Gaari",
+        3
+      ],
+      [
+        "Obispo",
+        18
+      ],
+      [
+        "Sambo",
+        2
+      ],
+      [
+        "Bacuna",
+        7
+      ],
+      [
+        "Bacuna",
+        10
+      ],
+      [
+        "Comenencia",
+        8
+      ],
+      [
+        "Antonisse",
+        11
+      ],
+      [
+        "Chong",
+        21
+      ],
+      [
+        "Kastaneer",
+        19
+      ]
+    ]
+  },
+  "czechia": {
+    "name": "Czechia",
+    "formation": "3421",
+    "coach": "",
+    "xi": [
+      [
+        "Kovár",
+        1
+      ],
+      [
+        "Chaloupek",
+        6
+      ],
+      [
+        "Coufal",
+        5
+      ],
+      [
+        "Hranác",
+        4
+      ],
+      [
+        "Krejcí",
+        7
+      ],
+      [
+        "Darida",
+        8
+      ],
+      [
+        "Jurásek",
+        14
+      ],
+      [
+        "Soucek",
+        22
+      ],
+      [
+        "Provod",
+        17
+      ],
+      [
+        "Schick",
+        10
+      ],
+      [
+        "Sulc",
+        15
+      ]
+    ]
+  },
+  "dr-congo": {
+    "name": "DR Congo",
+    "formation": "442",
+    "coach": "Sébastien Desabre",
+    "xi": [
+      [
+        "Mpasi-Nzau",
+        1
+      ],
+      [
+        "Masuaku",
+        26
+      ],
+      [
+        "Mbemba",
+        22
+      ],
+      [
+        "Tuanzebe",
+        4
+      ],
+      [
+        "Wan-Bissaka",
+        2
+      ],
+      [
+        "Moutoussamy",
+        8
+      ],
+      [
+        "Sadiki",
+        14
+      ],
+      [
+        "Bakambu",
+        17
+      ],
+      [
+        "Elia",
+        13
+      ],
+      [
+        "Mbuku",
+        7
+      ],
+      [
+        "Wissa",
+        20
+      ]
+    ]
+  },
+  "ecuador": {
+    "name": "Ecuador",
+    "formation": "442",
+    "coach": "",
+    "xi": [
+      [
+        "Galíndez",
+        1
+      ],
+      [
+        "Hincapié",
+        3
+      ],
+      [
+        "Ordóñez",
+        4
+      ],
+      [
+        "Pacho",
+        6
+      ],
+      [
+        "Caicedo",
+        23
+      ],
+      [
+        "Estupinán",
+        7
+      ],
+      [
+        "Franco",
+        21
+      ],
+      [
+        "Vite",
+        15
+      ],
+      [
+        "Angulo",
+        20
+      ],
+      [
+        "Plata",
+        19
+      ],
+      [
+        "Valencia",
+        13
+      ]
+    ]
+  },
+  "egypt": {
+    "name": "Egypt",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Shobeir",
+        23
+      ],
+      [
+        "Abdelmonem",
+        6
+      ],
+      [
+        "Fatouh",
+        13
+      ],
+      [
+        "Hany",
+        3
+      ],
+      [
+        "Ibrahim",
+        2
+      ],
+      [
+        "Ashour",
+        8
+      ],
+      [
+        "Attia",
+        19
+      ],
+      [
+        "Fathy",
+        14
+      ],
+      [
+        "Marmoush",
+        22
+      ],
+      [
+        "Salah",
+        10
+      ],
+      [
+        "Trezeguet",
+        7
+      ]
+    ]
+  },
+  "england": {
+    "name": "England",
+    "formation": "4231",
+    "coach": "Thomas Tuchel",
+    "xi": [
+      [
+        "Pickford",
+        1
+      ],
+      [
+        "Guéhi",
+        6
+      ],
+      [
+        "James",
+        24
+      ],
+      [
+        "Konsa",
+        2
+      ],
+      [
+        "O'Reilly",
+        3
+      ],
+      [
+        "Anderson",
+        8
+      ],
+      [
+        "Bellingham",
+        10
+      ],
+      [
+        "Rice",
+        4
+      ],
+      [
+        "Kane",
+        9
+      ],
+      [
+        "Rashford",
+        11
+      ],
+      [
+        "Saka",
+        7
+      ]
+    ]
+  },
+  "france": {
+    "name": "France",
+    "formation": "4231",
+    "coach": "Didier Deschamps",
+    "xi": [
+      [
+        "Maignan",
+        16
+      ],
+      [
+        "Hernández",
+        19
+      ],
+      [
+        "Koundé",
+        5
+      ],
+      [
+        "Saliba",
+        17
+      ],
+      [
+        "Upamecano",
+        4
+      ],
+      [
+        "Rabiot",
+        14
+      ],
+      [
+        "Tchouaméni",
+        8
+      ],
+      [
+        "Dembélé",
+        7
+      ],
+      [
+        "Doué",
+        20
+      ],
+      [
+        "Mbappé",
+        10
+      ],
+      [
+        "Olise",
+        11
+      ]
+    ]
+  },
+  "germany": {
+    "name": "Germany",
+    "formation": "4231",
+    "coach": "Julian Nagelsmann",
+    "xi": [
+      [
+        "Neuer",
+        1
+      ],
+      [
+        "Raum",
+        22
+      ],
+      [
+        "Schlotterbeck",
+        15
+      ],
+      [
+        "Tah",
+        4
+      ],
+      [
+        "Goretzka",
+        8
+      ],
+      [
+        "Kimmich",
+        6
+      ],
+      [
+        "Musiala",
+        10
+      ],
+      [
+        "Pavlovic",
+        5
+      ],
+      [
+        "Havertz",
+        7
+      ],
+      [
+        "Karl",
+        25
+      ],
+      [
+        "Wirtz",
+        17
+      ]
+    ]
+  },
+  "ghana": {
+    "name": "Ghana",
+    "formation": "3421",
+    "coach": "",
+    "xi": [
+      [
+        "Asare",
+        16
+      ],
+      [
+        "Adjetey",
+        4
+      ],
+      [
+        "Mensah",
+        14
+      ],
+      [
+        "Opoku",
+        18
+      ],
+      [
+        "Peprah Oppong",
+        21
+      ],
+      [
+        "Partey",
+        5
+      ],
+      [
+        "Sibo",
+        8
+      ],
+      [
+        "Yirenkyi",
+        3
+      ],
+      [
+        "Ayew",
+        9
+      ],
+      [
+        "Semenyo",
+        11
+      ],
+      [
+        "Williams",
+        19
+      ]
+    ]
+  },
+  "haiti": {
+    "name": "Haiti",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Placide",
+        1
+      ],
+      [
+        "Adé",
+        4
+      ],
+      [
+        "Arcus",
+        2
+      ],
+      [
+        "Delcroix",
+        5
+      ],
+      [
+        "Lacroix",
+        13
+      ],
+      [
+        "Bellegarde",
+        10
+      ],
+      [
+        "Casimir",
+        21
+      ],
+      [
+        "Deedson Louicius",
+        11
+      ],
+      [
+        "Pierre",
+        14
+      ],
+      [
+        "Isidor",
+        18
+      ],
+      [
+        "Providence",
+        15
+      ]
+    ]
+  },
+  "iran": {
+    "name": "Iran",
+    "formation": "433",
+    "coach": "",
+    "xi": [
+      [
+        "Beiranvand",
+        1
+      ],
+      [
+        "Khalilzadeh",
+        4
+      ],
+      [
+        "Mohammadi",
+        5
+      ],
+      [
+        "Nemati",
+        19
+      ],
+      [
+        "Yousefi",
+        17
+      ],
+      [
+        "Ezatolahi",
+        6
+      ],
+      [
+        "Ghoddos",
+        14
+      ],
+      [
+        "Ghayedi",
+        10
+      ],
+      [
+        "Hosseinzadeh",
+        18
+      ],
+      [
+        "Mohebi",
+        8
+      ],
+      [
+        "Taremi",
+        9
+      ]
+    ]
+  },
+  "iraq": {
+    "name": "Iraq",
+    "formation": "442",
+    "coach": "",
+    "xi": [
+      [
+        "Hassan",
+        12
+      ],
+      [
+        "Ali",
+        3
+      ],
+      [
+        "Doski",
+        23
+      ],
+      [
+        "Sulaka",
+        2
+      ],
+      [
+        "Tahseen",
+        4
+      ],
+      [
+        "Al-Ammari",
+        16
+      ],
+      [
+        "Bayesh",
+        8
+      ],
+      [
+        "Iqbal",
+        14
+      ],
+      [
+        "Al Hamadi",
+        9
+      ],
+      [
+        "Amyn",
+        7
+      ],
+      [
+        "Hussein",
+        18
+      ]
+    ]
+  },
+  "ivory-coast": {
+    "name": "Ivory Coast",
+    "formation": "433",
+    "coach": "",
+    "xi": [
+      [
+        "Fofana",
+        1
+      ],
+      [
+        "Agbadou",
+        20
+      ],
+      [
+        "Doué",
+        17
+      ],
+      [
+        "Konan",
+        3
+      ],
+      [
+        "Kossounou",
+        7
+      ],
+      [
+        "Amad",
+        15
+      ],
+      [
+        "Fofana",
+        6
+      ],
+      [
+        "Kessié",
+        8
+      ],
+      [
+        "Sangaré",
+        18
+      ],
+      [
+        "Diomande",
+        11
+      ],
+      [
+        "Guessand",
+        22
+      ]
+    ]
+  },
+  "japan": {
+    "name": "Japan",
+    "formation": "3421",
+    "coach": "",
+    "xi": [
+      [
+        "Suzuki",
+        1
+      ],
+      [
+        "Itakura",
+        4
+      ],
+      [
+        "Ito",
+        21
+      ],
+      [
+        "Tomiyasu",
+        22
+      ],
+      [
+        "Doan",
+        10
+      ],
+      [
+        "Endo",
+        6
+      ],
+      [
+        "Kamada",
+        15
+      ],
+      [
+        "Ito",
+        14
+      ],
+      [
+        "Kubo",
+        8
+      ],
+      [
+        "Nakamura",
+        13
+      ],
+      [
+        "Ueda",
+        18
+      ]
+    ]
+  },
+  "jordan": {
+    "name": "Jordan",
+    "formation": "343",
+    "coach": "",
+    "xi": [
+      [
+        "Abulaila",
+        1
+      ],
+      [
+        "Abu Dahab",
+        4
+      ],
+      [
+        "Al Arab",
+        5
+      ],
+      [
+        "Nasib",
+        3
+      ],
+      [
+        "Abu Taha",
+        20
+      ],
+      [
+        "Al Mardi",
+        13
+      ],
+      [
+        "Al Rashdan",
+        21
+      ],
+      [
+        "Al Rawabdeh",
+        8
+      ],
+      [
+        "Haddad",
+        23
+      ],
+      [
+        "Tamari",
+        10
+      ],
+      [
+        "Olwan",
+        9
+      ]
+    ]
+  },
+  "mexico": {
+    "name": "Mexico",
+    "formation": "4141",
+    "coach": "",
+    "xi": [
+      [
+        "Rangel",
+        1
+      ],
+      [
+        "Gallardo",
+        23
+      ],
+      [
+        "Lira",
+        6
+      ],
+      [
+        "Montes",
+        3
+      ],
+      [
+        "Sánchez",
+        2
+      ],
+      [
+        "Vásquez",
+        5
+      ],
+      [
+        "Alvarado",
+        25
+      ],
+      [
+        "Fidalgo",
+        8
+      ],
+      [
+        "Mora",
+        19
+      ],
+      [
+        "Jiménez",
+        9
+      ],
+      [
+        "Quiñones",
+        16
+      ]
+    ]
+  },
+  "morocco": {
+    "name": "Morocco",
+    "formation": "433",
+    "coach": "",
+    "xi": [
+      [
+        "Bono",
+        1
+      ],
+      [
+        "Aguerd",
+        5
+      ],
+      [
+        "Diop",
+        14
+      ],
+      [
+        "Hakimi",
+        2
+      ],
+      [
+        "Mazraoui",
+        3
+      ],
+      [
+        "El Aynaoui",
+        24
+      ],
+      [
+        "El Khannouss",
+        23
+      ],
+      [
+        "Saibari",
+        11
+      ],
+      [
+        "Brahim Diaz",
+        10
+      ],
+      [
+        "El Kaabi",
+        20
+      ],
+      [
+        "Ezzalzouli",
+        17
+      ]
+    ]
+  },
+  "netherlands": {
+    "name": "Netherlands",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Verbruggen",
+        1
+      ],
+      [
+        "Aké",
+        5
+      ],
+      [
+        "Van de Ven",
+        15
+      ],
+      [
+        "van Dijk",
+        4
+      ],
+      [
+        "de Jong",
+        21
+      ],
+      [
+        "Dumfries",
+        22
+      ],
+      [
+        "Gravenberch",
+        8
+      ],
+      [
+        "Reijnders",
+        14
+      ],
+      [
+        "Depay",
+        10
+      ],
+      [
+        "Gakpo",
+        11
+      ],
+      [
+        "Malen",
+        18
+      ]
+    ]
+  },
+  "new-zealand": {
+    "name": "New Zealand",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Crocombe",
+        1
+      ],
+      [
+        "Bindon",
+        4
+      ],
+      [
+        "Boxall",
+        5
+      ],
+      [
+        "Old",
+        19
+      ],
+      [
+        "Bell",
+        6
+      ],
+      [
+        "Cacace",
+        13
+      ],
+      [
+        "Garbett",
+        7
+      ],
+      [
+        "Singh",
+        10
+      ],
+      [
+        "Stamenic",
+        8
+      ],
+      [
+        "Just",
+        11
+      ],
+      [
+        "Wood",
+        9
+      ]
+    ]
+  },
+  "norway": {
+    "name": "Norway",
+    "formation": "433",
+    "coach": "Ståle Solbakken",
+    "xi": [
+      [
+        "Nyland",
+        1
+      ],
+      [
+        "Ajer",
+        3
+      ],
+      [
+        "Heggem",
+        17
+      ],
+      [
+        "Møller Wolfe",
+        5
+      ],
+      [
+        "Berg",
+        6
+      ],
+      [
+        "Berge",
+        8
+      ],
+      [
+        "Ødegaard",
+        10
+      ],
+      [
+        "Ryerson",
+        26
+      ],
+      [
+        "Haaland",
+        9
+      ],
+      [
+        "Nusa",
+        20
+      ],
+      [
+        "Sørloth",
+        7
+      ]
+    ]
+  },
+  "panama": {
+    "name": "Panama",
+    "formation": "3421",
+    "coach": "",
+    "xi": [
+      [
+        "Mosquera",
+        22
+      ],
+      [
+        "Andrade",
+        16
+      ],
+      [
+        "Córdoba",
+        3
+      ],
+      [
+        "Harvey",
+        14
+      ],
+      [
+        "Murillo",
+        23
+      ],
+      [
+        "Davis",
+        15
+      ],
+      [
+        "Godoy",
+        20
+      ],
+      [
+        "Martínez",
+        6
+      ],
+      [
+        "Díaz",
+        10
+      ],
+      [
+        "Rodriguez",
+        7
+      ],
+      [
+        "Waterman",
+        18
+      ]
+    ]
+  },
+  "paraguay": {
+    "name": "Paraguay",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Fernández",
+        1
+      ],
+      [
+        "Alderete",
+        3
+      ],
+      [
+        "Alonso",
+        6
+      ],
+      [
+        "Cáceres",
+        4
+      ],
+      [
+        "Gómez",
+        15
+      ],
+      [
+        "Bobadilla",
+        16
+      ],
+      [
+        "Cubas",
+        14
+      ],
+      [
+        "Enciso",
+        19
+      ],
+      [
+        "Gómez",
+        8
+      ],
+      [
+        "Almirón",
+        10
+      ],
+      [
+        "Sanabria",
+        9
+      ]
+    ]
+  },
+  "portugal": {
+    "name": "Portugal",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Costa",
+        1
+      ],
+      [
+        "Cancelo",
+        20
+      ],
+      [
+        "Dias",
+        3
+      ],
+      [
+        "Inácio",
+        14
+      ],
+      [
+        "Mendes",
+        25
+      ],
+      [
+        "Fernandes",
+        8
+      ],
+      [
+        "Neves",
+        15
+      ],
+      [
+        "Silva",
+        10
+      ],
+      [
+        "Vitinha",
+        23
+      ],
+      [
+        "Leão",
+        17
+      ],
+      [
+        "Ronaldo",
+        7
+      ]
+    ]
+  },
+  "qatar": {
+    "name": "Qatar",
+    "formation": "433",
+    "coach": "",
+    "xi": [
+      [
+        "Barsham",
+        22
+      ],
+      [
+        "Al Brake",
+        18
+      ],
+      [
+        "Khoukhi",
+        16
+      ],
+      [
+        "Mendes",
+        3
+      ],
+      [
+        "Miguel",
+        2
+      ],
+      [
+        "Al Mannai",
+        26
+      ],
+      [
+        "Boudiaf",
+        12
+      ],
+      [
+        "Madibo",
+        23
+      ],
+      [
+        "Afif",
+        11
+      ],
+      [
+        "Ali",
+        19
+      ],
+      [
+        "Junior",
+        8
+      ]
+    ]
+  },
+  "saudi-arabia": {
+    "name": "Saudi Arabia",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Al Owais",
+        21
+      ],
+      [
+        "Al Tambakti",
+        5
+      ],
+      [
+        "Al-Boushail",
+        13
+      ],
+      [
+        "Lajami",
+        3
+      ],
+      [
+        "Abdulhamid",
+        12
+      ],
+      [
+        "Al-Dawsari",
+        6
+      ],
+      [
+        "Al-Juwayr",
+        7
+      ],
+      [
+        "Alkhaibari",
+        15
+      ],
+      [
+        "Kanno",
+        23
+      ],
+      [
+        "Al-Buraikan",
+        9
+      ],
+      [
+        "Al-Dawsari",
+        10
+      ]
+    ]
+  },
+  "scotland": {
+    "name": "Scotland",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Gunn",
+        1
+      ],
+      [
+        "Hickey",
+        2
+      ],
+      [
+        "McKenna",
+        26
+      ],
+      [
+        "Robertson",
+        3
+      ],
+      [
+        "Souttar",
+        15
+      ],
+      [
+        "Christie",
+        11
+      ],
+      [
+        "McLean",
+        23
+      ],
+      [
+        "McTominay",
+        4
+      ],
+      [
+        "Adams",
+        10
+      ],
+      [
+        "Gannon-Doak",
+        17
+      ],
+      [
+        "McGinn",
+        7
+      ]
+    ]
+  },
+  "senegal": {
+    "name": "Senegal",
+    "formation": "433",
+    "coach": "",
+    "xi": [
+      [
+        "Mendy",
+        16
+      ],
+      [
+        "Diatta",
+        15
+      ],
+      [
+        "Diouf",
+        25
+      ],
+      [
+        "Koulibaly",
+        3
+      ],
+      [
+        "Niakhaté",
+        19
+      ],
+      [
+        "Diarra",
+        21
+      ],
+      [
+        "Gana Gueye",
+        5
+      ],
+      [
+        "Gueye",
+        26
+      ],
+      [
+        "Mané",
+        10
+      ],
+      [
+        "Jackson",
+        11
+      ],
+      [
+        "Ndiaye",
+        13
+      ]
+    ]
+  },
+  "south-africa": {
+    "name": "South Africa",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Williams",
+        1
+      ],
+      [
+        "Mbokazi",
+        14
+      ],
+      [
+        "Modiba",
+        6
+      ],
+      [
+        "Mudau",
+        20
+      ],
+      [
+        "Okon",
+        21
+      ],
+      [
+        "Mbatha",
+        5
+      ],
+      [
+        "Mokoena",
+        4
+      ],
+      [
+        "Appollis",
+        7
+      ],
+      [
+        "Foster",
+        9
+      ],
+      [
+        "Mofokeng",
+        10
+      ],
+      [
+        "Moremi",
+        8
+      ]
+    ]
+  },
+  "south-korea": {
+    "name": "South Korea",
+    "formation": "3421",
+    "coach": "",
+    "xi": [
+      [
+        "Kim",
+        1
+      ],
+      [
+        "Kim",
+        4
+      ],
+      [
+        "Kim",
+        5
+      ],
+      [
+        "Lee",
+        2
+      ],
+      [
+        "Seol",
+        22
+      ],
+      [
+        "Hwang",
+        6
+      ],
+      [
+        "Kim",
+        24
+      ],
+      [
+        "Lee",
+        19
+      ],
+      [
+        "Lee",
+        13
+      ],
+      [
+        "Hwang",
+        11
+      ],
+      [
+        "Son",
+        7
+      ]
+    ]
+  },
+  "spain": {
+    "name": "Spain",
+    "formation": "433",
+    "coach": "Luis de la Fuente",
+    "xi": [
+      [
+        "Simón",
+        23
+      ],
+      [
+        "Cubarsí",
+        22
+      ],
+      [
+        "Cucurella",
+        24
+      ],
+      [
+        "Laporte",
+        14
+      ],
+      [
+        "Porro",
+        12
+      ],
+      [
+        "Olmo",
+        10
+      ],
+      [
+        "Pedri",
+        20
+      ],
+      [
+        "Rodri",
+        16
+      ],
+      [
+        "Ruiz",
+        8
+      ],
+      [
+        "Lamine Yamal",
+        19
+      ],
+      [
+        "Oyarzabal",
+        21
+      ]
+    ]
+  },
+  "sweden": {
+    "name": "Sweden",
+    "formation": "343",
+    "coach": "Graham Potter",
+    "xi": [
+      [
+        "Nordfeldt",
+        23
+      ],
+      [
+        "Gudmundsson",
+        5
+      ],
+      [
+        "Hien",
+        4
+      ],
+      [
+        "Lagerbielke",
+        2
+      ],
+      [
+        "Lindelöf",
+        3
+      ],
+      [
+        "Ayari",
+        18
+      ],
+      [
+        "Karlström",
+        16
+      ],
+      [
+        "Svensson",
+        8
+      ],
+      [
+        "Elanga",
+        11
+      ],
+      [
+        "Gyökeres",
+        17
+      ],
+      [
+        "Isak",
+        9
+      ]
+    ]
+  },
+  "switzerland": {
+    "name": "Switzerland",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Kobel",
+        1
+      ],
+      [
+        "Akanji",
+        5
+      ],
+      [
+        "Elvedi",
+        4
+      ],
+      [
+        "Rodríguez",
+        13
+      ],
+      [
+        "Aebischer",
+        20
+      ],
+      [
+        "Freuler",
+        8
+      ],
+      [
+        "Rieder",
+        22
+      ],
+      [
+        "Widmer",
+        3
+      ],
+      [
+        "Xhaka",
+        10
+      ],
+      [
+        "Embolo",
+        7
+      ],
+      [
+        "Vargas",
+        17
+      ]
+    ]
+  },
+  "tunisia": {
+    "name": "Tunisia",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Dahmen",
+        16
+      ],
+      [
+        "Abdi",
+        2
+      ],
+      [
+        "Bronn",
+        6
+      ],
+      [
+        "Talbi",
+        3
+      ],
+      [
+        "Valery",
+        20
+      ],
+      [
+        "Achouri",
+        7
+      ],
+      [
+        "Ben Slimane",
+        25
+      ],
+      [
+        "Hannibal",
+        10
+      ],
+      [
+        "Khedira",
+        13
+      ],
+      [
+        "Skhiri",
+        17
+      ],
+      [
+        "Saad",
+        8
+      ]
+    ]
+  },
+  "turkiye": {
+    "name": "Turkiye",
+    "formation": "4231",
+    "coach": "",
+    "xi": [
+      [
+        "Çakir",
+        23
+      ],
+      [
+        "Bardakci",
+        14
+      ],
+      [
+        "Demiral",
+        3
+      ],
+      [
+        "Kadioglu",
+        20
+      ],
+      [
+        "Çalhanoglu",
+        10
+      ],
+      [
+        "Çelik",
+        2
+      ],
+      [
+        "Güler",
+        8
+      ],
+      [
+        "Yildiz",
+        11
+      ],
+      [
+        "Yüksek",
+        16
+      ],
+      [
+        "Aktürkoglu",
+        7
+      ],
+      [
+        "Baris Alper",
+        21
+      ]
+    ]
+  },
+  "uruguay": {
+    "name": "Uruguay",
+    "formation": "4411",
+    "coach": "",
+    "xi": [
+      [
+        "Muslera",
+        23
+      ],
+      [
+        "Araujo",
+        4
+      ],
+      [
+        "Araújo",
+        20
+      ],
+      [
+        "Giménez",
+        2
+      ],
+      [
+        "Olivera",
+        16
+      ],
+      [
+        "Varela",
+        13
+      ],
+      [
+        "Bentancur",
+        6
+      ],
+      [
+        "de Arrascaeta",
+        10
+      ],
+      [
+        "Ugarte",
+        5
+      ],
+      [
+        "Valverde",
+        8
+      ],
+      [
+        "Núñez",
+        9
+      ]
+    ]
+  },
+  "usa": {
+    "name": "USA",
+    "formation": "3421",
+    "coach": "",
+    "xi": [
+      [
+        "Turner",
+        1
+      ],
+      [
+        "McKenzie",
+        22
+      ],
+      [
+        "Ream",
+        13
+      ],
+      [
+        "Richards",
+        3
+      ],
+      [
+        "Robinson",
+        5
+      ],
+      [
+        "Adams",
+        4
+      ],
+      [
+        "McKennie",
+        8
+      ],
+      [
+        "Tillman",
+        17
+      ],
+      [
+        "Weah",
+        21
+      ],
+      [
+        "Balogun",
+        20
+      ],
+      [
+        "Pulisic",
+        10
+      ]
+    ]
+  },
+  "uzbekistan": {
+    "name": "Uzbekistan",
+    "formation": "3421",
+    "coach": "",
+    "xi": [
+      [
+        "Yusupov",
+        1
+      ],
+      [
+        "Alidzhanov",
+        3
+      ],
+      [
+        "Ashurmatov",
+        5
+      ],
+      [
+        "Khusanov",
+        2
+      ],
+      [
+        "Nasrulloev",
+        13
+      ],
+      [
+        "Abdullaev",
+        18
+      ],
+      [
+        "Khamrobekov",
+        9
+      ],
+      [
+        "Shomurodov",
+        14
+      ],
+      [
+        "Shukurov",
+        7
+      ],
+      [
+        "Urunov",
+        11
+      ],
+      [
+        "Fayzullayev",
+        22
+      ]
+    ]
+  }
+}
