@@ -6,3 +6,5 @@ venv/
 .venv/
 logs/
 .superpowers/
+.env
+*.env
