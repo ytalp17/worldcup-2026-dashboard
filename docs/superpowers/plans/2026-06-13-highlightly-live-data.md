@@ -146,6 +146,30 @@ git commit -m "build: add uvicorn production entrypoint"
 
 ## Phase 2 — Live data layer (synchronous, fully offline-testable)
 
+> ### ⚠️ REVISION after Task 5 fixture capture (authoritative — overrides Tasks 6–8 below)
+>
+> Real API responses (committed under `tests/fixtures/live/`) differ from the documented
+> assumptions. Tasks 6–8 implementers MUST follow these corrections:
+>
+> 1. **Matches list** is `{"data": [...]}`. Each match has `.id`, `.homeTeam.name`,
+>    `.awayTeam.name`, `.state.description` (`"Not started"` | `"Finished"` | live strings),
+>    `.state.clock` (int minutes or null), `.state.score.current` (string `"4 - 1"` or null).
+>    **There is NO venue on list matches** — venue only exists on the single-match detail.
+> 2. **Venue strategy CHANGED:** do not reconcile venue *names*. Instead **join each live match
+>    to the static schedule (`MATCHES` from `wc2026_matches.csv`) by team pair** and take that
+>    match's `stadium`. Group-stage pairings are unique, so `(home, away)` is a safe key.
+>    Live names seen (Brazil, Morocco, USA, Paraguay, Mexico) match our static names exactly;
+>    use normalization + a small alias map for FIFA spelling diffs, and return `None` (no map
+>    badge, graceful) when no static match is found.
+> 3. **Standings** is `{"groups": [...]}`. Each group `.name`; rows at `.standings[]`; per row:
+>    team `.team.name`, `.points`, played `.total.games`, won `.total.wins`, drawn
+>    `.total.draws`, lost `.total.loses`; goal-diff = `.total.scoredGoals - .total.receivedGoals`
+>    (no stored GD). **Skip the rollup group** whose name is `"Group Stage"` (keep only `Group A`…`Group L`).
+> 4. **Events** endpoint returns a **bare list** (not `{"events": [...]}`); was empty for the
+>    unplayed sample, so event field names are confirmed later when building the modal (Task 14).
+> 5. **Single match detail** (`/matches/{id}`) returns a **bare list of one**; venue at
+>    `.venue.name`/`.venue.city`, plus `.events`, `.statistics`, `.predictions`, `.lineups`.
+
 ### Task 4: HighlightlyClient — the only HTTP boundary
 
 **Files:**
