@@ -138,6 +138,7 @@ def build_layout(
             dcc.Store(id="user-tz"),
             dcc.Store(id="unit-store"),  # journey-grid distance unit (km/mi)
             dcc.Store(id="journey-redraw"),  # ping target for the selection redraw
+            dcc.Store(id="live-store", data={"ok": False, "any_live": False, "matches": [], "standings": {}}),
             dcc.Interval(id="tz-probe", interval=100, max_intervals=1),  # one-shot: fire once just after load to read the browser timezone
         ],
         id="mantine-provider",

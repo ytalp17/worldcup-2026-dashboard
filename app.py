@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import date
 from pathlib import Path
 
@@ -29,6 +30,9 @@ from src.data.lineups import LineupRepository, lineup_for_team
 from src.data.squads import Squad, SquadRepository, squad_for_team
 from src.data.team_stats import compute_team_stats
 from src.data.team_continents import grouped_team_options
+from src.data.live.client import HighlightlyClient
+from src.data.live.reconcile import build_stadium_index
+from src.data.live.service import LiveDataService
 from src.data.venues import build_venues
 
 DATA_DIR = Path(__file__).parent / "assets" / "data"
@@ -53,6 +57,15 @@ LINEUPS = LineupRepository(DATA_DIR / "estimated_starting_eleven.json").load()
 
 STADIUM_TO_CITY = {v.stadium_name: v.city for v in VENUES}
 MATCH_CALENDAR = MatchCalendar(MATCHES, STADIUM_TO_CITY, today=date.today())
+
+STADIUM_INDEX = build_stadium_index(MATCHES)
+_API_KEY = os.environ.get("HIGHLIGHTLY_API_KEY")
+# No-key mode: when the env var is unset the app runs purely on static data,
+# so dev and the whole test suite work offline.
+LIVE = (
+    LiveDataService(HighlightlyClient(api_key=_API_KEY), STADIUM_INDEX)
+    if _API_KEY else None
+)
 
 
 def flow_children(selected):
