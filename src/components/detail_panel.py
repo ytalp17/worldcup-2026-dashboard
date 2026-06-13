@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import dash_mantine_components as dmc
+from dash import html
 from dash_iconify import DashIconify
 
 from src.data.kickoff import KickoffView, kickoff_view, venue_offset_tag
@@ -89,24 +90,29 @@ def _kickoff_line(kv: KickoffView) -> dmc.Group:
     )
 
 
-def _match_item(match: Match, user_tz: str | None) -> dmc.TimelineItem:
+def _match_item(match: Match, user_tz: str | None, api_id=None) -> dmc.TimelineItem:
     kv = kickoff_view(match, user_tz)
     day = kv.user_date or match.date  # user-local date is the anchor when known
     title = f"{day.strftime('%b')} {day.day} · {_match_label(match)}"
+    content = [
+        dmc.Text(
+            [_team_span(match.home), " vs ", _team_span(match.away)],
+            size="sm",
+        ),
+        _kickoff_line(kv),
+    ]
+    if api_id is not None:
+        content = [html.Div(content, id={"type": "open-live-modal", "index": api_id},
+                            n_clicks=0, style={"cursor": "pointer"})]
     return dmc.TimelineItem(
         title=title,
         bullet=DashIconify(icon="tabler:ball-football", width=12),
-        children=[
-            dmc.Text(
-                [_team_span(match.home), " vs ", _team_span(match.away)],
-                size="sm",
-            ),
-            _kickoff_line(kv),
-        ],
+        children=content,
     )
 
 
-def _matches_section(matches: Sequence[Match], user_tz: str | None):
+def _matches_section(matches: Sequence[Match], user_tz: str | None, match_links=None):
+    links = match_links or {}
     header = dmc.Group(
         [
             dmc.Text("Matches", fw=600),
@@ -125,7 +131,7 @@ def _matches_section(matches: Sequence[Match], user_tz: str | None):
         body = dmc.Text(NO_MATCHES_TEXT, size="sm", c="dimmed")
     else:
         body = dmc.Timeline(
-            [_match_item(m, user_tz) for m in matches],
+            [_match_item(m, user_tz, links.get(m.number)) for m in matches],
             active=len(matches),
             bulletSize=20,
             lineWidth=2,
@@ -167,7 +173,7 @@ def _live_section(match: dict):
 
 
 def stadium_detail(venue: Venue, matches: Sequence[Match] = (), user_tz: str | None = None,
-                   live: dict | None = None):
+                   live: dict | None = None, match_links: dict | None = None):
     """Drawer body: photo, location, key stats, info, the live match (if any at
     this venue, with a button to open the detail modal), then the schedule."""
     children = [
@@ -181,5 +187,5 @@ def stadium_detail(venue: Venue, matches: Sequence[Match] = (), user_tz: str | N
         children.append(dmc.Divider())
         children.append(_live_section(match))
     children.append(dmc.Divider())
-    children.append(_matches_section(matches, user_tz))
+    children.append(_matches_section(matches, user_tz, match_links))
     return dmc.Stack(children, gap="md")

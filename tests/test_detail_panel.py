@@ -236,3 +236,28 @@ def test_stadium_detail_no_live_section_without_live_match():
     venue = _venue(has_image=True)  # stadium_name="Dallas Stadium"
     body = stadium_detail(venue, matches=(), user_tz=None, live={"matches": []})
     assert "open-live-modal" not in str(body.to_plotly_json())
+
+
+def test_drawer_match_is_clickable_when_id_resolved():
+    from src.components.detail_panel import stadium_detail
+    from datetime import date, time, datetime
+    from src.data.matches import Match
+    venue = _venue(has_image=True)  # stadium_name="Dallas Stadium"
+    m = Match(number=4, home="USA", away="Paraguay", group="Group D", stage="Group Stage",
+              stadium="Dallas Stadium", date=date(2026, 6, 12), local_time=time(18, 0),
+              kickoff_utc=datetime(2026, 6, 13, 1, 0))
+    body = stadium_detail(venue, matches=(m,), user_tz=None, match_links={4: 1267454654})
+    blob = str(body.to_plotly_json())
+    assert "open-live-modal" in blob and "1267454654" in blob
+
+
+def test_drawer_match_plain_when_no_link():
+    from src.components.detail_panel import stadium_detail
+    from datetime import date, time, datetime
+    from src.data.matches import Match
+    venue = _venue(has_image=True)
+    m = Match(number=4, home="USA", away="Paraguay", group="Group D", stage="Group Stage",
+              stadium="Dallas Stadium", date=date(2026, 6, 12), local_time=time(18, 0),
+              kickoff_utc=datetime(2026, 6, 13, 1, 0))
+    body = stadium_detail(venue, matches=(m,), user_tz=None, match_links={})
+    assert "open-live-modal" not in str(body.to_plotly_json())

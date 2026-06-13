@@ -183,13 +183,32 @@ app.index_string = f"""<!DOCTYPE html>
 </html>"""
 
 
+def _venue_match_links(matches, now):
+    """{match_number: api_match_id} for a venue's matches, resolved per date."""
+    if LIVE is None:
+        return {}
+    from src.data.live.reconcile import canonical_team, index_matches_by_pair
+    links = {}
+    by_date = {}
+    for m in matches:
+        by_date.setdefault(m.date.isoformat(), []).append(m)
+    for date_iso, day_matches in by_date.items():
+        idx = index_matches_by_pair(LIVE.matches_on(date_iso, now))
+        for m in day_matches:
+            mid = idx.get((canonical_team(m.home), canonical_team(m.away)))
+            if mid is not None:
+                links[m.number] = mid
+    return links
+
+
 def drawer_for_city(city: str | None, user_tz: str | None = None, live: dict | None = None):
     """Compute the (opened, title, children) drawer state for a clicked city."""
     venue = VENUES_BY_CITY.get(city) if city else None
     if venue is None:
         return False, no_update, no_update
     matches = MATCHES_BY_STADIUM.get(venue.stadium_name, [])
-    return True, venue.official_name, stadium_detail(venue, matches, user_tz, live=live)
+    links = _venue_match_links(matches, time.monotonic())
+    return True, venue.official_name, stadium_detail(venue, matches, user_tz, live=live, match_links=links)
 
 
 @callback(
