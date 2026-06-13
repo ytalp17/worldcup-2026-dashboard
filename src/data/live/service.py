@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import logging
+
 from src.data.live import models
 from src.data.live.reconcile import find_stadium
+
+logger = logging.getLogger(__name__)
 
 LEAGUE_ID = 1635
 SEASON = 2026
@@ -12,8 +16,12 @@ _STANDINGS_TTL = 3600.0
 class LiveDataService:
     """Caches Highlightly responses and builds a JSON-serializable snapshot.
 
-    On any client error the snapshot is marked ok=False (with the last good
-    payload if there is one, else empty) so UI callbacks fall back to static.
+    Any failure while fetching or shaping a snapshot — a network/quota error
+    from the client OR a parsing/programming error — is caught and logged, and
+    the snapshot is marked ok=False (carrying the last good payload if there is
+    one, else empty) so UI callbacks fall back to static data instead of
+    crashing. The broad catch is deliberate (the live feed must never take the
+    dashboard down); the logging keeps those failures visible for diagnosis.
     """
 
     def __init__(self, client, stadium_index, league_id=LEAGUE_ID, season=SEASON):
@@ -53,6 +61,7 @@ class LiveDataService:
             self._last_good = payload
             return payload
         except Exception:
+            logger.exception("Live snapshot failed; falling back to static")
             if self._last_good is not None:
                 return {**self._last_good, "ok": False}
             return {"ok": False, "any_live": False, "matches": [], "standings": {}}
