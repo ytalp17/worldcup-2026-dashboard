@@ -198,3 +198,43 @@ def test_marker_uses_custom_pulse_dot_markup():
     assert "venue-marker" in opts["html"]
     # Custom className avoids Leaflet's default white box around div icons.
     assert opts["className"] == "venue-marker-icon"
+
+
+def test_live_match_for_venue_returns_live_match():
+    from src.components.map_view import live_match_for_venue
+    live = {"matches": [
+        {"venue": "Dallas Stadium", "is_live": True, "home": "Brazil",
+         "away": "Mexico", "home_score": 2, "away_score": 1, "match_id": 42},
+    ]}
+    m = live_match_for_venue("Dallas Stadium", live)
+    assert m is not None and m["match_id"] == 42
+
+
+def test_live_match_for_venue_none_when_not_live_or_absent():
+    from src.components.map_view import live_match_for_venue
+    not_live = {"matches": [{"venue": "Dallas Stadium", "is_live": False, "match_id": 1}]}
+    assert live_match_for_venue("Dallas Stadium", not_live) is None
+    assert live_match_for_venue("Dallas Stadium", {"matches": []}) is None
+    assert live_match_for_venue("Dallas Stadium", None) is None
+
+
+def test_live_score_markers_one_per_live_venue():
+    from src.components.map_view import live_score_markers
+    from types import SimpleNamespace
+    venues = [
+        SimpleNamespace(city="Dallas", lat=32.7, lon=-97.0, stadium_name="Dallas Stadium"),
+        SimpleNamespace(city="Boston", lat=42.3, lon=-71.0, stadium_name="Boston Stadium"),
+    ]
+    live = {"matches": [
+        {"venue": "Dallas Stadium", "is_live": True, "home": "Brazil",
+         "away": "Mexico", "home_score": 2, "away_score": 1, "match_id": 42},
+    ]}
+    markers = live_score_markers(venues, live)
+    assert len(markers) == 1  # only the live Dallas venue
+    # The score text appears somewhere in the rendered marker html.
+    assert "2-1" in str(markers[0].to_plotly_json())
+
+
+def test_live_score_markers_empty_when_no_live():
+    from src.components.map_view import live_score_markers
+    assert live_score_markers([], {"matches": []}) == []

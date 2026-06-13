@@ -13,7 +13,7 @@ from src.components.flow_layer import flows_for
 from src.components.group_table import build_group_panel, group_rows, live_group_rows
 from src.components.header_calendar import build_match_calendar
 from src.components.layout import build_layout
-from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, filter_pin, pulse_markers
+from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, filter_pin, live_score_markers, pulse_markers
 from src.data.altitudes import AltitudeRepository
 from src.data.distances import DistanceRepository
 from src.data.flows import build_team_flows, team_cities
@@ -260,6 +260,14 @@ def pulse_children_for_mode(
 )
 def update_pulse_layer(team_mode, selected_date, index, user_tz):
     return pulse_children_for_mode(team_mode, selected_date, index, user_tz)
+
+
+@callback(
+    Output("live-layer", "children"),
+    Input("live-store", "data"),
+)
+def update_live_layer(live):
+    return live_score_markers(VENUES, live)
 
 
 @callback(

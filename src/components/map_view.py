@@ -101,12 +101,59 @@ def pulse_markers(venues: list[Venue], active_cities: set[str]) -> list[dl.DivMa
     return rings
 
 
+def live_match_for_venue(stadium_name: str, live: dict | None) -> dict | None:
+    """The in-play match at this stadium (by generic name), or None. Pure lookup."""
+    for m in (live or {}).get("matches", []):
+        if m.get("is_live") and m.get("venue") == stadium_name:
+            return m
+    return None
+
+
+def _live_badge_html(match: dict) -> str:
+    home, away = match.get("home_score"), match.get("away_score")
+    score = f"{home}-{away}" if home is not None else "LIVE"
+    # Inline-styled so no extra CSS file is needed; non-interactive overlay.
+    return (
+        '<div style="display:flex;align-items:center;gap:3px;'
+        'background:#e03131;color:#fff;font:700 10px/1 sans-serif;'
+        'padding:2px 5px;border-radius:7px;white-space:nowrap;'
+        'box-shadow:0 1px 3px rgba(0,0,0,.4);">'
+        f'<span style="font-size:8px;">●</span>{score}</div>'
+    )
+
+
+def live_score_markers(venues, live: dict | None) -> list:
+    """Non-interactive LIVE score badges over stadiums hosting an in-play match.
+    Rebuilt as its own layer (empty -> populated) like pulse_markers."""
+    markers = []
+    for v in venues:
+        match = live_match_for_venue(v.stadium_name, live)
+        if not match:
+            continue
+        markers.append(
+            dl.DivMarker(
+                id={"type": "live-badge", "index": v.city},
+                position=[v.lat, v.lon],
+                interactive=False,
+                iconOptions={
+                    "html": _live_badge_html(match),
+                    "className": "venue-live-badge-icon",
+                    # Offset the badge up-right of the dot so both are visible.
+                    "iconSize": [44, 16],
+                    "iconAnchor": [-6, 24],
+                },
+            )
+        )
+    return markers
+
+
 def build_map(venues: list[Venue]) -> dl.Map:
     return dl.Map(
         children=[
             dl.TileLayer(id="base-tiles", url=DARK_TILE, attribution=TILE_ATTRIBUTION),
             dl.LayerGroup(id="venue-layer", children=venue_markers(venues)),
             dl.LayerGroup(id="pulse-layer"),
+            dl.LayerGroup(id="live-layer"),
             dl.LayerGroup(id="flow-layer"),
             dl.LayerGroup(id="filter-pin-layer", children=[filter_pin()]),
         ],
