@@ -212,3 +212,50 @@ def test_match_lineups_parses_and_caches():
 def test_match_lineups_empty_dict_on_error():
     svc = LiveDataService(_BoomClient(), _index())
     assert svc.match_lineups(42, now=0.0) == {}
+
+
+# ---------------------------------------------------------------------------
+# matches_on
+# ---------------------------------------------------------------------------
+
+def test_matches_on_returns_day_match_dicts_and_caches():
+    client = _FakeClient()
+    svc = LiveDataService(client, _index())
+    out = svc.matches_on("2026-06-12", now=0.0)
+    assert {m["home"] for m in out} == {"USA", "Brazil"}
+    svc.matches_on("2026-06-12", now=10.0)        # cached (same date)
+    assert client.match_calls == 1
+    svc.matches_on("2026-06-13", now=20.0)        # different date -> new fetch
+    assert client.match_calls == 2
+
+
+def test_matches_on_empty_on_error():
+    svc = LiveDataService(_BoomClient(), _index())
+    assert svc.matches_on("2026-06-12", now=0.0) == []
+
+
+# ---------------------------------------------------------------------------
+# match_summary
+# ---------------------------------------------------------------------------
+
+def test_match_summary_parses_detail_and_caches():
+    class _C(_FakeClient):
+        def __init__(self):
+            super().__init__(); self.detail_calls = 0
+        def match(self, match_id):
+            self.detail_calls += 1
+            return [{"id": match_id, "homeTeam": {"name": "USA"},
+                     "awayTeam": {"name": "Paraguay"},
+                     "state": {"description": "Finished", "clock": 90,
+                               "score": {"current": "4 - 1"}}}]
+    c = _C()
+    svc = LiveDataService(c, _index())
+    s = svc.match_summary(1267454654, now=0.0)
+    assert s["home"] == "USA" and s["home_score"] == 4 and s["state"] == "finished"
+    svc.match_summary(1267454654, now=5.0)        # cached
+    assert c.detail_calls == 1
+
+
+def test_match_summary_none_on_error():
+    svc = LiveDataService(_BoomClient(), _index())
+    assert svc.match_summary(1, now=0.0) is None

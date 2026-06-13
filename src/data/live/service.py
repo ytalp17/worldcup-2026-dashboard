@@ -11,6 +11,7 @@ LEAGUE_ID = 1635
 SEASON = 2026
 _MATCHES_TTL = 60.0
 _STANDINGS_TTL = 3600.0
+_MATCHES_ON_TTL = 600.0
 
 
 class LiveDataService:
@@ -104,6 +105,33 @@ class LiveDataService:
         except Exception:
             logger.exception("Live lineups fetch failed for match %s", match_id)
             return {}
+
+    def matches_on(self, date_iso: str, now: float) -> list[dict]:
+        """Match dicts for one calendar day (same shape as snapshot 'matches').
+        Cached per date; [] on error."""
+        try:
+            raw = self._cached(
+                f"matches:{date_iso}", _MATCHES_ON_TTL, now,
+                lambda: self._client.matches(date=date_iso, league_id=self._league_id))
+            return [self._match_dict(m) for m in models.parse_matches(raw)]
+        except Exception:
+            logger.exception("Live matches_on fetch failed for %s", date_iso)
+            return []
+
+    def match_summary(self, match_id: int, now: float) -> dict | None:
+        """One match's header dict from the detail endpoint (bare list of one).
+        Cached; None on error."""
+        try:
+            raw = self._cached(
+                f"summary:{match_id}", _MATCHES_ON_TTL, now,
+                lambda: self._client.match(match_id))
+            rows = raw if isinstance(raw, list) else [raw]
+            if not rows:
+                return None
+            return self._match_dict(models.parse_match(rows[0]))
+        except Exception:
+            logger.exception("Live match_summary fetch failed for %s", match_id)
+            return None
 
     def _match_dict(self, m: models.LiveMatch) -> dict:
         return {
