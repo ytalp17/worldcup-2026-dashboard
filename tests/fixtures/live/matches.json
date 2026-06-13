@@ -1,0 +1,115 @@
+{
+  "data": [
+    {
+      "id": 1267455505,
+      "round": "Group Stage - 1",
+      "date": "2026-06-13T22:00:00.000Z",
+      "country": {
+        "code": "World",
+        "name": "World",
+        "logo": "https://highlightly.net/soccer/images/countries/World.png"
+      },
+      "state": {
+        "clock": null,
+        "score": {
+          "current": null,
+          "penalties": null
+        },
+        "description": "Not started"
+      },
+      "awayTeam": {
+        "id": 27165,
+        "logo": "https://highlightly.net/soccer/images/teams/27165.png",
+        "name": "Morocco"
+      },
+      "homeTeam": {
+        "id": 5890,
+        "logo": "https://highlightly.net/soccer/images/teams/5890.png",
+        "name": "Brazil"
+      },
+      "league": {
+        "id": 1635,
+        "logo": null,
+        "name": "World Cup",
+        "season": 2026
+      }
+    },
+    {
+      "id": 1267457207,
+      "round": "Group Stage - 1",
+      "date": "2026-06-13T19:00:00.000Z",
+      "country": {
+        "code": "World",
+        "name": "World",
+        "logo": "https://highlightly.net/soccer/images/countries/World.png"
+      },
+      "state": {
+        "clock": null,
+        "score": {
+          "current": null,
+          "penalties": null
+        },
+        "description": "Not started"
+      },
+      "awayTeam": {
+        "id": 13549,
+        "logo": "https://highlightly.net/soccer/images/teams/13549.png",
+        "name": "Switzerland"
+      },
+      "homeTeam": {
+        "id": 1336003,
+        "logo": "https://highlightly.net/soccer/images/teams/1336003.png",
+        "name": "Qatar"
+      },
+      "league": {
+        "id": 1635,
+        "logo": null,
+        "name": "World Cup",
+        "season": 2026
+      }
+    },
+    {
+      "id": 1267454654,
+      "round": "Group Stage - 1",
+      "date": "2026-06-13T01:00:00.000Z",
+      "country": {
+        "code": "World",
+        "name": "World",
+        "logo": "https://highlightly.net/soccer/images/countries/World.png"
+      },
+      "state": {
+        "clock": 90,
+        "score": {
+          "current": "4 - 1",
+          "penalties": null
+        },
+        "description": "Finished"
+      },
+      "awayTeam": {
+        "id": 2026164,
+        "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+        "name": "Paraguay"
+      },
+      "homeTeam": {
+        "id": 2029568,
+        "logo": "https://highlightly.net/soccer/images/teams/2029568.png",
+        "name": "USA"
+      },
+      "league": {
+        "id": 1635,
+        "logo": null,
+        "name": "World Cup",
+        "season": 2026
+      }
+    }
+  ],
+  "plan": {
+    "tier": "BASIC",
+    "message": "All data available with current plan."
+  },
+  "pagination": {
+    "totalCount": 3,
+    "offset": 0,
+    "limit": 100
+  }
+}

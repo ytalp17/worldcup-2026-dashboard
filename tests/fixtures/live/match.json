@@ -1,0 +1,541 @@
+[
+  {
+    "venue": {
+      "city": "East Rutherford, NJ",
+      "name": "New York New Jersey Stadium",
+      "country": "USA",
+      "capacity": "82500"
+    },
+    "referee": {
+      "name": "Vincic, Slavko",
+      "nationality": "Slovenia"
+    },
+    "forecast": {
+      "status": "clear day",
+      "temperature": "31\u00b0C"
+    },
+    "events": [],
+    "predictions": {
+      "live": [],
+      "prematch": [
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-07T08:49:27.192Z",
+          "probabilities": {
+            "away": "16.69%",
+            "draw": "24.67%",
+            "home": "58.64%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-07T11:50:32.259Z",
+          "probabilities": {
+            "away": "16.70%",
+            "draw": "24.67%",
+            "home": "58.63%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-07T14:57:46.506Z",
+          "probabilities": {
+            "away": "16.69%",
+            "draw": "24.67%",
+            "home": "58.64%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-07T18:07:57.676Z",
+          "probabilities": {
+            "away": "16.70%",
+            "draw": "24.66%",
+            "home": "58.65%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-07T21:13:14.841Z",
+          "probabilities": {
+            "away": "17.21%",
+            "draw": "25.10%",
+            "home": "57.69%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-08T08:38:47.657Z",
+          "probabilities": {
+            "away": "17.34%",
+            "draw": "25.12%",
+            "home": "57.53%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-08T11:31:05.472Z",
+          "probabilities": {
+            "away": "17.34%",
+            "draw": "25.12%",
+            "home": "57.53%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-08T14:22:12.977Z",
+          "probabilities": {
+            "away": "17.35%",
+            "draw": "25.08%",
+            "home": "57.57%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-08T17:16:25.065Z",
+          "probabilities": {
+            "away": "17.33%",
+            "draw": "25.13%",
+            "home": "57.55%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-08T20:06:27.577Z",
+          "probabilities": {
+            "away": "17.33%",
+            "draw": "25.14%",
+            "home": "57.53%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-09T08:54:01.537Z",
+          "probabilities": {
+            "away": "17.40%",
+            "draw": "25.08%",
+            "home": "57.52%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-09T11:57:07.318Z",
+          "probabilities": {
+            "away": "17.40%",
+            "draw": "25.08%",
+            "home": "57.53%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-09T14:52:32.162Z",
+          "probabilities": {
+            "away": "17.38%",
+            "draw": "25.14%",
+            "home": "57.48%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-09T17:57:21.742Z",
+          "probabilities": {
+            "away": "17.37%",
+            "draw": "25.15%",
+            "home": "57.48%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-09T20:54:39.347Z",
+          "probabilities": {
+            "away": "17.34%",
+            "draw": "25.19%",
+            "home": "57.47%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-10T08:45:10.717Z",
+          "probabilities": {
+            "away": "17.39%",
+            "draw": "25.20%",
+            "home": "57.41%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-10T11:43:23.748Z",
+          "probabilities": {
+            "away": "17.34%",
+            "draw": "25.19%",
+            "home": "57.47%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-10T14:43:57.000Z",
+          "probabilities": {
+            "away": "17.34%",
+            "draw": "25.20%",
+            "home": "57.46%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-10T17:48:25.383Z",
+          "probabilities": {
+            "away": "17.36%",
+            "draw": "25.12%",
+            "home": "57.51%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-10T20:48:14.181Z",
+          "probabilities": {
+            "away": "17.27%",
+            "draw": "25.10%",
+            "home": "57.62%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-11T08:36:11.403Z",
+          "probabilities": {
+            "away": "17.34%",
+            "draw": "25.12%",
+            "home": "57.53%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-11T11:39:03.605Z",
+          "probabilities": {
+            "away": "17.35%",
+            "draw": "25.12%",
+            "home": "57.53%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-11T14:30:34.129Z",
+          "probabilities": {
+            "away": "17.37%",
+            "draw": "25.31%",
+            "home": "57.32%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-11T17:27:22.884Z",
+          "probabilities": {
+            "away": "17.41%",
+            "draw": "25.34%",
+            "home": "57.25%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-11T20:31:34.702Z",
+          "probabilities": {
+            "away": "17.51%",
+            "draw": "25.36%",
+            "home": "57.13%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-12T08:25:13.945Z",
+          "probabilities": {
+            "away": "16.82%",
+            "draw": "24.77%",
+            "home": "58.41%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-12T11:23:44.830Z",
+          "probabilities": {
+            "away": "16.94%",
+            "draw": "24.79%",
+            "home": "58.26%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-12T14:20:39.542Z",
+          "probabilities": {
+            "away": "16.85%",
+            "draw": "24.78%",
+            "home": "58.37%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-12T17:22:41.224Z",
+          "probabilities": {
+            "away": "16.78%",
+            "draw": "24.79%",
+            "home": "58.43%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-12T20:29:58.649Z",
+          "probabilities": {
+            "away": "17.38%",
+            "draw": "25.16%",
+            "home": "57.46%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-13T08:52:28.254Z",
+          "probabilities": {
+            "away": "17.63%",
+            "draw": "25.85%",
+            "home": "56.52%"
+          }
+        },
+        {
+          "type": "prematch",
+          "modelType": "three-way",
+          "description": "Brazil is most likely to win the game against Morocco.",
+          "generatedAt": "2026-06-13T11:55:21.013Z",
+          "probabilities": {
+            "away": "17.29%",
+            "draw": "25.85%",
+            "home": "56.86%"
+          }
+        }
+      ]
+    },
+    "statistics": [
+      {
+        "statistics": [],
+        "team": {
+          "id": 5890,
+          "logo": "https://highlightly.net/soccer/images/teams/5890.png",
+          "name": "Brazil"
+        }
+      },
+      {
+        "statistics": [],
+        "team": {
+          "id": 27165,
+          "logo": "https://highlightly.net/soccer/images/teams/27165.png",
+          "name": "Morocco"
+        }
+      }
+    ],
+    "id": 1267455505,
+    "round": "Group Stage - 1",
+    "date": "2026-06-13T22:00:00.000Z",
+    "country": {
+      "code": "World",
+      "name": "World",
+      "logo": "https://highlightly.net/soccer/images/countries/World.png"
+    },
+    "state": {
+      "clock": null,
+      "score": {
+        "current": null,
+        "penalties": null
+      },
+      "description": "Not started"
+    },
+    "awayTeam": {
+      "id": 27165,
+      "logo": "https://highlightly.net/soccer/images/teams/27165.png",
+      "name": "Morocco",
+      "topPlayers": [
+        {
+          "name": "Ismael Saibari",
+          "position": "Attacker",
+          "statistics": [
+            {
+              "name": "Goals",
+              "value": 0
+            },
+            {
+              "name": "Rating",
+              "value": 0
+            },
+            {
+              "name": "Assists",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "name": "Brahim Diaz",
+          "position": "Midfielder",
+          "statistics": [
+            {
+              "name": "Goals",
+              "value": 0
+            },
+            {
+              "name": "Rating",
+              "value": 0
+            },
+            {
+              "name": "Assists",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "name": "Achraf Hakimi",
+          "position": "Defender",
+          "statistics": [
+            {
+              "name": "Goals",
+              "value": 0
+            },
+            {
+              "name": "Rating",
+              "value": 0
+            },
+            {
+              "name": "Yellow:Red",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "shots": []
+    },
+    "homeTeam": {
+      "id": 5890,
+      "logo": "https://highlightly.net/soccer/images/teams/5890.png",
+      "name": "Brazil",
+      "topPlayers": [
+        {
+          "name": "Matheus Cunha",
+          "position": "Attacker",
+          "statistics": [
+            {
+              "name": "Goals",
+              "value": 0
+            },
+            {
+              "name": "Rating",
+              "value": 0
+            },
+            {
+              "name": "Assists",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "name": "Vinicius J\u00fanior",
+          "position": "Midfielder",
+          "statistics": [
+            {
+              "name": "Goals",
+              "value": 0
+            },
+            {
+              "name": "Rating",
+              "value": 0
+            },
+            {
+              "name": "Assists",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "name": "Marquinhos",
+          "position": "Defender",
+          "statistics": [
+            {
+              "name": "Goals",
+              "value": 0
+            },
+            {
+              "name": "Rating",
+              "value": 0
+            },
+            {
+              "name": "Yellow:Red",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "shots": []
+    },
+    "league": {
+      "id": 1635,
+      "logo": null,
+      "name": "World Cup",
+      "season": 2026
+    },
+    "news": []
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "homeTeam": {
+    "formation": "Unknown",
+    "substitutes": [],
+    "initialLineup": [],
+    "id": 5890,
+    "logo": "https://highlightly.net/soccer/images/teams/5890.png",
+    "name": "https://highlightly.net/soccer/images/teams/27165.png"
+  },
+  "awayTeam": {
+    "formation": "Unknown",
+    "substitutes": [],
+    "initialLineup": [],
+    "id": 27165,
+    "logo": "https://highlightly.net/soccer/images/teams/27165.png",
+    "name": "https://highlightly.net/soccer/images/teams/27165.png"
+  }
+}

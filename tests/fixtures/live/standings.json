@@ -1,0 +1,2055 @@
+{
+  "groups": [
+    {
+      "name": "Group A",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 14400,
+            "logo": "https://highlightly.net/soccer/images/teams/14400.png",
+            "name": "Mexico"
+          },
+          "total": {
+            "wins": 1,
+            "draws": 0,
+            "games": 1,
+            "loses": 0,
+            "scoredGoals": 2,
+            "receivedGoals": 0
+          },
+          "points": 3,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 15251,
+            "logo": "https://highlightly.net/soccer/images/teams/15251.png",
+            "name": "South Korea"
+          },
+          "total": {
+            "wins": 1,
+            "draws": 0,
+            "games": 1,
+            "loses": 0,
+            "scoredGoals": 2,
+            "receivedGoals": 1
+          },
+          "points": 3,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 656054,
+            "logo": "https://highlightly.net/soccer/images/teams/656054.png",
+            "name": "Czech Republic"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 1,
+            "loses": 1,
+            "scoredGoals": 1,
+            "receivedGoals": 2
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1303665,
+            "logo": "https://highlightly.net/soccer/images/teams/1303665.png",
+            "name": "South Africa"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 1,
+            "loses": 1,
+            "scoredGoals": 0,
+            "receivedGoals": 2
+          },
+          "points": 0,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "name": "Group B",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 4705963,
+            "logo": "https://highlightly.net/soccer/images/teams/4705963.png",
+            "name": "Canada"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 1,
+            "games": 1,
+            "loses": 0,
+            "scoredGoals": 1,
+            "receivedGoals": 1
+          },
+          "points": 1,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 947947,
+            "logo": "https://highlightly.net/soccer/images/teams/947947.png",
+            "name": "Bosnia & Herzegovina"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 1,
+            "games": 1,
+            "loses": 0,
+            "scoredGoals": 1,
+            "receivedGoals": 1
+          },
+          "points": 1,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1336003,
+            "logo": "https://highlightly.net/soccer/images/teams/1336003.png",
+            "name": "Qatar"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 13549,
+            "logo": "https://highlightly.net/soccer/images/teams/13549.png",
+            "name": "Switzerland"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "name": "Group C",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 5890,
+            "logo": "https://highlightly.net/soccer/images/teams/5890.png",
+            "name": "Brazil"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 27165,
+            "logo": "https://highlightly.net/soccer/images/teams/27165.png",
+            "name": "Morocco"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 2031270,
+            "logo": "https://highlightly.net/soccer/images/teams/2031270.png",
+            "name": "Haiti"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 943692,
+            "logo": "https://highlightly.net/soccer/images/teams/943692.png",
+            "name": "Scotland"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "name": "Group D",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 2029568,
+            "logo": "https://highlightly.net/soccer/images/teams/2029568.png",
+            "name": "USA"
+          },
+          "total": {
+            "wins": 1,
+            "draws": 0,
+            "games": 1,
+            "loses": 0,
+            "scoredGoals": 4,
+            "receivedGoals": 1
+          },
+          "points": 3,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 17804,
+            "logo": "https://highlightly.net/soccer/images/teams/17804.png",
+            "name": "Australia"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 662011,
+            "logo": "https://highlightly.net/soccer/images/teams/662011.png",
+            "name": "Turkey"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 2026164,
+            "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+            "name": "Paraguay"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 1,
+            "loses": 1,
+            "scoredGoals": 1,
+            "receivedGoals": 4
+          },
+          "points": 0,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "name": "Group E",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 22059,
+            "logo": "https://highlightly.net/soccer/images/teams/22059.png",
+            "name": "Germany"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 4706814,
+            "logo": "https://highlightly.net/soccer/images/teams/4706814.png",
+            "name": "Cura\u00e7ao"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1278135,
+            "logo": "https://highlightly.net/soccer/images/teams/1278135.png",
+            "name": "Ivory Coast"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 2027866,
+            "logo": "https://highlightly.net/soccer/images/teams/2027866.png",
+            "name": "Ecuador"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "name": "Group F",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 952202,
+            "logo": "https://highlightly.net/soccer/images/teams/952202.png",
+            "name": "Netherlands"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 10996,
+            "logo": "https://highlightly.net/soccer/images/teams/10996.png",
+            "name": "Japan"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 5039,
+            "logo": "https://highlightly.net/soccer/images/teams/5039.png",
+            "name": "Sweden"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 24612,
+            "logo": "https://highlightly.net/soccer/images/teams/24612.png",
+            "name": "Tunisia"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "name": "Group G",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1635,
+            "logo": "https://highlightly.net/soccer/images/teams/1635.png",
+            "name": "Belgium"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 28016,
+            "logo": "https://highlightly.net/soccer/images/teams/28016.png",
+            "name": "Egypt"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 19506,
+            "logo": "https://highlightly.net/soccer/images/teams/19506.png",
+            "name": "Iran"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 3977507,
+            "logo": "https://highlightly.net/soccer/images/teams/3977507.png",
+            "name": "New Zealand"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "name": "Group H",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 8443,
+            "logo": "https://highlightly.net/soccer/images/teams/8443.png",
+            "name": "Spain"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1305367,
+            "logo": "https://highlightly.net/soccer/images/teams/1305367.png",
+            "name": "Cape Verde"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 20357,
+            "logo": "https://highlightly.net/soccer/images/teams/20357.png",
+            "name": "Saudi Arabia"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 6741,
+            "logo": "https://highlightly.net/soccer/images/teams/6741.png",
+            "name": "Uruguay"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "name": "Group I",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 2486,
+            "logo": "https://highlightly.net/soccer/images/teams/2486.png",
+            "name": "France"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 11847,
+            "logo": "https://highlightly.net/soccer/images/teams/11847.png",
+            "name": "Senegal"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1334301,
+            "logo": "https://highlightly.net/soccer/images/teams/1334301.png",
+            "name": "Iraq"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 928374,
+            "logo": "https://highlightly.net/soccer/images/teams/928374.png",
+            "name": "Norway"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "name": "Group J",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 22910,
+            "logo": "https://highlightly.net/soccer/images/teams/22910.png",
+            "name": "Argentina"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1304516,
+            "logo": "https://highlightly.net/soccer/images/teams/1304516.png",
+            "name": "Algeria"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 660309,
+            "logo": "https://highlightly.net/soccer/images/teams/660309.png",
+            "name": "Austria"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1318132,
+            "logo": "https://highlightly.net/soccer/images/teams/1318132.png",
+            "name": "Jordan"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "name": "Group K",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 23761,
+            "logo": "https://highlightly.net/soccer/images/teams/23761.png",
+            "name": "Portugal"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1284092,
+            "logo": "https://highlightly.net/soccer/images/teams/1284092.png",
+            "name": "Congo DR"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1335152,
+            "logo": "https://highlightly.net/soccer/images/teams/1335152.png",
+            "name": "Uzbekistan"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 7592,
+            "logo": "https://highlightly.net/soccer/images/teams/7592.png",
+            "name": "Colombia"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "name": "Group L",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 9294,
+            "logo": "https://highlightly.net/soccer/images/teams/9294.png",
+            "name": "England"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 3337,
+            "logo": "https://highlightly.net/soccer/images/teams/3337.png",
+            "name": "Croatia"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1280688,
+            "logo": "https://highlightly.net/soccer/images/teams/1280688.png",
+            "name": "Ghana"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 10145,
+            "logo": "https://highlightly.net/soccer/images/teams/10145.png",
+            "name": "Panama"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "name": "Group Stage",
+      "standings": [
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 662011,
+            "logo": "https://highlightly.net/soccer/images/teams/662011.png",
+            "name": "Turkey"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 1
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 19506,
+            "logo": "https://highlightly.net/soccer/images/teams/19506.png",
+            "name": "Iran"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 2
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 660309,
+            "logo": "https://highlightly.net/soccer/images/teams/660309.png",
+            "name": "Austria"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 3
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1278135,
+            "logo": "https://highlightly.net/soccer/images/teams/1278135.png",
+            "name": "Ivory Coast"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 4
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 5039,
+            "logo": "https://highlightly.net/soccer/images/teams/5039.png",
+            "name": "Sweden"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 5
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1335152,
+            "logo": "https://highlightly.net/soccer/images/teams/1335152.png",
+            "name": "Uzbekistan"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 6
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1336003,
+            "logo": "https://highlightly.net/soccer/images/teams/1336003.png",
+            "name": "Qatar"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 7
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1334301,
+            "logo": "https://highlightly.net/soccer/images/teams/1334301.png",
+            "name": "Iraq"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 8
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 20357,
+            "logo": "https://highlightly.net/soccer/images/teams/20357.png",
+            "name": "Saudi Arabia"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 9
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 1280688,
+            "logo": "https://highlightly.net/soccer/images/teams/1280688.png",
+            "name": "Ghana"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 10
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 2031270,
+            "logo": "https://highlightly.net/soccer/images/teams/2031270.png",
+            "name": "Haiti"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "points": 0,
+          "position": 11
+        },
+        {
+          "away": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "home": {
+            "wins": 0,
+            "draws": 0,
+            "games": 0,
+            "loses": 0,
+            "scoredGoals": 0,
+            "receivedGoals": 0
+          },
+          "team": {
+            "id": 656054,
+            "logo": "https://highlightly.net/soccer/images/teams/656054.png",
+            "name": "Czech Republic"
+          },
+          "total": {
+            "wins": 0,
+            "draws": 0,
+            "games": 1,
+            "loses": 1,
+            "scoredGoals": 1,
+            "receivedGoals": 2
+          },
+          "points": 0,
+          "position": 12
+        }
+      ]
+    }
+  ],
+  "league": {
+    "id": 1635,
+    "logo": null,
+    "name": "World Cup",
+    "season": 2026
+  }
+}
