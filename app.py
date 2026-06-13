@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 from datetime import date
 from pathlib import Path
 
-from dash import ALL, Dash, Input, Output, State, callback, clientside_callback, ctx, no_update
+from dash import ALL, Dash, Input, Output, State, callback, clientside_callback, ctx, no_update, set_props
 
 from src.components.detail_panel import stadium_detail
 from src.components.flow_layer import flows_for
@@ -32,7 +33,7 @@ from src.data.team_stats import compute_team_stats
 from src.data.team_continents import grouped_team_options
 from src.data.live.client import HighlightlyClient
 from src.data.live.reconcile import build_stadium_index
-from src.data.live.service import LiveDataService
+from src.data.live.service import LiveDataService, next_delay
 from src.data.venues import build_venues
 
 DATA_DIR = Path(__file__).parent / "assets" / "data"
@@ -502,6 +503,19 @@ clientside_callback(
     Output("journey-redraw", "data"),
     Input("journey-grid", "selectedRows"),
 )
+
+if LIVE is not None:
+    @callback(persistent=True)
+    async def live_feed():
+        ws = ctx.websocket
+        if ws is None:
+            return
+        while not ws.is_shutdown:
+            now = asyncio.get_event_loop().time()
+            snap = await asyncio.to_thread(LIVE.snapshot, date.today().isoformat(), now)
+            set_props("live-store", {"data": snap})
+            await asyncio.sleep(next_delay(snap))
+
 
 if __name__ == "__main__":
     app.run(debug=True)

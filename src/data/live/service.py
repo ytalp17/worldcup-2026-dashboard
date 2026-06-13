@@ -78,3 +78,8 @@ class LiveDataService:
             "away_score": m.away_score,
             "is_live": m.is_live,
         }
+
+
+def next_delay(snapshot: dict) -> int:
+    """Adaptive poll cadence (seconds): fast while any match is live, slow when idle."""
+    return 60 if snapshot.get("any_live") else 1800
