@@ -79,6 +79,32 @@ class LiveDataService:
             logger.exception("Live events fetch failed for match %s", match_id)
             return []
 
+    def match_statistics(self, match_id: int, now: float) -> dict:
+        """On-demand statistics for one match, cached like matches.
+        Empty dict on any failure."""
+        try:
+            raw = self._cached(
+                f"stats:{match_id}", _MATCHES_TTL, now,
+                lambda: self._client.statistics(match_id),
+            )
+            return models.parse_statistics(raw)
+        except Exception:
+            logger.exception("Live statistics fetch failed for match %s", match_id)
+            return {}
+
+    def match_lineups(self, match_id: int, now: float) -> dict:
+        """On-demand lineups for one match, cached like matches.
+        Empty dict on any failure."""
+        try:
+            raw = self._cached(
+                f"lineups:{match_id}", _MATCHES_TTL, now,
+                lambda: self._client.lineups(match_id),
+            )
+            return models.parse_lineups(raw)
+        except Exception:
+            logger.exception("Live lineups fetch failed for match %s", match_id)
+            return {}
+
     def _match_dict(self, m: models.LiveMatch) -> dict:
         return {
             "match_id": m.match_id,

@@ -15,9 +15,11 @@ from src.data.live.models import (
     MatchState,
     Standing,
     parse_events,
+    parse_lineups,
     parse_match,
     parse_matches,
     parse_standings,
+    parse_statistics,
 )
 
 FIXTURES = Path(__file__).parent / "fixtures" / "live"
@@ -219,3 +221,109 @@ class TestParseEvents:
 
     def test_none_input_returns_empty_list(self):
         assert parse_events(None) == []
+
+
+# ---------------------------------------------------------------------------
+# parse_events — real fixture (new schema: time/team.name)
+# ---------------------------------------------------------------------------
+
+class TestParseEventsFromFixture:
+    def setup_method(self):
+        raw = json.loads((FIXTURES / "finished_events.json").read_text())
+        self.raw = raw
+        self.events = parse_events(raw)
+
+    def test_length_is_21(self):
+        assert len(self.events) == 21
+
+    def test_first_event_in_fixture_has_minute_7(self):
+        # original order: first event has time="7" and team.name="USA"
+        # after parse it should have minute=7
+        by_minute = {e.minute: e for e in self.events}
+        assert 7 in by_minute
+
+    def test_first_event_team_is_string_not_dict(self):
+        # team must be "USA", not a dict
+        evt_at_7 = next(e for e in self.events if e.minute == 7)
+        assert evt_at_7.team == "USA"
+        assert isinstance(evt_at_7.team, str)
+
+    def test_sorted_ascending_by_minute(self):
+        minutes = [e.minute for e in self.events]
+        assert minutes == sorted(minutes)
+
+    def test_no_event_has_minute_0(self):
+        # The fixture has no 0-minute events; the bug caused all minutes to be 0
+        assert all(e.minute != 0 for e in self.events)
+
+    def test_first_event_player_is_d_bobadilla(self):
+        evt_at_7 = next(e for e in self.events if e.minute == 7)
+        assert evt_at_7.player == "D. Bobadilla"
+        assert evt_at_7.type == "Own Goal"
+
+
+# ---------------------------------------------------------------------------
+# parse_statistics — real fixture
+# ---------------------------------------------------------------------------
+
+class TestParseStatisticsFromFixture:
+    def setup_method(self):
+        raw = json.loads((FIXTURES / "finished_statistics.json").read_text())
+        self.stats = parse_statistics(raw)
+
+    def test_returns_dict_with_two_teams(self):
+        assert isinstance(self.stats, dict)
+        assert len(self.stats) == 2
+
+    def test_usa_possession(self):
+        assert self.stats["USA"]["Possession"] == 0.65
+
+    def test_usa_fouls(self):
+        assert self.stats["USA"]["Fouls"] == 13
+
+    def test_paraguay_possession(self):
+        assert self.stats["Paraguay"]["Possession"] == 0.35
+
+    def test_usa_expected_goals(self):
+        assert self.stats["USA"]["Expected Goals"] == 1.42
+
+    def test_team_keys_are_strings(self):
+        for key in self.stats:
+            assert isinstance(key, str)
+
+
+# ---------------------------------------------------------------------------
+# parse_lineups — real fixture
+# ---------------------------------------------------------------------------
+
+class TestParseLineupsFromFixture:
+    def setup_method(self):
+        raw = json.loads((FIXTURES / "finished_lineups.json").read_text())
+        self.lineups = parse_lineups(raw)
+
+    def test_returns_dict_with_home_and_away(self):
+        assert "home" in self.lineups
+        assert "away" in self.lineups
+
+    def test_home_formation(self):
+        assert self.lineups["home"]["formation"] == "4-2-3-1"
+
+    def test_home_has_11_starters(self):
+        assert len(self.lineups["home"]["starters"]) == 11
+
+    def test_home_first_starter_is_matthew_freese(self):
+        assert self.lineups["home"]["starters"][0]["name"] == "Matthew Freese"
+
+    def test_starter_has_required_fields(self):
+        starter = self.lineups["home"]["starters"][0]
+        assert "name" in starter
+        assert "number" in starter
+        assert "position" in starter
+
+    def test_home_has_subs(self):
+        assert len(self.lineups["home"]["subs"]) > 0
+
+    def test_missing_data_returns_defaults(self):
+        result = parse_lineups({})
+        assert result["home"] == {"formation": "", "starters": [], "subs": []}
+        assert result["away"] == {"formation": "", "starters": [], "subs": []}

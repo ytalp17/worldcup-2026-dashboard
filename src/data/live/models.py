@@ -92,17 +92,72 @@ def parse_matches(raw: dict) -> list[LiveMatch]:
     return [parse_match(m) for m in raw.get("data", [])]
 
 
+def _parse_minute(e: dict) -> int:
+    """Extract a minute integer from an event dict.
+
+    Handles both schemas:
+    - New real API: ``time`` is a string like ``"7"`` or ``"45+5"`` (base only).
+    - Old/inline test schema: ``minute`` is an integer.
+    """
+    raw_time = e.get("time")
+    if raw_time is not None:
+        # Strip stoppage-time suffix ("45+5" → "45")
+        base = str(raw_time).split("+")[0]
+        try:
+            return int(base)
+        except ValueError:
+            pass
+    return int(e.get("minute") or 0)
+
+
 def parse_events(raw: list) -> list[MatchEvent]:
     events = [
         MatchEvent(
-            minute=int(e.get("minute", 0)),
+            minute=_parse_minute(e),
             type=str(e.get("type", "")),
             player=str(e.get("player", "")),
-            team=str(e.get("team", "")),
+            team=(e.get("team") or {}).get("name", "") if isinstance(e.get("team"), dict) else str(e.get("team", "")),
         )
         for e in (raw or [])
     ]
     return sorted(events, key=lambda e: e.minute)
+
+
+def parse_statistics(raw: list) -> dict:
+    """Parse a list of two team-statistics objects into {team_name: {displayName: value}}."""
+    return {
+        (t.get("team") or {}).get("name", ""): {
+            s["displayName"]: s["value"]
+            for s in t.get("statistics", [])
+        }
+        for t in (raw or [])
+    }
+
+
+def parse_lineups(raw: dict) -> dict:
+    """Parse homeTeam/awayTeam lineup data into {home/away: {formation, starters, subs}}."""
+    def _team(data: dict) -> dict:
+        if not data:
+            return {"formation": "", "starters": [], "subs": []}
+        starters = [
+            {"name": p["name"], "number": p["number"], "position": p["position"]}
+            for row in data.get("initialLineup", [])
+            for p in row
+        ]
+        subs = [
+            {"name": p["name"], "number": p["number"], "position": p["position"]}
+            for p in data.get("substitutes", [])
+        ]
+        return {
+            "formation": data.get("formation", ""),
+            "starters": starters,
+            "subs": subs,
+        }
+
+    return {
+        "home": _team((raw or {}).get("homeTeam") or {}),
+        "away": _team((raw or {}).get("awayTeam") or {}),
+    }
 
 
 def parse_standings(raw: dict) -> dict[str, list[Standing]]:

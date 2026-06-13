@@ -128,3 +128,87 @@ def test_match_events_empty_on_error():
     svc = LiveDataService(_BoomClient(), _index())
     # _BoomClient has no events(); AttributeError is caught and returns [].
     assert svc.match_events(42, now=0.0) == []
+
+
+# ---------------------------------------------------------------------------
+# match_statistics
+# ---------------------------------------------------------------------------
+
+def test_match_statistics_parses_and_caches():
+    class _C(_FakeClient):
+        def __init__(self):
+            super().__init__()
+            self.stats_calls = 0
+
+        def statistics(self, match_id):
+            self.stats_calls += 1
+            return [
+                {"team": {"name": "USA"}, "statistics": [
+                    {"displayName": "Possession", "value": 0.65},
+                    {"displayName": "Fouls", "value": 13},
+                ]},
+                {"team": {"name": "Paraguay"}, "statistics": [
+                    {"displayName": "Possession", "value": 0.35},
+                    {"displayName": "Fouls", "value": 17},
+                ]},
+            ]
+
+    c = _C()
+    svc = LiveDataService(c, _index())
+    result = svc.match_statistics(42, now=0.0)
+    assert isinstance(result, dict)
+    assert result["USA"]["Possession"] == 0.65
+    assert result["USA"]["Fouls"] == 13
+    assert result["Paraguay"]["Possession"] == 0.35
+    # Cached within TTL — no second call
+    svc.match_statistics(42, now=10.0)
+    assert c.stats_calls == 1
+
+
+def test_match_statistics_empty_dict_on_error():
+    svc = LiveDataService(_BoomClient(), _index())
+    assert svc.match_statistics(42, now=0.0) == {}
+
+
+# ---------------------------------------------------------------------------
+# match_lineups
+# ---------------------------------------------------------------------------
+
+def test_match_lineups_parses_and_caches():
+    class _C(_FakeClient):
+        def __init__(self):
+            super().__init__()
+            self.lineup_calls = 0
+
+        def lineups(self, match_id):
+            self.lineup_calls += 1
+            return {
+                "homeTeam": {
+                    "formation": "4-2-3-1",
+                    "initialLineup": [[{"name": "Matthew Freese", "number": 24, "position": "Goalkeeper"}]],
+                    "substitutes": [{"name": "Matt Turner", "number": 1, "position": "Goalkeeper"}],
+                    "name": "USA",
+                },
+                "awayTeam": {
+                    "formation": "4-4-2",
+                    "initialLineup": [[{"name": "Antony Silva", "number": 1, "position": "Goalkeeper"}]],
+                    "substitutes": [],
+                    "name": "Paraguay",
+                },
+            }
+
+    c = _C()
+    svc = LiveDataService(c, _index())
+    result = svc.match_lineups(42, now=0.0)
+    assert isinstance(result, dict)
+    assert result["home"]["formation"] == "4-2-3-1"
+    assert result["home"]["starters"][0]["name"] == "Matthew Freese"
+    assert len(result["home"]["subs"]) == 1
+    # Cached within TTL
+    svc.match_lineups(42, now=10.0)
+    assert c.lineup_calls == 1
+
+
+def test_match_lineups_empty_dict_on_error():
+    svc = LiveDataService(_BoomClient(), _index())
+    assert svc.match_lineups(42, now=0.0) == {}

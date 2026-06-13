@@ -307,8 +307,14 @@ def open_live_modal(strip_clicks, drawer_clicks, live):
         (m for m in (live or {}).get("matches", []) if m.get("match_id") == match_id),
         None,
     )
-    events = LIVE.match_events(match_id, time.monotonic()) if LIVE is not None else []
-    return True, modal_body(match, events)
+    now = time.monotonic()
+    if LIVE is not None:
+        events = LIVE.match_events(match_id, now)
+        stats = LIVE.match_statistics(match_id, now)
+        lineups = LIVE.match_lineups(match_id, now)
+    else:
+        events, stats, lineups = [], {}, {}
+    return True, modal_body(match, events, stats, lineups)
 
 
 @callback(

@@ -53,6 +53,10 @@ class HighlightlyClient:
         # /events/{id} returns a bare list of event objects.
         return self._get(f"/events/{match_id}", {})
 
+    def statistics(self, match_id: int) -> list:
+        # /statistics/{id} returns a bare list of two team-statistics objects.
+        return self._get(f"/statistics/{match_id}", {})
+
     def lineups(self, match_id: int) -> dict:
         return self._get(f"/lineups/{match_id}", {})
 
