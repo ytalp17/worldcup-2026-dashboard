@@ -163,13 +163,13 @@ app.index_string = f"""<!DOCTYPE html>
 </html>"""
 
 
-def drawer_for_city(city: str | None, user_tz: str | None = None):
+def drawer_for_city(city: str | None, user_tz: str | None = None, live: dict | None = None):
     """Compute the (opened, title, children) drawer state for a clicked city."""
     venue = VENUES_BY_CITY.get(city) if city else None
     if venue is None:
         return False, no_update, no_update
     matches = MATCHES_BY_STADIUM.get(venue.stadium_name, [])
-    return True, venue.official_name, stadium_detail(venue, matches, user_tz)
+    return True, venue.official_name, stadium_detail(venue, matches, user_tz, live=live)
 
 
 @callback(
@@ -179,16 +179,17 @@ def drawer_for_city(city: str | None, user_tz: str | None = None):
     Output("filter-drawer", "opened", allow_duplicate=True),
     Input({"type": MARKER_TYPE, "index": ALL}, "n_clicks"),
     State("user-tz", "data"),
+    State("live-store", "data"),
     prevent_initial_call=True,
 )
-def open_stadium_drawer(n_clicks, user_tz):
+def open_stadium_drawer(n_clicks, user_tz, live):
     # user_tz is a State snapshot: if the tz probe hasn't resolved yet, the drawer falls back to venue-local time (window is brief, acceptable per design).
     # Ignore the callback firing when markers mount with n_clicks=None.
     if not any(n_clicks):
         return no_update, no_update, no_update, no_update
     triggered = ctx.triggered_id
     city = triggered.get("index") if isinstance(triggered, dict) else None
-    opened, title, children = drawer_for_city(city, user_tz)
+    opened, title, children = drawer_for_city(city, user_tz, live)
     # Opening the stadium drawer closes the filter drawer (both are left-side).
     return opened, title, children, (False if opened else no_update)
 

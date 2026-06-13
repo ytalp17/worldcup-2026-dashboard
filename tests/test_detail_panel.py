@@ -217,3 +217,22 @@ def test_match_same_day_different_clock_has_no_day_tag():
     assert "15:00 your time" in text
     assert "13:00 local" in text          # no trailing junk / no day tag
     assert "(+0d)" not in text and "(-0d)" not in text
+
+
+def test_stadium_detail_shows_live_section_with_modal_button():
+    venue = _venue(has_image=True)  # stadium_name="Dallas Stadium"
+    live = {"matches": [
+        {"match_id": 42, "home": "Brazil", "away": "Mexico", "home_score": 2,
+         "away_score": 1, "state": "live", "is_live": True, "venue": "Dallas Stadium"},
+    ]}
+    body = stadium_detail(venue, matches=(), user_tz=None, live=live)
+    blob = str(body.to_plotly_json())
+    assert "2 - 1" in blob                      # live score shown
+    assert "open-live-modal" in blob             # button id type present
+    assert "42" in blob                          # match_id in the button id
+
+
+def test_stadium_detail_no_live_section_without_live_match():
+    venue = _venue(has_image=True)  # stadium_name="Dallas Stadium"
+    body = stadium_detail(venue, matches=(), user_tz=None, live={"matches": []})
+    assert "open-live-modal" not in str(body.to_plotly_json())
