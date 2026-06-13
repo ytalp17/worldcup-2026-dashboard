@@ -1,0 +1,221 @@
+"""Tests for src/data/live/models.py — parse Highlightly JSON into typed dataclasses.
+
+Tests run against real captured fixtures in tests/fixtures/live/.
+"""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from src.data.live.models import (
+    LiveMatch,
+    MatchEvent,
+    MatchState,
+    Standing,
+    parse_events,
+    parse_match,
+    parse_matches,
+    parse_standings,
+)
+
+FIXTURES = Path(__file__).parent / "fixtures" / "live"
+
+
+# ---------------------------------------------------------------------------
+# parse_matches — real fixture
+# ---------------------------------------------------------------------------
+
+class TestParseMatchesFromFixture:
+    def setup_method(self):
+        raw = json.loads((FIXTURES / "matches.json").read_text())
+        self.raw = raw
+        self.matches = parse_matches(raw)
+
+    def test_returns_list_of_live_match(self):
+        assert all(isinstance(m, LiveMatch) for m in self.matches)
+
+    def test_length_equals_data_rows(self):
+        expected = len(self.raw["data"])
+        assert len(self.matches) == expected  # 3 matches in fixture
+
+    def test_finished_match_usa_paraguay(self):
+        # USA vs Paraguay, score "4 - 1", state Finished
+        finished = next(
+            m for m in self.matches if m.home == "USA" and m.away == "Paraguay"
+        )
+        assert finished.state is MatchState.FINISHED
+        assert finished.home_score == 4
+        assert finished.away_score == 1
+
+    def test_finished_match_is_not_live(self):
+        finished = next(m for m in self.matches if m.home == "USA")
+        assert finished.is_live is False
+
+    def test_not_started_match_brazil_morocco(self):
+        # Brazil vs Morocco — "Not started", no score
+        not_started = next(
+            m for m in self.matches if m.home == "Brazil" and m.away == "Morocco"
+        )
+        assert not_started.state is MatchState.SCHEDULED
+        assert not_started.home_score is None
+        assert not_started.away_score is None
+
+    def test_not_started_match_is_not_live(self):
+        not_started = next(m for m in self.matches if m.home == "Brazil")
+        assert not_started.is_live is False
+
+    def test_match_ids_are_ints(self):
+        for m in self.matches:
+            assert isinstance(m.match_id, int)
+
+
+# ---------------------------------------------------------------------------
+# parse_match — inline live-state dict
+# ---------------------------------------------------------------------------
+
+class TestParseMatchInline:
+    RAW_LIVE = {
+        "id": 42,
+        "homeTeam": {"name": "Brazil"},
+        "awayTeam": {"name": "Mexico"},
+        "state": {
+            "description": "Second Half",
+            "clock": 67,
+            "score": {"current": "2 - 1"},
+        },
+    }
+
+    def test_returns_live_match(self):
+        m = parse_match(self.RAW_LIVE)
+        assert isinstance(m, LiveMatch)
+
+    def test_match_id(self):
+        m = parse_match(self.RAW_LIVE)
+        assert m.match_id == 42
+
+    def test_team_names(self):
+        m = parse_match(self.RAW_LIVE)
+        assert m.home == "Brazil"
+        assert m.away == "Mexico"
+
+    def test_state_is_live(self):
+        m = parse_match(self.RAW_LIVE)
+        assert m.state is MatchState.LIVE
+
+    def test_clock(self):
+        m = parse_match(self.RAW_LIVE)
+        assert m.clock == 67
+
+    def test_scores_parsed(self):
+        m = parse_match(self.RAW_LIVE)
+        assert m.home_score == 2
+        assert m.away_score == 1
+
+    def test_is_live_true(self):
+        m = parse_match(self.RAW_LIVE)
+        assert m.is_live is True
+
+    def test_halftime_state(self):
+        raw = {
+            "id": 99,
+            "homeTeam": {"name": "A"},
+            "awayTeam": {"name": "B"},
+            "state": {"description": "Halftime", "clock": 45, "score": {"current": "1 - 0"}},
+        }
+        m = parse_match(raw)
+        assert m.state is MatchState.HALF_TIME
+        assert m.is_live is True
+
+
+# ---------------------------------------------------------------------------
+# parse_standings — real fixture
+# ---------------------------------------------------------------------------
+
+class TestParseStandingsFromFixture:
+    def setup_method(self):
+        raw = json.loads((FIXTURES / "standings.json").read_text())
+        self.standings = parse_standings(raw)
+
+    def test_returns_dict(self):
+        assert isinstance(self.standings, dict)
+
+    def test_group_stage_rollup_skipped(self):
+        assert "Group Stage" not in self.standings
+
+    def test_twelve_real_groups(self):
+        assert len(self.standings) == 12
+
+    def test_expected_group_keys(self):
+        for letter in "ABCDEFGHIJKL":
+            assert f"Group {letter}" in self.standings
+
+    def test_group_a_leader_is_mexico(self):
+        # Group A: Mexico leads with 3 points (1 win, scored 2, received 0)
+        rows = self.standings["Group A"]
+        assert rows[0].team == "Mexico"
+        assert rows[0].points == 3
+
+    def test_group_a_leader_goal_diff(self):
+        # Mexico: scoredGoals=2, receivedGoals=0 → goal_diff=2
+        rows = self.standings["Group A"]
+        assert rows[0].goal_diff == 2
+
+    def test_group_d_leader_is_usa(self):
+        # Group D: USA leads with 3 points (scored 4, received 1)
+        rows = self.standings["Group D"]
+        assert rows[0].team == "USA"
+        assert rows[0].points == 3
+        assert rows[0].goal_diff == 3  # 4 - 1
+
+    def test_standings_are_standing_instances(self):
+        for group_rows in self.standings.values():
+            for row in group_rows:
+                assert isinstance(row, Standing)
+
+    def test_group_a_has_four_teams(self):
+        assert len(self.standings["Group A"]) == 4
+
+    def test_south_korea_in_group_a(self):
+        teams = [r.team for r in self.standings["Group A"]]
+        assert "South Korea" in teams
+
+
+# ---------------------------------------------------------------------------
+# parse_events
+# ---------------------------------------------------------------------------
+
+class TestParseEvents:
+    RAW_EVENTS = [
+        {"minute": 67, "type": "Goal", "player": "Neymar", "team": "Brazil"},
+        {"minute": 12, "type": "Yellow Card", "player": "Alvarez", "team": "Mexico"},
+    ]
+
+    def test_returns_list_of_match_event(self):
+        events = parse_events(self.RAW_EVENTS)
+        assert all(isinstance(e, MatchEvent) for e in events)
+
+    def test_sorted_by_minute_ascending(self):
+        events = parse_events(self.RAW_EVENTS)
+        assert [e.minute for e in events] == [12, 67]
+
+    def test_event_fields(self):
+        events = parse_events(self.RAW_EVENTS)
+        yellow = events[0]
+        assert yellow.minute == 12
+        assert yellow.type == "Yellow Card"
+        assert yellow.player == "Alvarez"
+        assert yellow.team == "Mexico"
+
+        goal = events[1]
+        assert goal.minute == 67
+        assert goal.type == "Goal"
+        assert goal.player == "Neymar"
+        assert goal.team == "Brazil"
+
+    def test_empty_input_returns_empty_list(self):
+        assert parse_events([]) == []
+
+    def test_none_input_returns_empty_list(self):
+        assert parse_events(None) == []
