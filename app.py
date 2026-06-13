@@ -10,7 +10,7 @@ from dash import ALL, Dash, Input, Output, State, callback, clientside_callback,
 
 from src.components.detail_panel import stadium_detail
 from src.components.flow_layer import flows_for
-from src.components.group_table import build_group_panel, group_rows
+from src.components.group_table import build_group_panel, group_rows, live_group_rows
 from src.components.header_calendar import build_match_calendar
 from src.components.layout import build_layout
 from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, filter_pin, pulse_markers
@@ -82,13 +82,16 @@ app.title = "FIFA World Cup 2026"
 TEAM_CAROUSEL = build_team_carousel(TEAM_NAMES, app.get_asset_url, index=0)
 
 
-def group_panel_payload(index):
-    """(group_name, rowData) for the centred team at `index`. Used by the
-    content callback and the initial panel render."""
+def group_panel_payload(index, live_standings=None):
+    """(group_name, rowData) for the centred team at `index`. Uses LIVE standings
+    when available for that group, else the static (zeroed) standings."""
     team = center_team(TEAM_NAMES, index or 0)
     group = group_for_team(GROUPS, team)
     name = group.name if group else "—"
-    rows = group_rows(group, app.get_asset_url) if group else []
+    rows = []
+    if group:
+        rows = (live_group_rows(name, live_standings, app.get_asset_url)
+                or group_rows(group, app.get_asset_url))
     return name, rows
 
 
@@ -340,9 +343,10 @@ def render_carousel(index):
     Output("group-grid", "rowData"),
     Output("group-table-title", "children"),
     Input("carousel-index", "data"),
+    Input("live-store", "data"),
 )
-def update_group_panel(index):
-    name, rows = group_panel_payload(index)
+def update_group_panel(index, live):
+    name, rows = group_panel_payload(index, (live or {}).get("standings"))
     return rows, name
 
 

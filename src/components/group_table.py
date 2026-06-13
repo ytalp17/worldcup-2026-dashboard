@@ -61,6 +61,34 @@ def group_rows(group: Group, asset_url: Callable[[str], str]) -> list[dict]:
     return rows
 
 
+def live_group_rows(
+    group_name: str,
+    live_standings: dict | None,
+    asset_url: Callable[[str], str],
+) -> list[dict] | None:
+    """ag-grid rowData built from the LIVE standings snapshot for one group, or
+    None if that group is absent/empty (caller then falls back to static rows).
+    Row order is the API's (already position-ordered)."""
+    table = (live_standings or {}).get(group_name)
+    if not table:
+        return None
+    rows = []
+    for rank, s in enumerate(table, start=1):
+        team = s["team"]
+        rows.append({
+            "rank": rank,
+            "team": display_name(team),
+            "flag": asset_url(f"country_logos/{team}.svg"),
+            "mp": s["played"],
+            "w": s["won"],
+            "d": s["drawn"],
+            "l": s["lost"],
+            "gd": s["goal_diff"],
+            "pts": s["points"],
+        })
+    return rows
+
+
 def build_group_panel(group: Group | None, asset_url: Callable[[str], str]) -> dmc.Box:
     """The panel body: header (Table / World Cup / group name + chevron), the
     ag-grid, and an empty flex spacer reserved for future infographics."""

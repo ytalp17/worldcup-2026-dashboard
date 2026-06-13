@@ -71,3 +71,28 @@ def test_build_group_panel_handles_none_group():
     assert grid.rowData == []
     title = next(n for n in _walk(panel) if getattr(n, "id", None) == "group-table-title")
     assert title.children == "—"
+
+
+def test_live_group_rows_builds_from_snapshot():
+    from src.components.group_table import live_group_rows
+    live = {"Group A": [
+        {"team": "Mexico", "played": 1, "won": 1, "drawn": 0, "lost": 0,
+         "goal_diff": 2, "points": 3},
+        {"team": "South Africa", "played": 1, "won": 0, "drawn": 0, "lost": 1,
+         "goal_diff": -2, "points": 0},
+    ]}
+    rows = live_group_rows("Group A", live, asset_url=lambda p: "/assets/" + p)
+    assert rows is not None
+    assert rows[0]["rank"] == 1
+    assert rows[0]["pts"] == 3
+    assert rows[0]["gd"] == 2
+    assert rows[0]["mp"] == 1
+    assert rows[1]["team"]  # display name present
+    assert "Mexico" in rows[0]["flag"]
+
+
+def test_live_group_rows_none_when_group_absent_or_empty():
+    from src.components.group_table import live_group_rows
+    assert live_group_rows("Group Z", {"Group A": [{}]}, asset_url=str) is None
+    assert live_group_rows("Group A", {"Group A": []}, asset_url=str) is None
+    assert live_group_rows("Group A", None, asset_url=str) is None
