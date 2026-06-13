@@ -5,6 +5,7 @@ from dash import dcc, html
 from dash_iconify import DashIconify
 
 from src.components.filter_panel import build_filter_drawer
+from src.components.live_match_modal import build_modal
 from src.components.live_strip import build_live_strip
 from src.components.map_view import build_map
 from src.components.mode_switch import mode_switch
@@ -136,6 +137,7 @@ def build_layout(
             drawer,
             filter_drawer,
             build_live_strip(),
+            build_modal(),
             dcc.Store(id="carousel-index", data=0, storage_type="local"),
             dcc.Store(id="user-tz"),
             dcc.Store(id="unit-store"),  # journey-grid distance unit (km/mi)

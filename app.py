@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import time
 from datetime import date
 from pathlib import Path
 
@@ -25,6 +26,7 @@ from src.data.stadiums import StadiumRepository
 from src.components.formation_pitch import build_formation_panel, formation_title, pitch_src
 from src.components.leaders_card import build_leaders_card
 from src.components.squad_table import build_squad_panel, squad_rows
+from src.components.live_match_modal import build_modal, modal_body
 from src.components.live_strip import strip_items
 from src.components.team_kpis import build_kpi_strip, kpi_cards
 from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, team_order
@@ -277,6 +279,30 @@ def update_live_layer(live):
 )
 def render_live_strip(live):
     return strip_items(live)
+
+
+@callback(
+    Output("live-match-modal", "opened"),
+    Output("live-match-modal", "children"),
+    Input({"type": "live-strip-item", "index": ALL}, "n_clicks"),
+    Input({"type": "open-live-modal", "index": ALL}, "n_clicks"),
+    State("live-store", "data"),
+    prevent_initial_call=True,
+)
+def open_live_modal(strip_clicks, drawer_clicks, live):
+    clicks = (strip_clicks or []) + (drawer_clicks or [])
+    if not any(c for c in clicks if c):
+        return no_update, no_update
+    triggered = ctx.triggered_id
+    if not isinstance(triggered, dict):
+        return no_update, no_update
+    match_id = triggered["index"]
+    match = next(
+        (m for m in (live or {}).get("matches", []) if m.get("match_id") == match_id),
+        None,
+    )
+    events = LIVE.match_events(match_id, time.monotonic()) if LIVE is not None else []
+    return True, modal_body(match, events)
 
 
 @callback(

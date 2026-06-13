@@ -66,6 +66,19 @@ class LiveDataService:
                 return {**self._last_good, "ok": False}
             return {"ok": False, "any_live": False, "matches": [], "standings": {}}
 
+    def match_events(self, match_id: int, now: float) -> list[dict]:
+        """On-demand events for one match (parsed dicts), cached like matches.
+        Empty list on any failure so the modal still renders."""
+        try:
+            raw = self._cached(
+                f"events:{match_id}", _MATCHES_TTL, now,
+                lambda: self._client.events(match_id),
+            )
+            return [vars(e) for e in models.parse_events(raw)]
+        except Exception:
+            logger.exception("Live events fetch failed for match %s", match_id)
+            return []
+
     def _match_dict(self, m: models.LiveMatch) -> dict:
         return {
             "match_id": m.match_id,

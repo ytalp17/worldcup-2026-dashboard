@@ -103,3 +103,28 @@ def test_error_after_success_returns_last_good_marked_not_ok():
     bad = svc.snapshot(date="2026-06-13", now=999.0)  # past TTL -> refetch -> error
     assert bad["ok"] is False
     assert bad["matches"]  # last-good payload retained
+
+
+def test_match_events_parses_and_caches():
+    class _C(_FakeClient):
+        def __init__(self):
+            super().__init__()
+            self.event_calls = 0
+
+        def events(self, match_id):
+            self.event_calls += 1
+            return [{"minute": 67, "type": "Goal", "player": "Neymar", "team": "Brazil"},
+                    {"minute": 12, "type": "Yellow Card", "player": "A", "team": "Mexico"}]
+
+    c = _C()
+    svc = LiveDataService(c, _index())
+    evs = svc.match_events(42, now=0.0)
+    assert [e["minute"] for e in evs] == [12, 67]   # sorted, dict form
+    svc.match_events(42, now=10.0)                   # cached within TTL
+    assert c.event_calls == 1
+
+
+def test_match_events_empty_on_error():
+    svc = LiveDataService(_BoomClient(), _index())
+    # _BoomClient has no events(); AttributeError is caught and returns [].
+    assert svc.match_events(42, now=0.0) == []
