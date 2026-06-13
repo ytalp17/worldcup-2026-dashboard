@@ -28,9 +28,19 @@ class MatchCalendar:
             self._cities_by_date.setdefault(m.date, set()).add(city)
             self._kickoffs.append((m.kickoff_utc, city))
         self._end = max(self._cities_by_date) if self._cities_by_date else today
+        self._start = min(self._cities_by_date) if self._cities_by_date else today
 
     @property
     def start(self) -> date:
+        return self._start
+
+    @property
+    def default_day(self) -> date:
+        """Today, clamped into [start, end] — the day selected on load."""
+        if self._today < self._start:
+            return self._start
+        if self._today > self._end:
+            return self._end
         return self._today
 
     @property

@@ -13,12 +13,12 @@ CALENDAR_DAYS = 10
 
 
 def build_match_calendar(calendar: MatchCalendar) -> dmc.MiniCalendar:
-    """Compact header calendar spanning today → the final day. Selecting a date
-    drives the map highlight callback in app.py (active stadiums pulse)."""
+    """Compact header calendar spanning the opening day -> the final day. Opens on
+    today (clamped); users can scroll back for past days."""
     return dmc.MiniCalendar(
         id=CALENDAR_ID,
-        value=calendar.start.isoformat(),
-        defaultDate=calendar.start.isoformat(),
+        value=calendar.default_day.isoformat(),
+        defaultDate=calendar.default_day.isoformat(),
         minDate=calendar.start.isoformat(),
         maxDate=(calendar.end + timedelta(days=1)).isoformat(),
         numberOfDays=CALENDAR_DAYS,
