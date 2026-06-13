@@ -25,6 +25,7 @@ from src.data.stadiums import StadiumRepository
 from src.components.formation_pitch import build_formation_panel, formation_title, pitch_src
 from src.components.leaders_card import build_leaders_card
 from src.components.squad_table import build_squad_panel, squad_rows
+from src.components.live_strip import strip_items
 from src.components.team_kpis import build_kpi_strip, kpi_cards
 from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, team_order
 from src.data.lineups import LineupRepository, lineup_for_team
@@ -268,6 +269,14 @@ def update_pulse_layer(team_mode, selected_date, index, user_tz):
 )
 def update_live_layer(live):
     return live_score_markers(VENUES, live)
+
+
+@callback(
+    Output("live-strip", "children"),
+    Input("live-store", "data"),
+)
+def render_live_strip(live):
+    return strip_items(live)
 
 
 @callback(
