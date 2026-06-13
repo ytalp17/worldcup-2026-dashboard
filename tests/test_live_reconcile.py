@@ -43,3 +43,21 @@ def test_find_stadium_against_real_schedule():
     index = build_stadium_index(matches)
     # Match #4 in the real schedule: USA vs Paraguay at Los Angeles Stadium.
     assert find_stadium("USA", "Paraguay", index) == "Los Angeles Stadium"
+
+
+def test_index_matches_by_pair_keys_on_canonical_names():
+    from src.data.live.reconcile import index_matches_by_pair, canonical_team
+    api_matches = [
+        {"match_id": 11, "home": "USA", "away": "Paraguay"},
+        {"match_id": 22, "home": "South Korea", "away": "Czech Republic"},
+    ]
+    idx = index_matches_by_pair(api_matches)
+    assert idx[("usa", "paraguay")] == 11
+    # static names "Korea Republic"/"Czechia" canonicalize to the API spellings
+    assert idx[(canonical_team("Korea Republic"), canonical_team("Czechia"))] == 22
+
+
+def test_index_matches_by_pair_skips_incomplete():
+    from src.data.live.reconcile import index_matches_by_pair
+    idx = index_matches_by_pair([{"home": "USA", "away": "Paraguay"}])  # no match_id
+    assert idx == {}

@@ -27,6 +27,16 @@ def canonical_team(name: str, aliases: dict[str, str] = TEAM_ALIASES) -> str:
     return aliases.get(norm, norm)
 
 
+def index_matches_by_pair(api_matches, aliases: dict[str, str] = TEAM_ALIASES) -> dict[tuple[str, str], int]:
+    """{(canonical_home, canonical_away): match_id} for API match dicts, so a
+    static schedule match can be resolved to its API id by team pair."""
+    return {
+        (canonical_team(m["home"], aliases), canonical_team(m["away"], aliases)): m["match_id"]
+        for m in api_matches
+        if m.get("home") and m.get("away") and m.get("match_id") is not None
+    }
+
+
 def build_stadium_index(matches) -> dict[tuple[str, str], str]:
     """(canonical_home, canonical_away) -> stadium, from the static schedule."""
     return {
