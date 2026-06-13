@@ -26,7 +26,7 @@ class HighlightlyClient:
         self._base_url = base_url.rstrip("/")
         self.requests_remaining: int | None = None
 
-    def _get(self, path: str, params: dict) -> dict:
+    def _get(self, path: str, params: dict) -> dict | list:
         resp = requests.get(
             f"{self._base_url}{path}",
             headers={"x-rapidapi-key": self._api_key},
@@ -45,10 +45,12 @@ class HighlightlyClient:
     def matches(self, date: str, league_id: int) -> dict:
         return self._get("/matches", {"date": date, "leagueId": league_id})
 
-    def match(self, match_id: int) -> dict:
+    def match(self, match_id: int) -> list:
+        # /matches/{id} returns a bare list of one detailed match object.
         return self._get(f"/matches/{match_id}", {})
 
-    def events(self, match_id: int) -> dict:
+    def events(self, match_id: int) -> list:
+        # /events/{id} returns a bare list of event objects.
         return self._get(f"/events/{match_id}", {})
 
     def lineups(self, match_id: int) -> dict:
