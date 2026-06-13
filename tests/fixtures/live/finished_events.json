@@ -1,0 +1,296 @@
+[
+  {
+    "team": {
+      "id": 2029568,
+      "logo": "https://highlightly.net/soccer/images/teams/2029568.png",
+      "name": "USA"
+    },
+    "time": "7",
+    "type": "Own Goal",
+    "assist": null,
+    "player": "D. Bobadilla",
+    "playerId": 31412381,
+    "substituted": null,
+    "assistingPlayerId": null
+  },
+  {
+    "team": {
+      "id": 2026164,
+      "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+      "name": "Paraguay"
+    },
+    "time": "10",
+    "type": "Yellow Card",
+    "assist": null,
+    "player": "J. Caceres",
+    "playerId": 31554866,
+    "substituted": null,
+    "assistingPlayerId": null
+  },
+  {
+    "team": {
+      "id": 2029568,
+      "logo": "https://highlightly.net/soccer/images/teams/2029568.png",
+      "name": "USA"
+    },
+    "time": "28",
+    "type": "VAR Goal Cancelled - Offside",
+    "assist": null,
+    "player": "F. Balogun",
+    "playerId": 22352589,
+    "substituted": null,
+    "assistingPlayerId": null
+  },
+  {
+    "team": {
+      "id": 2029568,
+      "logo": "https://highlightly.net/soccer/images/teams/2029568.png",
+      "name": "USA"
+    },
+    "time": "31",
+    "type": "Goal",
+    "assist": "C. Pulisic",
+    "player": "F. Balogun",
+    "playerId": 22352589,
+    "substituted": null,
+    "assistingPlayerId": 2891
+  },
+  {
+    "team": {
+      "id": 2029568,
+      "logo": "https://highlightly.net/soccer/images/teams/2029568.png",
+      "name": "USA"
+    },
+    "time": "45+5",
+    "type": "Goal",
+    "assist": "M. Tillman",
+    "player": "F. Balogun",
+    "playerId": 22352589,
+    "substituted": null,
+    "assistingPlayerId": 26088111
+  },
+  {
+    "team": {
+      "id": 2026164,
+      "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+      "name": "Paraguay"
+    },
+    "time": "46",
+    "type": "Substitution",
+    "assist": null,
+    "player": "D. Bobadilla",
+    "playerId": 31412381,
+    "substituted": "Mauricio",
+    "assistingPlayerId": 17144239
+  },
+  {
+    "team": {
+      "id": 2029568,
+      "logo": "https://highlightly.net/soccer/images/teams/2029568.png",
+      "name": "USA"
+    },
+    "time": "46",
+    "type": "Substitution",
+    "assist": null,
+    "player": "C. Pulisic",
+    "playerId": 2891,
+    "substituted": "S. Berhalter",
+    "assistingPlayerId": 32475947
+  },
+  {
+    "team": {
+      "id": 2026164,
+      "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+      "name": "Paraguay"
+    },
+    "time": "53",
+    "type": "Yellow Card",
+    "assist": null,
+    "player": "M. Almiron",
+    "playerId": 403781,
+    "substituted": null,
+    "assistingPlayerId": null
+  },
+  {
+    "team": {
+      "id": 2029568,
+      "logo": "https://highlightly.net/soccer/images/teams/2029568.png",
+      "name": "USA"
+    },
+    "time": "59",
+    "type": "Yellow Card",
+    "assist": null,
+    "player": "T. Adams",
+    "playerId": 185304,
+    "substituted": null,
+    "assistingPlayerId": null
+  },
+  {
+    "team": {
+      "id": 2026164,
+      "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+      "name": "Paraguay"
+    },
+    "time": "62",
+    "type": "Substitution",
+    "assist": null,
+    "player": "A. Sanabria",
+    "playerId": 406196,
+    "substituted": "A. Arce",
+    "assistingPlayerId": 15369214
+  },
+  {
+    "team": {
+      "id": 2029568,
+      "logo": "https://highlightly.net/soccer/images/teams/2029568.png",
+      "name": "USA"
+    },
+    "time": "72",
+    "type": "Substitution",
+    "assist": null,
+    "player": "S. Dest",
+    "playerId": 6236489,
+    "substituted": "T. Weah",
+    "assistingPlayerId": 183372
+  },
+  {
+    "team": {
+      "id": 2029568,
+      "logo": "https://highlightly.net/soccer/images/teams/2029568.png",
+      "name": "USA"
+    },
+    "time": "72",
+    "type": "Substitution",
+    "assist": null,
+    "player": "F. Balogun",
+    "playerId": 22352589,
+    "substituted": "R. Pepi",
+    "assistingPlayerId": 11892902
+  },
+  {
+    "team": {
+      "id": 2026164,
+      "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+      "name": "Paraguay"
+    },
+    "time": "73",
+    "type": "Goal",
+    "assist": "J. Enciso",
+    "player": "Mauricio",
+    "playerId": 17144239,
+    "substituted": null,
+    "assistingPlayerId": 11390421
+  },
+  {
+    "team": {
+      "id": 2026164,
+      "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+      "name": "Paraguay"
+    },
+    "time": "79",
+    "type": "Yellow Card",
+    "assist": null,
+    "player": "D. Gomez",
+    "playerId": 44817724,
+    "substituted": null,
+    "assistingPlayerId": null
+  },
+  {
+    "team": {
+      "id": 2026164,
+      "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+      "name": "Paraguay"
+    },
+    "time": "79",
+    "type": "Substitution",
+    "assist": null,
+    "player": "M. Almiron",
+    "playerId": 403781,
+    "substituted": "R. Sosa",
+    "assistingPlayerId": 31604132
+  },
+  {
+    "team": {
+      "id": 2026164,
+      "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+      "name": "Paraguay"
+    },
+    "time": "79",
+    "type": "Substitution",
+    "assist": null,
+    "player": "J. Caceres",
+    "playerId": 31554866,
+    "substituted": "G. Velazquez",
+    "assistingPlayerId": 5765242
+  },
+  {
+    "team": {
+      "id": 2026164,
+      "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+      "name": "Paraguay"
+    },
+    "time": "80",
+    "type": "Substitution",
+    "assist": null,
+    "player": "D. Gomez",
+    "playerId": 44817724,
+    "substituted": "Kaku",
+    "assistingPlayerId": 404908
+  },
+  {
+    "team": {
+      "id": 2029568,
+      "logo": "https://highlightly.net/soccer/images/teams/2029568.png",
+      "name": "USA"
+    },
+    "time": "82",
+    "type": "Substitution",
+    "assist": null,
+    "player": "M. Tillman",
+    "playerId": 26088111,
+    "substituted": "G. Reyna",
+    "assistingPlayerId": 26069435
+  },
+  {
+    "team": {
+      "id": 2026164,
+      "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+      "name": "Paraguay"
+    },
+    "time": "88",
+    "type": "Yellow Card",
+    "assist": null,
+    "player": "A. Arce",
+    "playerId": 15369214,
+    "substituted": null,
+    "assistingPlayerId": null
+  },
+  {
+    "team": {
+      "id": 2026164,
+      "logo": "https://highlightly.net/soccer/images/teams/2026164.png",
+      "name": "Paraguay"
+    },
+    "time": "90+3",
+    "type": "Yellow Card",
+    "assist": null,
+    "player": "J. Alonso",
+    "playerId": 402493,
+    "substituted": null,
+    "assistingPlayerId": null
+  },
+  {
+    "team": {
+      "id": 2029568,
+      "logo": "https://highlightly.net/soccer/images/teams/2029568.png",
+      "name": "USA"
+    },
+    "time": "90+8",
+    "type": "Goal",
+    "assist": "A. Freeman",
+    "player": "G. Reyna",
+    "playerId": 26069435,
+    "substituted": null,
+    "assistingPlayerId": 57315188
+  }
+]
