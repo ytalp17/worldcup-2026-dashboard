@@ -511,7 +511,7 @@ if LIVE is not None:
         if ws is None:
             return
         while not ws.is_shutdown:
-            now = asyncio.get_event_loop().time()
+            now = asyncio.get_running_loop().time()
             snap = await asyncio.to_thread(LIVE.snapshot, date.today().isoformat(), now)
             set_props("live-store", {"data": snap})
             await asyncio.sleep(next_delay(snap))
