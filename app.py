@@ -36,6 +36,7 @@ from src.data.team_stats import compute_team_stats
 from src.data.team_continents import grouped_team_options
 from src.data.live.client import HighlightlyClient
 from src.data.live.reconcile import build_stadium_index
+from src.data.env_config import load_env_file
 from src.data.live.service import LiveDataService, next_delay
 from src.data.venues import build_venues
 
@@ -63,6 +64,10 @@ STADIUM_TO_CITY = {v.stadium_name: v.city for v in VENUES}
 MATCH_CALENDAR = MatchCalendar(MATCHES, STADIUM_TO_CITY, today=date.today())
 
 STADIUM_INDEX = build_stadium_index(MATCHES)
+# Load HIGHLIGHTLY_API_KEY (and any other vars) from a local .env so running
+# `python app.py` picks up the key without a manual export. An already-exported
+# value still wins (setdefault). Without a key, the app runs static-only.
+load_env_file(Path(__file__).parent / ".env")
 _API_KEY = os.environ.get("HIGHLIGHTLY_API_KEY")
 # No-key mode: when the env var is unset the app runs purely on static data,
 # so dev and the whole test suite work offline.
