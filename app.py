@@ -129,6 +129,21 @@ def formation_panel_payload(index, dark):
     return title, team, src
 
 
+def strip_day_matches(selected_date, today, live, matches_on):
+    """Match dicts for the strip on the selected day. Today -> the live-store
+    matches (auto-updating); any other valid day -> matches_on(day); when the
+    fetcher is None (no key) or the date is unparseable -> the live-store matches."""
+    from datetime import date as _date
+    if selected_date:
+        try:
+            day = _date.fromisoformat(selected_date)
+        except (ValueError, TypeError):
+            day = today
+        if day != today and matches_on is not None:
+            return matches_on(selected_date)
+    return (live or {}).get("matches", [])
+
+
 app.layout = build_layout(
     VENUES,
     TEAM_OPTIONS,
@@ -281,10 +296,13 @@ def update_live_layer(live):
 
 @callback(
     Output("live-strip", "children"),
+    Input("match-calendar", "value"),
     Input("live-store", "data"),
 )
-def render_live_strip(live):
-    return strip_items(live)
+def render_live_strip(selected_date, live):
+    fetch = (lambda d: LIVE.matches_on(d, time.monotonic())) if LIVE is not None else None
+    matches = strip_day_matches(selected_date, date.today(), live, fetch)
+    return strip_items({"matches": matches})
 
 
 @callback(
