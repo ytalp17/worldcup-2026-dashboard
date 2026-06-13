@@ -4,7 +4,6 @@ import json
 from datetime import date
 from pathlib import Path
 
-import dash
 from dash import ALL, Dash, Input, Output, State, callback, clientside_callback, ctx, no_update
 
 from src.components.detail_panel import stadium_detail
@@ -31,12 +30,6 @@ from src.data.squads import Squad, SquadRepository, squad_for_team
 from src.data.team_stats import compute_team_stats
 from src.data.team_continents import grouped_team_options
 from src.data.venues import build_venues
-
-# dash-mantine-components 2.x is built on Mantine 8 / React 18 (e.g. useId).
-# The runtime (conda base) pairs it with Dash 2.18, which still defaults to
-# React 16, so we must opt into React 18 or the UI fails with
-# "(0 , r.useId) is not a function".
-dash._dash_renderer._set_react_version("18.2.0")
 
 DATA_DIR = Path(__file__).parent / "assets" / "data"
 IMAGE_DIR = Path(__file__).parent / "assets" / "stadiums"
@@ -65,7 +58,12 @@ MATCH_CALENDAR = MatchCalendar(MATCHES, STADIUM_TO_CITY, today=date.today())
 def flow_children(selected):
     return flows_for(selected, TEAM_FLOWS)
 
-app = Dash(__name__)
+app = Dash(
+    __name__,
+    backend="fastapi",
+    websocket_callbacks=True,
+    suppress_callback_exceptions=True,
+)
 app.title = "FIFA World Cup 2026"
 TEAM_CAROUSEL = build_team_carousel(TEAM_NAMES, app.get_asset_url, index=0)
 
