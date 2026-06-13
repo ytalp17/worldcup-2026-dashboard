@@ -310,10 +310,9 @@ def render_live_strip(selected_date, live):
     Output("live-match-modal", "children"),
     Input({"type": "live-strip-item", "index": ALL}, "n_clicks"),
     Input({"type": "open-live-modal", "index": ALL}, "n_clicks"),
-    State("live-store", "data"),
     prevent_initial_call=True,
 )
-def open_live_modal(strip_clicks, drawer_clicks, live):
+def open_live_modal(strip_clicks, drawer_clicks):
     clicks = (strip_clicks or []) + (drawer_clicks or [])
     if not any(c for c in clicks if c):
         return no_update, no_update
@@ -321,17 +320,14 @@ def open_live_modal(strip_clicks, drawer_clicks, live):
     if not isinstance(triggered, dict):
         return no_update, no_update
     match_id = triggered["index"]
-    match = next(
-        (m for m in (live or {}).get("matches", []) if m.get("match_id") == match_id),
-        None,
-    )
     now = time.monotonic()
     if LIVE is not None:
+        match = LIVE.match_summary(match_id, now)
         events = LIVE.match_events(match_id, now)
         stats = LIVE.match_statistics(match_id, now)
         lineups = LIVE.match_lineups(match_id, now)
     else:
-        events, stats, lineups = [], {}, {}
+        match, events, stats, lineups = None, [], {}, {}
     return True, modal_body(match, events, stats, lineups)
 
 
