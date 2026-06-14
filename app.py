@@ -139,7 +139,7 @@ def tournament_grid_payload(scope, tab, live):
     standings = (live or {}).get("standings") or {}
     tl = LIVE.tournament_team_leaders(standings) if LIVE is not None else {}
     pl = LIVE.tournament_player_leaders() if LIVE is not None else {}
-    rows = tourn_row_data(scope, tab, tl, pl, standings)
+    rows = tourn_row_data(scope, tab, tl, pl)
     return rows, tourn_columns(scope, tab)
 
 

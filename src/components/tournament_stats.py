@@ -5,7 +5,7 @@ import dash_mantine_components as dmc
 
 # ---- tab catalogue -------------------------------------------------------
 
-TEAM_TABS = ["Standings", "Attack & xG", "Possession & Passing", "Defense", "Discipline"]
+TEAM_TABS = ["Attack & xG", "Possession & Passing", "Defense", "Discipline"]
 PLAYER_TABS = ["Goals", "Assists", "Cards"]
 
 # Team stat tabs (not Standings) -> the tournament_team_leaders key.
@@ -38,15 +38,6 @@ def _columns_for(scope, tab):
 
     team = {"headerName": "Team", "field": "team", "flex": 1, "minWidth": 120,
             "sortable": True}
-    if tab == "Standings":
-        return [
-            {"headerName": "Pos", "field": "pos", "width": 52, "sortable": True},
-            team,
-            {"headerName": "Grp", "field": "group", "width": 56, "sortable": True},
-            _num("P", "played", 44), _num("W", "won", 44), _num("D", "drawn", 44),
-            _num("L", "lost", 44), _num("GF", "gf", 48), _num("GA", "ga", 48),
-            _num("GD", "gd", 50), _num("Pts", "points", 52),
-        ]
     if tab == "Attack & xG":
         return [team, _num("Goals", "goals", 60), _num("xG", "xg", 56),
                 _num("xA", "xa", 56), _num("BigCh", "big_chances", 64),
@@ -86,33 +77,12 @@ def tourn_columns(scope: str, tab: str) -> list[dict]:
     return _columns_for(scope, _resolve_tab(scope, tab))
 
 
-def standings_table_rows(standings: dict | None) -> list[dict]:
-    """Flatten the {group: [row]} standings into one tournament table sorted by
-    points (then GD, GF), with a 1-based overall position."""
-    rows = []
-    for group, table in (standings or {}).items():
-        for s in table:
-            rows.append({
-                "team": s.get("team", ""), "group": group,
-                "played": s.get("played", 0), "won": s.get("won", 0),
-                "drawn": s.get("drawn", 0), "lost": s.get("lost", 0),
-                "gf": s.get("goals_for", 0), "ga": s.get("goals_against", 0),
-                "gd": s.get("goal_diff", 0), "points": s.get("points", 0),
-            })
-    rows.sort(key=lambda r: (-r["points"], -r["gd"], -r["gf"], r["team"]))
-    for i, r in enumerate(rows):
-        r["pos"] = i + 1
-    return rows
-
-
 def tourn_row_data(scope: str, tab: str, team_leaders: dict | None,
-                   player_leaders: dict | None, standings: dict | None) -> list[dict]:
+                   player_leaders: dict | None) -> list[dict]:
     tab = _resolve_tab(scope, tab)
     if scope == "Players":
         rows = (player_leaders or {}).get(_PLAYER_TAB_KEY[tab], [])
         return [{"rank": i + 1, **r} for i, r in enumerate(rows)]
-    if tab == "Standings":
-        return standings_table_rows(standings)
     return list((team_leaders or {}).get(_TEAM_TAB_KEY[tab], []))
 
 
@@ -121,11 +91,11 @@ def build_tournament_drawer() -> dmc.Drawer:
     AG grid. The grid's columnDefs/rowData are driven by app callbacks."""
     scope = dmc.SegmentedControl(id="tourn-scope", value="Team",
                                  data=["Team", "Players"], size="xs", fullWidth=True)
-    tabs = dmc.SegmentedControl(id="tourn-tabs", value="Standings",
+    tabs = dmc.SegmentedControl(id="tourn-tabs", value="Attack & xG",
                                 data=TEAM_TABS, size="xs", fullWidth=True)
     grid = dag.AgGrid(
         id="tourn-grid",
-        columnDefs=tourn_columns("Team", "Standings"),
+        columnDefs=tourn_columns("Team", "Attack & xG"),
         rowData=[],
         className="ag-theme-quartz-dark tourn-grid",
         dashGridOptions=_GRID_OPTIONS,
