@@ -684,6 +684,17 @@ clientside_callback(
     Input("color-scheme-toggle", "checked"),
 )
 
+_TOURN_GRID_THEME_JS = """
+(checked) => (checked ? 'ag-theme-quartz-dark tourn-grid'
+                      : 'ag-theme-quartz tourn-grid')
+"""
+
+clientside_callback(
+    _TOURN_GRID_THEME_JS,
+    Output("tourn-grid", "className"),
+    Input("color-scheme-toggle", "checked"),
+)
+
 # Switch the journey grid's Distance unit (km <-> mi). The formatDistance value
 # formatter reads window.__journeyUnit; we set it and refresh just that column so
 # the current sort and page are preserved (no rowData/columnDefs churn).
