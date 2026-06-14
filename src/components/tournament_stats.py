@@ -33,9 +33,8 @@ def _columns_for(scope, tab):
         if tab == "Cards":
             return [rank, player, team, _num("🟨", "yellow", 50),
                     _num("🟥", "red", 50), _num("Ap", "apps", 50)]
-        stat = {"Goals": "value", "Assists": "value"}[tab]
-        head = {"Goals": "Goals", "Assists": "Assists"}[tab]
-        return [rank, player, team, _num(head, stat, 70), _num("Ap", "apps", 50)]
+        # Goals/Assists both rank on the single aggregated `value` field.
+        return [rank, player, team, _num(tab, "value", 70), _num("Ap", "apps", 50)]
 
     team = {"headerName": "Team", "field": "team", "flex": 1, "minWidth": 120,
             "sortable": True}

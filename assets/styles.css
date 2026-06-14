@@ -526,6 +526,25 @@ body,
     color: var(--mantine-color-dimmed);
 }
 
+/* --- tournament-stats grid (lives in the frosted Tournament Stats drawer) --- */
+/* Transparent like the squad/journey grids so the frosted drawer shows through. */
+.tourn-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    --ag-background-color: transparent;
+    --ag-odd-row-background-color: transparent;
+    --ag-header-background-color: transparent;
+    --ag-borders: none;
+    --ag-row-border-width: 0;
+    --ag-font-size: 13px;
+}
+
+.tourn-grid .ag-cell,
+.tourn-grid .ag-header-cell {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
 /* --- travel-distance grid (lives in the filter drawer, Time mode) --- */
 
 /* Transparent so the frosted drawer shows through, like the other grids. */
