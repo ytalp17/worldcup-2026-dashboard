@@ -217,3 +217,17 @@ def test_squad_panel_payload_matches_centered_team():
     name, rows = app.squad_panel_payload(0)
     expected = center_team(app.TEAM_NAMES, 0)
     assert name == expected
+
+
+def test_leaders_payload_columns_and_team():
+    import app
+    rows, cols, team = app.leaders_payload("Goals", 0)
+    assert team == app.center_team(app.TEAM_NAMES, 0)
+    assert [c["headerName"] for c in cols] == ["#", "Player", "Goals", "Apps"]
+    assert isinstance(rows, list)   # empty in no-key test env, but well-formed
+
+
+def test_leaders_payload_rating_tab_header():
+    import app
+    _rows, cols, _team = app.leaders_payload("Rating", 3)
+    assert cols[2]["headerName"] == "Rating"

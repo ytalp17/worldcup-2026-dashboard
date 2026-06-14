@@ -21,7 +21,11 @@ from src.data.groups import build_groups, group_for_team
 from src.data.match_calendar import MatchCalendar
 from src.data.matches import MatchRepository, matches_by_stadium
 from src.components.formation_pitch import build_formation_panel, formation_title, pitch_src
-from src.components.leaders_card import build_leaders_card
+from src.components.leaders_card import (
+    build_leaders_card,
+    leaders_columns,
+    leaders_row_data,
+)
 from src.components.squad_table import build_squad_panel, squad_rows
 from src.components.live_match_modal import build_modal, modal_body
 from src.components.live_strip import overlay_style, strip_items
@@ -75,8 +79,12 @@ load_env_file(Path(__file__).parent / ".env")
 _API_KEY = os.environ.get("HIGHLIGHTLY_API_KEY")
 # No-key mode: when the env var is unset the app runs purely on static data,
 # so dev and the whole test suite work offline.
+# Per-match player-stats cache (gitignored). The live_feed loop maintains it;
+# team_leaders reads it for the leaders card.
+PLAYER_STORE_PATH = DATA_DIR / "live_player_stats.csv"
 LIVE = (
-    LiveDataService(HighlightlyClient(api_key=_API_KEY), STADIUM_INDEX)
+    LiveDataService(HighlightlyClient(api_key=_API_KEY), STADIUM_INDEX,
+                    player_store=PLAYER_STORE_PATH)
     if _API_KEY else None
 )
 
@@ -114,6 +122,14 @@ def squad_panel_payload(index):
     name = squad.name if squad else "—"
     rows = squad_rows(squad) if squad else []
     return name, rows
+
+
+def leaders_payload(stat, index):
+    """(rowData, columnDefs, team_name) for the leaders grid: the centred team's
+    player leaders for the active stat tab. Empty rows when there's no live data."""
+    team = center_team(TEAM_NAMES, index or 0)
+    leaders = LIVE.team_leaders(team) if LIVE is not None else {}
+    return leaders_row_data(leaders, stat), leaders_columns(stat), team
 
 
 def team_stats_payload(index):
@@ -482,6 +498,19 @@ def update_squad_panel(index):
 
 
 @callback(
+    Output("leaders-grid", "rowData"),
+    Output("leaders-grid", "columnDefs"),
+    Output("leaders-table-title", "children"),
+    Input("leaders-tabs", "value"),
+    Input("carousel-index", "data"),
+    Input("live-store", "data"),
+)
+def update_leaders_panel(stat, index, live):
+    rows, cols, team = leaders_payload(stat, index)
+    return rows, cols, team
+
+
+@callback(
     Output("formation-img", "src"),
     Output("formation-title", "children"),
     Input("carousel-index", "data"),
@@ -629,6 +658,15 @@ clientside_callback(
     Input("journey-grid", "selectedRows"),
 )
 
+def _backfill_player_stats():
+    """One-time refresh of the player-stats cache from past scheduled dates.
+    Idempotent: update_player_stats skips finished matches already on disk."""
+    today = date.today()
+    now = time.monotonic()
+    for d in sorted({m.date for m in MATCHES if m.date <= today}):
+        LIVE.update_player_stats(LIVE.matches_on(d.isoformat(), now), now)
+
+
 # Always register the persistent WS callback so the client can always resolve it
 # (a conditional registration leaves a connecting client with a callback the
 # server doesn't know, which raises "Callback function not found"). When there's
@@ -638,10 +676,12 @@ async def live_feed():
     ws = ctx.websocket
     if ws is None or LIVE is None:
         return
+    await asyncio.to_thread(_backfill_player_stats)
     while not ws.is_shutdown:
         now = asyncio.get_running_loop().time()
         snap = await asyncio.to_thread(LIVE.snapshot, date.today().isoformat(), now)
         set_props("live-store", {"data": snap})
+        await asyncio.to_thread(LIVE.update_player_stats, snap["matches"], now)
         await asyncio.sleep(next_delay(snap))
 
 

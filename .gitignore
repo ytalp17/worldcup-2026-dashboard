@@ -8,3 +8,4 @@ logs/
 .superpowers/
 .env
 *.env
+assets/data/live_player_stats.csv
