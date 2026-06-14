@@ -763,6 +763,7 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 - Delete (data): `assets/data/fifa_2026_host_cities.csv`, `fifa_wc2026_stadiums.csv`, `wc2026_stadium_altitude.csv`, `host_cities.csv`, `fifa_2026_matches.csv`, `team_continents.csv`, `team_distances.csv`, `wc2026_matches.csv`, `world_cup_2026_squads.csv`, `fifa_abbrevations.md`, `managers.md`
 - Delete (code): `src/data/host_cities.py`, `src/data/stadiums.py`, `src/data/altitudes.py`, `src/data/timezones.py`
 - Delete (tests): `tests/test_host_cities.py`, `tests/test_stadiums.py`, `tests/test_altitudes.py`, `tests/test_timezones.py`
+- **Orphaned helper scripts (user-approved 2026-06-14):** repoint `scripts/download_stadium_images.py` to read `venues.csv` (cols `image_filename`/`image_url` instead of `Image_Filename`/`Image_URL`); delete `scripts/compute_kickoff_utc.py` and `scripts/compute_team_distances.py` (superseded — their outputs `kickoff_utc`/`distance_km` are now materialized columns in `matches.csv`/`teams.csv`, which are the source of truth). Note: `scripts/consolidate_csvs.py` is a historical migration record; after its source inputs are deleted it is no longer re-runnable, by design.
 
 - [ ] **Step 1: Verify nothing still imports the modules to be deleted**
 
