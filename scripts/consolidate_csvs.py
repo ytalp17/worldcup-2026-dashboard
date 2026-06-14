@@ -1,8 +1,11 @@
 """One-off migration: consolidate the 9 source CSVs (+ 2 .md files) in
 assets/data/ into 4 entity CSVs (venues, teams, matches, squads).
 
-Run once from the repo root:  python scripts/consolidate_csvs.py
-Committed for reproducibility / audit. Safe to re-run (idempotent).
+This was run once from the repo root:  python scripts/consolidate_csvs.py
+Kept as a historical / audit record of the migration. Its source inputs (the
+old per-entity CSVs and the two .md files) were removed after the migration, so
+this script is NO LONGER re-runnable — the 4 consolidated CSVs are now the
+hand-maintained source of truth.
 """
 from __future__ import annotations
 
