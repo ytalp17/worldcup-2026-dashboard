@@ -1,49 +1,49 @@
-team,continent,distance_km,code,confederation,coach,coach_nationality,coach_since
-Algeria,Africa,4797.5,ALG,CAF,Vladimir Petković,Bosnia and Herzegovina,Since February 2024
-Argentina,South America,739.0,ARG,CONMEBOL,Lionel Scaloni,Argentina,Since November 2018
-Australia,Oceania,1329.3,AUS,AFC,Tony Popovic,Australia,Since September 2024
-Austria,Europe,3053.8,AUT,UEFA,Ralf Rangnick,Germany,Since May 2022
-Belgium,Europe,3301.7,BEL,UEFA,Rudi Garcia,France,Since January 2025
-Bosnia and Herzegovina,Europe,5057.6,BIH,UEFA,Sergej Barbarez,Bosnia,Since April 2024
-Brazil,South America,1757.6,BRA,CONMEBOL,Carlo Ancelotti,Italy,Since May 2025
-Cabo Verde,Africa,2502.3,CPV,CAF,Bubista,Cape Verde,Since January 2020
-Canada,North America,3356.8,CAN,CONCACAF,Jesse Marsch,USA,Since May 2024
-Colombia,South America,2915.1,COL,CONMEBOL,Néstor Lorenzo,Argentina,Since July 2022
-Congo DR,Africa,3660.1,COD,CAF,Sébastien Desabre,France,Since August 2022
-Croatia,Europe,2499.9,CRO,UEFA,Zlatko Dalić,Croatia,Since October 2017
-Curaçao,North America,2702.1,CUW,CONCACAF,Dick Advocaat,Netherlands,Since January 2024
-Czechia,Europe,4544.2,CZE,UEFA,Miroslav Koubek,Czechia,Since December 2025
-Côte d'Ivoire,Africa,1088.8,CIV,CAF,Emerse Faé,Ivory Coast,Since January 2024
-Ecuador,South America,3404.7,ECU,CONMEBOL,Sebastián Beccacece,Argentina,Since August 2024
-Egypt,Africa,391.3,EGY,CAF,Hossam Hassan,Egypt,Since February 2024
-England,Europe,2767.5,ENG,UEFA,Thomas Tuchel,Germany,Since January 2025
-France,Europe,545.5,FRA,UEFA,Didier Deschamps,France,Since July 2012
-Germany,Europe,2640.0,GER,UEFA,Julian Nagelsmann,Germany,Since September 2023
-Ghana,Africa,1094.2,GHA,CAF,Carlos Queiroz,Portugal,Since April 2026
-Haiti,North America,1475.8,HAI,CONCACAF,Sébastien Migné,France,Since June 2024
-IR Iran,Asia,1553.1,IRN,AFC,Amir Ghalenoei,Iran,Since March 2023
-Iraq,Asia,952.5,IRQ,AFC,Graham Arnold,Australia,Since May 2025
-Japan,Asia,1688.2,JPN,AFC,Hajime Moriyasu,Japan,Since July 2018
-Jordan,Asia,2314.8,JOR,AFC,Jamal Sellami,Morocco,Since August 2024
-Korea Republic,Asia,644.9,KOR,AFC,Hong Myung-bo,Korea Republic,Since July 2024
-Mexico,North America,951.8,MEX,CONCACAF,Javier Aguirre,Mexico,Since July 2024
-Morocco,Africa,1749.7,MAR,CAF,Mohamed Ouahbi,Morocco/Belgium,Since March 2026
-Netherlands,Europe,1421.0,NED,UEFA,Ronald Koeman,Netherlands,Since January 2023
-New Zealand,Oceania,1748.5,NZL,OFC,Darren Bazeley,UK (born in Northampton),Since November 2022
-Norway,Europe,547.8,NOR,UEFA,Ståle Solbakken,Norway,Since December 2020
-Panama,North America,540.2,PAN,CONCACAF,Thomas Christiansen,Spain/Denmark (born in Hadsund),Since July 2020
-Paraguay,South America,504.6,PAR,CONMEBOL,Gustavo Alfaro,Argentina,Since August 2024
-Portugal,Europe,1547.1,POR,UEFA,Roberto Martinez,Spain,Since January 2023
-Qatar,Asia,1519.1,QAT,AFC,Julen Lopetegui,Spain,Since May 2025
-Saudi Arabia,Asia,2089.8,KSA,AFC,Giorgios Donis,Greece,Since April 2026
-Scotland,Europe,1972.5,SCO,UEFA,Steve Clarke,Scotland,Since May 2019
-Senegal,Africa,540.2,SEN,CAF,Pape Thiaw,Senegal,Since December 2024
-South Africa,Africa,3942.6,RSA,CAF,Hugo Broos,Belgium,Since May 2021
-Spain,Europe,2373.1,ESP,UEFA,Luis de la Fuente,Spain,Since December 2022
-Sweden,Europe,1028.7,SWE,UEFA,Graham Potter,England,Since October 2025
-Switzerland,Europe,2253.1,SUI,UEFA,Murat Yakin,Switzerland,Since August 2021
-Tunisia,Africa,1582.1,TUN,CAF,Sabri Lamouchi,France,Since January 2026
-Türkiye,Europe,1828.0,TUR,UEFA,Vincenzo Montella,Italy,Since September 2023
-USA,North America,3106.3,USA,CONCACAF,Mauricio Pochettino,Argentina,Since September 2024
-Uruguay,South America,2439.2,URU,CONMEBOL,Marcelo Bielsa,Argentina,Since May 2023
-Uzbekistan,Asia,2349.2,UZB,AFC,Fabio Cannavaro,Italy,Since October 2025
+team,continent,distance_km,code,confederation,coach,coach_nationality,coach_since,fifa_rank
+Algeria,Africa,4797.5,ALG,CAF,Vladimir Petković,Bosnia and Herzegovina,Since February 2024,28
+Argentina,South America,739.0,ARG,CONMEBOL,Lionel Scaloni,Argentina,Since November 2018,1
+Australia,Oceania,1329.3,AUS,AFC,Tony Popovic,Australia,Since September 2024,23
+Austria,Europe,3053.8,AUT,UEFA,Ralf Rangnick,Germany,Since May 2022,25
+Belgium,Europe,3301.7,BEL,UEFA,Rudi Garcia,France,Since January 2025,9
+Bosnia and Herzegovina,Europe,5057.6,BIH,UEFA,Sergej Barbarez,Bosnia,Since April 2024,63
+Brazil,South America,1757.6,BRA,CONMEBOL,Carlo Ancelotti,Italy,Since May 2025,6
+Cabo Verde,Africa,2502.3,CPV,CAF,Bubista,Cape Verde,Since January 2020,67
+Canada,North America,3356.8,CAN,CONCACAF,Jesse Marsch,USA,Since May 2024,31
+Colombia,South America,2915.1,COL,CONMEBOL,Néstor Lorenzo,Argentina,Since July 2022,14
+Congo DR,Africa,3660.1,COD,CAF,Sébastien Desabre,France,Since August 2022,46
+Croatia,Europe,2499.9,CRO,UEFA,Zlatko Dalić,Croatia,Since October 2017,11
+Curaçao,North America,2702.1,CUW,CONCACAF,Dick Advocaat,Netherlands,Since January 2024,82
+Czechia,Europe,4544.2,CZE,UEFA,Miroslav Koubek,Czechia,Since December 2025,43
+Côte d'Ivoire,Africa,1088.8,CIV,CAF,Emerse Faé,Ivory Coast,Since January 2024,33
+Ecuador,South America,3404.7,ECU,CONMEBOL,Sebastián Beccacece,Argentina,Since August 2024,24
+Egypt,Africa,391.3,EGY,CAF,Hossam Hassan,Egypt,Since February 2024,29
+England,Europe,2767.5,ENG,UEFA,Thomas Tuchel,Germany,Since January 2025,4
+France,Europe,545.5,FRA,UEFA,Didier Deschamps,France,Since July 2012,3
+Germany,Europe,2640.0,GER,UEFA,Julian Nagelsmann,Germany,Since September 2023,10
+Ghana,Africa,1094.2,GHA,CAF,Carlos Queiroz,Portugal,Since April 2026,73
+Haiti,North America,1475.8,HAI,CONCACAF,Sébastien Migné,France,Since June 2024,84
+IR Iran,Asia,1553.1,IRN,AFC,Amir Ghalenoei,Iran,Since March 2023,20
+Iraq,Asia,952.5,IRQ,AFC,Graham Arnold,Australia,Since May 2025,57
+Japan,Asia,1688.2,JPN,AFC,Hajime Moriyasu,Japan,Since July 2018,18
+Jordan,Asia,2314.8,JOR,AFC,Jamal Sellami,Morocco,Since August 2024,64
+Korea Republic,Asia,644.9,KOR,AFC,Hong Myung-bo,Korea Republic,Since July 2024,22
+Mexico,North America,951.8,MEX,CONCACAF,Javier Aguirre,Mexico,Since July 2024,13
+Morocco,Africa,1749.7,MAR,CAF,Mohamed Ouahbi,Morocco/Belgium,Since March 2026,7
+Netherlands,Europe,1421.0,NED,UEFA,Ronald Koeman,Netherlands,Since January 2023,8
+New Zealand,Oceania,1748.5,NZL,OFC,Darren Bazeley,UK (born in Northampton),Since November 2022,85
+Norway,Europe,547.8,NOR,UEFA,Ståle Solbakken,Norway,Since December 2020,30
+Panama,North America,540.2,PAN,CONCACAF,Thomas Christiansen,Spain/Denmark (born in Hadsund),Since July 2020,34
+Paraguay,South America,504.6,PAR,CONMEBOL,Gustavo Alfaro,Argentina,Since August 2024,42
+Portugal,Europe,1547.1,POR,UEFA,Roberto Martinez,Spain,Since January 2023,5
+Qatar,Asia,1519.1,QAT,AFC,Julen Lopetegui,Spain,Since May 2025,50
+Saudi Arabia,Asia,2089.8,KSA,AFC,Giorgios Donis,Greece,Since April 2026,60
+Scotland,Europe,1972.5,SCO,UEFA,Steve Clarke,Scotland,Since May 2019,37
+Senegal,Africa,540.2,SEN,CAF,Pape Thiaw,Senegal,Since December 2024,16
+South Africa,Africa,3942.6,RSA,CAF,Hugo Broos,Belgium,Since May 2021,61
+Spain,Europe,2373.1,ESP,UEFA,Luis de la Fuente,Spain,Since December 2022,2
+Sweden,Europe,1028.7,SWE,UEFA,Graham Potter,England,Since October 2025,39
+Switzerland,Europe,2253.1,SUI,UEFA,Murat Yakin,Switzerland,Since August 2021,19
+Tunisia,Africa,1582.1,TUN,CAF,Sabri Lamouchi,France,Since January 2026,45
+Türkiye,Europe,1828.0,TUR,UEFA,Vincenzo Montella,Italy,Since September 2023,27
+USA,North America,3106.3,USA,CONCACAF,Mauricio Pochettino,Argentina,Since September 2024,15
+Uruguay,South America,2439.2,URU,CONMEBOL,Marcelo Bielsa,Argentina,Since May 2023,17
+Uzbekistan,Asia,2349.2,UZB,AFC,Fabio Cannavaro,Italy,Since October 2025,51

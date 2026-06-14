@@ -30,10 +30,12 @@ def test_venues_csv_shape_and_join():
 def test_teams_csv_shape_and_codes():
     df = pd.read_csv(DATA / "teams.csv")
     assert len(df) == 48
-    assert set(df.columns) == {
+    # The migration produces these columns; later steps (e.g. rankings.py) may
+    # enrich teams.csv with additional columns such as fifa_rank.
+    assert {
         "team", "continent", "distance_km", "code", "confederation",
         "coach", "coach_nationality", "coach_since",
-    }
+    } <= set(df.columns)
     assert df["code"].notna().all() and (df["code"].str.len() == 3).all()
     by_team = df.set_index("team")
     assert by_team.loc["Korea Republic", "code"] == "KOR"
