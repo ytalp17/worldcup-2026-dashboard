@@ -91,6 +91,22 @@ def test_live_group_rows_builds_from_snapshot():
     assert "Mexico" in rows[0]["flag"]
 
 
+def test_live_group_rows_resolves_team_to_official_flag_and_name():
+    # The live feed uses names like "Korea Republic"/"Czech Republic" that differ
+    # from the country_logos filenames; a resolver maps them to the official name
+    # so the flag URL points at a real file (no 404) and the label is friendly.
+    from src.components.group_table import live_group_rows
+    live = {"Group A": [
+        {"team": "Korea Republic", "played": 0, "won": 0, "drawn": 0, "lost": 0,
+         "goal_diff": 0, "points": 0},
+    ]}
+    resolve = {"korea republic": "Korea Republic"}.get  # normalized -> official
+    rows = live_group_rows("Group A", live, asset_url=lambda p: "/assets/" + p,
+                           resolve_team=lambda t: resolve(t.lower(), t))
+    assert rows[0]["flag"].endswith("country_logos/Korea Republic.svg")
+    assert rows[0]["team"] == "South Korea"   # display override applied to official
+
+
 def test_live_group_rows_none_when_group_absent_or_empty():
     from src.components.group_table import live_group_rows
     assert live_group_rows("Group Z", {"Group A": [{}]}, asset_url=str) is None

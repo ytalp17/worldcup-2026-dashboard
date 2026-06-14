@@ -65,16 +65,19 @@ def live_group_rows(
     group_name: str,
     live_standings: dict | None,
     asset_url: Callable[[str], str],
+    resolve_team: Callable[[str], str] = lambda t: t,
 ) -> list[dict] | None:
     """ag-grid rowData built from the LIVE standings snapshot for one group, or
     None if that group is absent/empty (caller then falls back to static rows).
-    Row order is the API's (already position-ordered)."""
+    Row order is the API's (already position-ordered). `resolve_team` maps the
+    raw live team name to its official name so the flag filename and display name
+    line up with the static assets (the live feed spells some names differently)."""
     table = (live_standings or {}).get(group_name)
     if not table:
         return None
     rows = []
     for rank, s in enumerate(table, start=1):
-        team = s["team"]
+        team = resolve_team(s["team"])
         rows.append({
             "rank": rank,
             "team": display_name(team),

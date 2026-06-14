@@ -248,6 +248,16 @@ def test_tournament_grid_payload_players_goals():
     assert isinstance(rows, list)
 
 
+def test_official_team_maps_live_names_to_logo_filenames():
+    import app
+    # Live-feed spellings must resolve to the official country_logos filenames.
+    assert app.official_team("Czech Republic") == "Czechia"
+    assert app.official_team("South Korea") == "Korea Republic"
+    assert app.official_team("Bosnia & Herzegovina") == "Bosnia and Herzegovina"
+    assert app.official_team("Brazil") == "Brazil"          # already official
+    assert app.official_team("Nowhere FC") == "Nowhere FC"  # unknown: passthrough
+
+
 def test_attach_team_flags_adds_flag_url_and_display_name():
     import app
     rows = app.attach_team_flags([

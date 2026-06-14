@@ -68,6 +68,14 @@ TEAM_NAMES = team_order(TEAM_FLOWS)
 # Canonical (normalized) team name -> official cased name, so a raw/aliased live
 # team name resolves to the country_logos/<official>.svg filename and display name.
 _NORM_TO_OFFICIAL = {canonical_team(t): t for t in TEAM_NAMES}
+
+
+def official_team(name: str) -> str:
+    """Map a raw/aliased (e.g. live-feed) team name to its official cased name,
+    which matches the country_logos/<official>.svg files and display_name."""
+    return _NORM_TO_OFFICIAL.get(canonical_team(name), name)
+
+
 GROUPS = build_groups(MATCHES)
 SQUADS = SquadRepository(DATA_DIR / "squads.csv").load()
 LINEUPS = LineupRepository(DATA_DIR / "estimated_starting_eleven.json").load()
@@ -115,7 +123,8 @@ def group_panel_payload(index, live_standings=None):
     name = group.name if group else "—"
     rows = []
     if group:
-        rows = (live_group_rows(name, live_standings, app.get_asset_url)
+        rows = (live_group_rows(name, live_standings, app.get_asset_url,
+                                resolve_team=official_team)
                 or group_rows(group, app.get_asset_url))
     return name, rows
 
@@ -144,8 +153,7 @@ def attach_team_flags(rows):
     canonical team name, matching assets/country_logos/<canonical>.svg."""
     out = []
     for r in rows:
-        raw = r.get("team", "")
-        official = _NORM_TO_OFFICIAL.get(canonical_team(raw), raw)
+        official = official_team(r.get("team", ""))
         out.append({**r, "team": display_name(official),
                     "flag": app.get_asset_url(f"country_logos/{official}.svg")})
     return out
@@ -775,4 +783,4 @@ async def live_feed():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
