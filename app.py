@@ -77,11 +77,11 @@ STADIUM_INDEX = build_stadium_index(MATCHES)
 # value still wins (setdefault). Without a key, the app runs static-only.
 load_env_file(Path(__file__).parent / ".env")
 _API_KEY = os.environ.get("HIGHLIGHTLY_API_KEY")
-# No-key mode: when the env var is unset the app runs purely on static data,
-# so dev and the whole test suite work offline.
 # Per-match player-stats cache (gitignored). The live_feed loop maintains it;
 # team_leaders reads it for the leaders card.
 PLAYER_STORE_PATH = DATA_DIR / "live_player_stats.csv"
+# No-key mode: when the env var is unset the app runs purely on static data,
+# so dev and the whole test suite work offline.
 LIVE = (
     LiveDataService(HighlightlyClient(api_key=_API_KEY), STADIUM_INDEX,
                     player_store=PLAYER_STORE_PATH)
