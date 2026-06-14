@@ -3,6 +3,18 @@ from __future__ import annotations
 import dash_mantine_components as dmc
 from dash import html
 
+from src.data.live.reconcile import canonical_team, normalize
+from src.data.team_continents import TEAM_CODE
+
+# Normalized canonical team name -> FIFA 3-letter code, for compact strip labels.
+_CODE_BY_NORM = {normalize(team): code for team, code in TEAM_CODE.items()}
+
+
+def abbr(name: str) -> str:
+    """FIFA 3-letter code for a (possibly live-API) team name, mapping aliases
+    through canonical_team; the original name when no code is known."""
+    return _CODE_BY_NORM.get(canonical_team(name), name)
+
 
 def _score(m: dict) -> str:
     if m.get("home_score") is None:
@@ -29,8 +41,8 @@ def strip_items(live: dict | None) -> list:
                 children=dmc.Paper(
                     dmc.Group(
                         [_badge(m),
-                         dmc.Text(f"{m['home']} {_score(m)} {m['away']}", size="sm",
-                                  fw=600)],
+                         dmc.Text(f"{abbr(m['home'])} {_score(m)} {abbr(m['away'])}",
+                                  size="sm", fw=600)],
                         gap="xs",
                         wrap="nowrap",
                     ),
@@ -44,9 +56,30 @@ def strip_items(live: dict | None) -> list:
     return items
 
 
+# Base style for the fixed bottom-center overlay (see overlay_style()).
+_OVERLAY_STYLE = {
+    "position": "fixed",
+    "bottom": "12px",
+    "left": "50%",
+    "transform": "translateX(-50%)",
+    "zIndex": 1500,
+    "pointerEvents": "auto",
+}
+
+
+def overlay_style(visible: bool = True) -> dict:
+    """Style for the strip overlay; hidden (display:none) when not on the
+    calendar/Time view. Base positioning is always preserved."""
+    style = dict(_OVERLAY_STYLE)
+    if not visible:
+        style["display"] = "none"
+    return style
+
+
 def build_live_strip(live: dict | None = None):
     """Fixed-position bottom-center overlay; renders nothing when no matches.
-    Inner Group has id 'live-strip' so a callback can refresh its children."""
+    Inner Group has id 'live-strip' so a callback can refresh its children;
+    the outer 'live-strip-overlay' is toggled to hide it off the calendar view."""
     return html.Div(
         dmc.Group(
             strip_items(live),
@@ -55,12 +88,6 @@ def build_live_strip(live: dict | None = None):
             wrap="nowrap",
             style={"overflowX": "auto", "maxWidth": "92vw"},
         ),
-        style={
-            "position": "fixed",
-            "bottom": "12px",
-            "left": "50%",
-            "transform": "translateX(-50%)",
-            "zIndex": 1500,
-            "pointerEvents": "auto",
-        },
+        id="live-strip-overlay",
+        style=overlay_style(visible=True),
     )

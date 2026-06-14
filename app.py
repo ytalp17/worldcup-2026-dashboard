@@ -24,13 +24,13 @@ from src.components.formation_pitch import build_formation_panel, formation_titl
 from src.components.leaders_card import build_leaders_card
 from src.components.squad_table import build_squad_panel, squad_rows
 from src.components.live_match_modal import build_modal, modal_body
-from src.components.live_strip import strip_items
+from src.components.live_strip import overlay_style, strip_items
 from src.components.team_kpis import build_kpi_strip, kpi_cards
 from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, team_order
 from src.data.lineups import LineupRepository, lineup_for_team
 from src.data.squads import Squad, SquadRepository, squad_for_team
 from src.data.team_stats import compute_team_stats
-from src.data.team_continents import grouped_team_options
+from src.data.team_continents import fifa_rank_for, grouped_team_options, manager_for
 from src.data.live.client import HighlightlyClient
 from src.data.live.reconcile import build_stadium_index
 from src.data.env_config import load_env_file
@@ -110,7 +110,8 @@ def team_stats_payload(index):
     """TeamStats (KPI strip values) for the centred team at `index`."""
     team = center_team(TEAM_NAMES, index or 0)
     squad = squad_for_team(SQUADS, team) or Squad(team, ())
-    return compute_team_stats(squad)
+    return compute_team_stats(
+        squad, fifa_rank=fifa_rank_for(team), manager=manager_for(team))
 
 
 def formation_panel_payload(index, dark):
@@ -363,6 +364,16 @@ def toggle_filter_pin(team_mode):
     # Runs on initial load too, so a persisted Team mode hides the pin from the
     # first render. Re-seeding the pin in Time mode is harmless (Dash diffs the DOM).
     return [] if team_mode else [filter_pin()]
+
+
+@callback(
+    Output("live-strip-overlay", "style"),
+    Input("mode-toggle", "checked"),
+)
+def toggle_live_strip(team_mode):
+    # The live match strip belongs to the calendar/Time view only; hide it in
+    # Team mode. Runs on initial load too, so a persisted Team mode hides it.
+    return overlay_style(visible=not team_mode)
 
 
 @callback(

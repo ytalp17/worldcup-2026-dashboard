@@ -53,7 +53,8 @@ def _mean(values: list[float]) -> float | None:
     return sum(values) / len(values) if values else None
 
 
-def compute_team_stats(squad: Squad) -> TeamStats:
+def compute_team_stats(squad: Squad, fifa_rank: int | None = None,
+                       manager: str | None = None) -> TeamStats:
     players = squad.players
     ages = [int(p.age) for p in players if p.age.isdigit()]
     heights = []
@@ -75,4 +76,6 @@ def compute_team_stats(squad: Squad) -> TeamStats:
         foot_right_pct=(round(right / n * 100) if n else None),
         foot_left_pct=(round(left / n * 100) if n else None),
         squad_size=n,
+        fifa_rank=fifa_rank,
+        manager=manager,
     )

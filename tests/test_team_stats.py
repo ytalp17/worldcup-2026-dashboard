@@ -67,3 +67,15 @@ def test_compute_team_stats_ignores_blank_cells():
     assert stats.avg_age == 30.0
     assert stats.avg_height == 1.8
     assert stats.squad_size == 2
+
+
+def test_compute_team_stats_passes_through_rank_and_manager():
+    stats = compute_team_stats(
+        Squad("Brazil", (_player(),)), fifa_rank=6, manager="Carlo Ancelotti")
+    assert stats.fifa_rank == 6
+    assert stats.manager == "Carlo Ancelotti"
+
+
+def test_compute_team_stats_rank_and_manager_default_none():
+    stats = compute_team_stats(Squad("X", (_player(),)))
+    assert stats.fifa_rank is None and stats.manager is None

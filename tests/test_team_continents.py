@@ -66,3 +66,12 @@ def test_code_for_known_and_unknown():
 def test_team_code_map_covers_all_teams():
     assert len(TEAM_CODE) == 48
     assert all(len(c) == 3 for c in TEAM_CODE.values())
+
+
+def test_manager_and_fifa_rank_from_csv():
+    from src.data.team_continents import fifa_rank_for, manager_for
+    assert manager_for("Brazil") == "Carlo Ancelotti"
+    assert fifa_rank_for("Argentina") == 1
+    assert fifa_rank_for("USA") == 15
+    assert manager_for("Atlantis") is None
+    assert fifa_rank_for("Atlantis") is None
