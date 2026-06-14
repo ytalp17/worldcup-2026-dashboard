@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import logging
 
-from src.data.live import models
-from src.data.live.reconcile import find_stadium
+from pathlib import Path
+
+from src.data.live import models, player_store
+from src.data.live.player_stats import parse_player_stats
+from src.data.live.reconcile import canonical_team, find_stadium
 
 logger = logging.getLogger(__name__)
 
@@ -25,11 +28,13 @@ class LiveDataService:
     dashboard down); the logging keeps those failures visible for diagnosis.
     """
 
-    def __init__(self, client, stadium_index, league_id=LEAGUE_ID, season=SEASON):
+    def __init__(self, client, stadium_index, league_id=LEAGUE_ID, season=SEASON,
+                 player_store=None):
         self._client = client
         self._stadium_index = stadium_index
         self._league_id = league_id
         self._season = season
+        self._player_store = Path(player_store) if player_store else None
         self._cache: dict[str, tuple[float, object]] = {}
         self._last_good: dict | None = None
 
@@ -132,6 +137,83 @@ class LiveDataService:
         except Exception:
             logger.exception("Live match_summary fetch failed for %s", match_id)
             return None
+
+    def update_player_stats(self, matches, now: float) -> None:
+        """Refresh the player-stats cache from today's matches.
+
+        Finished & already stored -> skip (no fetch). Finished & new, or live ->
+        fetch events + detail once and overwrite that match's rows. Each match is
+        independent: a failure is logged and skipped, leaving the cache intact.
+        """
+        if self._player_store is None:
+            return
+        stored = player_store.stored_match_states(self._player_store)
+        live_states = {models.MatchState.LIVE.value, models.MatchState.HALF_TIME.value}
+        for m in matches:
+            mid = m.get("match_id")
+            state = m.get("state")
+            if mid is None:
+                continue
+            finished = state == models.MatchState.FINISHED.value
+            if finished and stored.get(mid) == models.MatchState.FINISHED.value:
+                continue
+            if not (finished or state in live_states):
+                continue
+            try:
+                events = self._client.events(mid)
+                detail = self._client.match(mid)
+                detail_obj = detail[0] if isinstance(detail, list) and detail else detail
+                rows = parse_player_stats(mid, events, detail_obj)
+                player_store.upsert(self._player_store, mid, state, rows)
+            except Exception:
+                logger.exception("player stats update failed for match %s", mid)
+
+    def team_leaders(self, team: str) -> dict:
+        """Per-stat ranked leader rows for `team` aggregated across its matches.
+
+        Returns {"goals"|"assists"|"cards"|"rating": [{player, value, apps}, ...]}.
+        Players are grouped by playerId when present, else normalized name. Each
+        list is filtered to players with a value for that stat and sorted desc.
+        """
+        if self._player_store is None:
+            return {}
+        by_match = player_store.load(self._player_store)
+        target = canonical_team(team)
+        groups: dict = {}
+        for rows in by_match.values():
+            for r in rows:
+                if canonical_team(r.team) != target:
+                    continue
+                key = r.player_id if r.player_id else r.player.strip().lower()
+                g = groups.get(key)
+                if g is None:
+                    g = {"player": r.player, "goals": 0, "assists": 0,
+                         "yellow": 0, "red": 0, "ratings": [], "matches": set()}
+                    groups[key] = g
+                if len(r.player) > len(g["player"]):
+                    g["player"] = r.player        # prefer the fuller name
+                g["goals"] += r.goals
+                g["assists"] += r.assists
+                g["yellow"] += r.yellow
+                g["red"] += r.red
+                if r.rating is not None:
+                    g["ratings"].append(r.rating)
+                g["matches"].add(r.match_id)
+
+        def ranked(value_fn, keep_fn):
+            out = [{"player": g["player"], "value": value_fn(g), "apps": len(g["matches"])}
+                   for g in groups.values() if keep_fn(g)]
+            out.sort(key=lambda d: d["value"], reverse=True)
+            return out
+
+        return {
+            "goals": ranked(lambda g: g["goals"], lambda g: g["goals"] > 0),
+            "assists": ranked(lambda g: g["assists"], lambda g: g["assists"] > 0),
+            "cards": ranked(lambda g: g["yellow"] + g["red"],
+                            lambda g: (g["yellow"] + g["red"]) > 0),
+            "rating": ranked(lambda g: round(sum(g["ratings"]) / len(g["ratings"]), 2),
+                             lambda g: len(g["ratings"]) > 0),
+        }
 
     def _match_dict(self, m: models.LiveMatch) -> dict:
         return {

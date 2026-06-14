@@ -259,3 +259,91 @@ def test_match_summary_parses_detail_and_caches():
 def test_match_summary_none_on_error():
     svc = LiveDataService(_BoomClient(), _index())
     assert svc.match_summary(1, now=0.0) is None
+
+
+# ---------------------------------------------------------------------------
+# update_player_stats / team_leaders
+# ---------------------------------------------------------------------------
+
+from src.data.live import player_store  # noqa: E402
+
+
+class _StatsClient(_FakeClient):
+    def __init__(self):
+        super().__init__()
+        self.event_calls = {}
+        self.detail_calls = {}
+
+    def events(self, match_id):
+        self.event_calls[match_id] = self.event_calls.get(match_id, 0) + 1
+        return [
+            {"team": {"name": "USA"}, "type": "Goal", "player": "F. Balogun",
+             "playerId": 100, "assist": "C. Pulisic", "assistingPlayerId": 200},
+            {"team": {"name": "USA"}, "type": "Yellow Card", "player": "T. Adams",
+             "playerId": 300},
+        ]
+
+    def match(self, match_id):
+        self.detail_calls[match_id] = self.detail_calls.get(match_id, 0) + 1
+        return [{"id": match_id,
+                 "homeTeam": {"name": "USA", "topPlayers": [
+                     {"name": "Folarin Balogun",
+                      "statistics": [{"name": "Rating", "value": 8.0}]}]},
+                 "awayTeam": {"name": "Paraguay", "topPlayers": []}}]
+
+
+def test_update_player_stats_fetches_and_stores_finished(tmp_path):
+    path = tmp_path / "ps.csv"
+    c = _StatsClient()
+    svc = LiveDataService(c, _index(), player_store=path)
+    matches = [{"match_id": 1, "state": MatchState.FINISHED.value}]
+    svc.update_player_stats(matches, now=0.0)
+    assert player_store.stored_match_states(path) == {1: MatchState.FINISHED.value}
+    assert c.event_calls[1] == 1
+
+
+def test_update_player_stats_skips_already_stored_finished(tmp_path):
+    path = tmp_path / "ps.csv"
+    c = _StatsClient()
+    svc = LiveDataService(c, _index(), player_store=path)
+    matches = [{"match_id": 1, "state": MatchState.FINISHED.value}]
+    svc.update_player_stats(matches, now=0.0)
+    svc.update_player_stats(matches, now=1.0)   # second pass must not re-fetch
+    assert c.event_calls[1] == 1
+
+
+def test_update_player_stats_overwrites_live(tmp_path):
+    path = tmp_path / "ps.csv"
+    c = _StatsClient()
+    svc = LiveDataService(c, _index(), player_store=path)
+    matches = [{"match_id": 2, "state": MatchState.LIVE.value}]
+    svc.update_player_stats(matches, now=0.0)
+    svc.update_player_stats(matches, now=1.0)   # live always re-fetched
+    assert c.event_calls[2] == 2
+
+
+def test_update_player_stats_noop_without_store():
+    svc = LiveDataService(_StatsClient(), _index())   # no player_store
+    svc.update_player_stats([{"match_id": 1, "state": "finished"}], now=0.0)  # no crash
+
+
+def test_team_leaders_groups_and_ranks(tmp_path):
+    path = tmp_path / "ps.csv"
+    c = _StatsClient()
+    svc = LiveDataService(c, _index(), player_store=path)
+    # Two matches for USA so apps and sums accumulate.
+    svc.update_player_stats([{"match_id": 1, "state": MatchState.FINISHED.value}], now=0.0)
+    svc.update_player_stats([{"match_id": 2, "state": MatchState.FINISHED.value}], now=0.0)
+    leaders = svc.team_leaders("USA")
+    goals = leaders["goals"]
+    assert goals[0]["player"] == "F. Balogun"
+    assert goals[0]["value"] == 2          # one goal in each of two matches
+    assert goals[0]["apps"] == 2
+    assert leaders["assists"][0]["value"] == 2     # C. Pulisic, two assists
+    assert leaders["cards"][0]["value"] == 2       # T. Adams, two yellows
+    assert leaders["rating"][0]["value"] == 8.0    # avg of 8.0 and 8.0
+
+
+def test_team_leaders_empty_without_store():
+    svc = LiveDataService(_StatsClient(), _index())
+    assert svc.team_leaders("USA") == {}
