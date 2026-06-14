@@ -45,11 +45,13 @@ def test_kpi_cards_has_seven_with_real_and_placeholder_values():
     assert all_text.count("—") >= 3
 
 
-def test_foot_card_uses_ring_progress():
+def test_foot_card_uses_split_bar_with_both_percentages():
     cards = kpi_cards(REAL)
-    rings = [n for c in cards for n in _walk(c) if isinstance(n, dmc.RingProgress)]
-    assert len(rings) == 1
-    assert rings[0].sections[0]["value"] == 81
+    # The donut/ring is gone, replaced by a split bar.
+    assert not [n for c in cards for n in _walk(c)
+                if isinstance(n, dmc.RingProgress)]
+    all_text = " ".join(t for c in cards for t in _texts(c))
+    assert "R 81%" in all_text and "L 15%" in all_text   # both on the foot card
 
 
 def test_manager_card_shows_nationality_and_flag():
