@@ -52,6 +52,22 @@ def test_foot_card_uses_ring_progress():
     assert rings[0].sections[0]["value"] == 81
 
 
+def test_manager_card_shows_nationality_and_flag():
+    stats = TeamStats(
+        avg_age=29.8, avg_height=1.84, squad_value=1, value_display="€1M",
+        foot_right_pct=80, foot_left_pct=15, squad_size=26,
+        manager="Carlo Ancelotti", manager_nationality="Italy",
+        manager_flag="/assets/manager_flags/Italy.png",
+    )
+    cards = kpi_cards(stats)
+    all_text = " ".join(t for c in cards for t in _texts(c))
+    assert "Carlo Ancelotti" in all_text
+    assert "Italy" in all_text
+    imgs = [n for c in cards for n in _walk(c) if isinstance(n, dmc.Image)]
+    assert any(getattr(i, "src", "") == "/assets/manager_flags/Italy.png"
+               for i in imgs)
+
+
 def test_build_kpi_strip_has_id():
     strip = build_kpi_strip(REAL)
     assert strip.id == "kpi-strip"

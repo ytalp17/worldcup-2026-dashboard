@@ -75,3 +75,15 @@ def test_manager_and_fifa_rank_from_csv():
     assert fifa_rank_for("USA") == 15
     assert manager_for("Atlantis") is None
     assert fifa_rank_for("Atlantis") is None
+
+
+def test_manager_nationality_cleaned_and_aliased():
+    from src.data.team_continents import manager_nationality_for
+    # Brazil's coach (Ancelotti) is Italian.
+    assert manager_nationality_for("Brazil") == "Italy"
+    # "Morocco/Belgium" -> primary country; "(born ...)" stripped.
+    assert manager_nationality_for("Morocco") == "Morocco"
+    assert manager_nationality_for("Panama") == "Spain"   # "Spain/Denmark (born in Hadsund)"
+    # "Bosnia" normalized to the full canonical country name.
+    assert manager_nationality_for("Bosnia and Herzegovina") == "Bosnia and Herzegovina"
+    assert manager_nationality_for("Atlantis") is None

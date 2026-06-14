@@ -30,7 +30,12 @@ from src.components.team_carousel import advance, build_team_carousel, carousel_
 from src.data.lineups import LineupRepository, lineup_for_team
 from src.data.squads import Squad, SquadRepository, squad_for_team
 from src.data.team_stats import compute_team_stats
-from src.data.team_continents import fifa_rank_for, grouped_team_options, manager_for
+from src.data.team_continents import (
+    fifa_rank_for,
+    grouped_team_options,
+    manager_for,
+    manager_nationality_for,
+)
 from src.data.live.client import HighlightlyClient
 from src.data.live.reconcile import build_stadium_index
 from src.data.env_config import load_env_file
@@ -39,6 +44,7 @@ from src.data.venues import VenueRepository
 
 DATA_DIR = Path(__file__).parent / "assets" / "data"
 IMAGE_DIR = Path(__file__).parent / "assets" / "stadiums"
+MANAGER_FLAGS_DIR = Path(__file__).parent / "assets" / "manager_flags"
 
 VENUES = VenueRepository(DATA_DIR / "venues.csv", IMAGE_DIR).load()
 VENUES_BY_CITY = {v.city: v for v in VENUES}
@@ -110,8 +116,17 @@ def team_stats_payload(index):
     """TeamStats (KPI strip values) for the centred team at `index`."""
     team = center_team(TEAM_NAMES, index or 0)
     squad = squad_for_team(SQUADS, team) or Squad(team, ())
+    nationality = manager_nationality_for(team)
+    flag = None
+    if nationality and (MANAGER_FLAGS_DIR / f"{nationality}.png").exists():
+        flag = app.get_asset_url(f"manager_flags/{nationality}.png")
     return compute_team_stats(
-        squad, fifa_rank=fifa_rank_for(team), manager=manager_for(team))
+        squad,
+        fifa_rank=fifa_rank_for(team),
+        manager=manager_for(team),
+        manager_nationality=nationality,
+        manager_flag=flag,
+    )
 
 
 def formation_panel_payload(index, dark):

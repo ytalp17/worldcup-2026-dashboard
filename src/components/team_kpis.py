@@ -8,9 +8,10 @@ from src.data.team_stats import TeamStats
 PLACEHOLDER = "—"
 
 
-def stat_card(icon, label, value=None, sub=None, ring=None) -> dmc.Box:
+def stat_card(icon, label, value=None, sub=None, ring=None, sub_node=None) -> dmc.Box:
     """A small KPI card: icon + label on top, a big value (or a ring) below,
-    and an optional dimmed sub-label."""
+    and an optional dimmed sub-label. ``sub_node`` (a component) takes precedence
+    over the plain-text ``sub`` for richer footers (e.g. a flag + country)."""
     head = dmc.Group(
         [
             DashIconify(icon=icon, width=14, className="stat-card__icon"),
@@ -23,10 +24,26 @@ def stat_card(icon, label, value=None, sub=None, ring=None) -> dmc.Box:
     body = ring if ring is not None else dmc.Text(
         value, className="stat-card__value", fw=700)
     children = [head, body]
-    if sub:
+    if sub_node is not None:
+        children.append(sub_node)
+    elif sub:
         children.append(dmc.Text(sub, size="xs", c="dimmed",
                                  className="stat-card__sub"))
     return dmc.Box(children, className="stat-card")
+
+
+def _manager_sub(stats: TeamStats):
+    """Footer for the manager card: nationality flag + country when known,
+    else None (so stat_card falls back to the plain 'head coach' label)."""
+    if not stats.manager_nationality:
+        return None
+    parts = []
+    if stats.manager_flag:
+        parts.append(dmc.Image(src=stats.manager_flag, w=18, h=12, fit="contain",
+                               className="stat-card__flag"))
+    parts.append(dmc.Text(stats.manager_nationality, size="xs", c="dimmed",
+                          className="stat-card__sub"))
+    return dmc.Group(parts, gap=4, wrap="nowrap", align="center")
 
 
 def _foot_ring(stats: TeamStats) -> dmc.RingProgress:
@@ -63,7 +80,7 @@ def kpi_cards(stats: TeamStats) -> list[dmc.Box]:
                   sub=f"of {stats.squad_size}" if stats.squad_size else None),
         stat_card("tabler:shoe", "Foot", sub=foot_sub, ring=_foot_ring(stats)),
         stat_card("tabler:user-star", "Manager", stats.manager or PLACEHOLDER,
-                  sub="head coach"),
+                  sub="head coach", sub_node=_manager_sub(stats)),
     ]
 
 

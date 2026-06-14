@@ -79,3 +79,19 @@ def test_compute_team_stats_passes_through_rank_and_manager():
 def test_compute_team_stats_rank_and_manager_default_none():
     stats = compute_team_stats(Squad("X", (_player(),)))
     assert stats.fifa_rank is None and stats.manager is None
+
+
+def test_compute_team_stats_passes_manager_nationality_and_flag():
+    stats = compute_team_stats(
+        Squad("Brazil", (_player(),)),
+        manager="Carlo Ancelotti",
+        manager_nationality="Italy",
+        manager_flag="/assets/manager_flags/Italy.png",
+    )
+    assert stats.manager_nationality == "Italy"
+    assert stats.manager_flag == "/assets/manager_flags/Italy.png"
+
+
+def test_compute_team_stats_manager_extras_default_none():
+    stats = compute_team_stats(Squad("X", (_player(),)))
+    assert stats.manager_nationality is None and stats.manager_flag is None

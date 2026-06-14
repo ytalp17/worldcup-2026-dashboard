@@ -46,6 +46,8 @@ class TeamStats:
     # No data source yet — rendered as "—".
     fifa_rank: int | None = None
     manager: str | None = None
+    manager_nationality: str | None = None
+    manager_flag: str | None = None  # asset src for the nationality flag, if any
     abroad: int | None = None
 
 
@@ -54,7 +56,9 @@ def _mean(values: list[float]) -> float | None:
 
 
 def compute_team_stats(squad: Squad, fifa_rank: int | None = None,
-                       manager: str | None = None) -> TeamStats:
+                       manager: str | None = None,
+                       manager_nationality: str | None = None,
+                       manager_flag: str | None = None) -> TeamStats:
     players = squad.players
     ages = [int(p.age) for p in players if p.age.isdigit()]
     heights = []
@@ -78,4 +82,6 @@ def compute_team_stats(squad: Squad, fifa_rank: int | None = None,
         squad_size=n,
         fifa_rank=fifa_rank,
         manager=manager,
+        manager_nationality=manager_nationality,
+        manager_flag=manager_flag,
     )

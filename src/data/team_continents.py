@@ -53,11 +53,32 @@ def _load_team_ranks(csv_path: Path = _CSV_PATH) -> dict[str, int]:
     }
 
 
-# Team -> continent / FIFA code / head coach / FIFA rank, from assets/data/teams.csv.
+def _load_team_manager_nationalities(csv_path: Path = _CSV_PATH) -> dict[str, str]:
+    df = pd.read_csv(csv_path)
+    if "coach_nationality" not in df.columns:
+        return {}
+    return {
+        str(row["team"]): str(row["coach_nationality"]).strip()
+        for _, row in df.iterrows()
+        if str(row["coach_nationality"]).strip()
+    }
+
+
+# Team -> continent / FIFA code / head coach / coach nationality / FIFA rank.
 TEAM_CONTINENT: dict[str, str] = _load_team_continents()
 TEAM_CODE: dict[str, str] = _load_team_codes()
 TEAM_MANAGER: dict[str, str] = _load_team_managers()
 TEAM_FIFA_RANK: dict[str, int] = _load_team_ranks()
+TEAM_MANAGER_NATIONALITY: dict[str, str] = _load_team_manager_nationalities()
+
+# Raw coach_nationality values are free-text ("Morocco/Belgium",
+# "UK (born in Northampton)"). Reduce to a single canonical country.
+_NATIONALITY_ALIASES = {"Bosnia": "Bosnia and Herzegovina"}
+
+
+def _clean_nationality(raw: str) -> str:
+    primary = raw.split("/")[0].split("(")[0].strip()
+    return _NATIONALITY_ALIASES.get(primary, primary)
 
 
 def continent_for(team: str) -> str:
@@ -82,6 +103,12 @@ def manager_for(team: str) -> str | None:
 def fifa_rank_for(team: str) -> int | None:
     """FIFA world ranking for a team, or None when unknown."""
     return TEAM_FIFA_RANK.get(team)
+
+
+def manager_nationality_for(team: str) -> str | None:
+    """Head coach's nationality as a single canonical country, or None."""
+    raw = TEAM_MANAGER_NATIONALITY.get(team)
+    return _clean_nationality(raw) if raw else None
 
 
 def grouped_team_options(teams: list[str]) -> list[dict]:
