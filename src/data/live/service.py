@@ -308,6 +308,7 @@ class LiveDataService:
                     agg[key] = a
                 for k in STAT_KEYS:
                     a["sums"][k] += r.stats.get(k, 0.0)
+                # possession is reported as a per-match mean (below), not the sum above
                 a["poss"].append(r.stats.get("possession", 0.0))
                 a["matches"] += 1
 

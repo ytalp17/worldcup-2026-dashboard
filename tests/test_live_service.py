@@ -478,3 +478,21 @@ def test_tournament_team_leaders_sums_avgs_and_ratios(tmp_path):
 def test_tournament_team_leaders_empty_without_store():
     svc = LiveDataService(_FakeClient(), _index())
     assert svc.tournament_team_leaders() == {}
+
+
+def test_tournament_team_leaders_goals_default_zero_without_standings(tmp_path):
+    path = tmp_path / "ts.csv"
+    team_stats_store.upsert(path, 1, "finished", [_tstat(1, "USA", xg=1.0)])
+    svc = LiveDataService(_FakeClient(), _index(), team_store=path)
+    T = svc.tournament_team_leaders()        # no standings passed
+    atk = next(r for r in T["attack"] if r["team"] == "USA")
+    assert atk["goals"] == 0                  # GF join absent -> 0
+
+
+def test_tournament_team_leaders_shot_acc_zero_when_no_shots(tmp_path):
+    path = tmp_path / "ts.csv"
+    team_stats_store.upsert(path, 1, "finished", [_tstat(1, "USA", corners=3)])
+    svc = LiveDataService(_FakeClient(), _index(), team_store=path)
+    atk = next(r for r in svc.tournament_team_leaders()["attack"] if r["team"] == "USA")
+    assert atk["shots"] == 0
+    assert atk["shot_acc"] == 0.0             # no division-by-zero
