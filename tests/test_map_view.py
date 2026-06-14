@@ -147,41 +147,15 @@ def test_map_hides_zoom_control():
     assert build_map(VENUES).zoomControl is False
 
 
-def test_map_has_flow_layer_and_filter_pin():
-    from src.components.map_view import FILTER_PIN
+def test_map_has_flow_layer_and_no_pin_layers():
+    # The control pins moved out of the map into a fixed overlay; the map keeps
+    # the flow layer but no longer carries any pin layers.
     m = build_map(VENUES)
     children = m.children if isinstance(m.children, list) else [m.children]
     layer_ids = [getattr(c, "id", None) for c in children]
     assert "flow-layer" in layer_ids
-    assert "filter-pin-layer" in layer_ids
-    pins = [
-        c for c in _walk(m)
-        if isinstance(c, dl.DivMarker) and getattr(c, "id", None) == "filter-pin"
-    ]
-    assert len(pins) == 1
-    assert pins[0].position == FILTER_PIN
-
-
-def test_filter_pin_lives_inside_filter_pin_layer():
-    m = build_map(VENUES)
-    children = m.children if isinstance(m.children, list) else [m.children]
-    layer = next(
-        c for c in children
-        if isinstance(c, dl.LayerGroup) and getattr(c, "id", None) == "filter-pin-layer"
-    )
-    pin_ids = [getattr(n, "id", None) for n in _walk(layer)]
-    assert "filter-pin" in pin_ids
-
-
-def test_filter_pin_uses_a_plane_icon():
-    m = build_map(VENUES)
-    pin = next(
-        c for c in _walk(m)
-        if isinstance(c, dl.DivMarker) and getattr(c, "id", None) == "filter-pin"
-    )
-    html = pin.iconOptions["html"]
-    assert 'data-icon="plane"' in html
-    assert "22 3 2 3 10 12.46" not in html
+    assert "filter-pin-layer" not in layer_ids
+    assert "tournament-pin-layer" not in layer_ids
 
 
 def test_markers_positioned_at_venue_coordinates():
@@ -255,16 +229,53 @@ def test_live_score_markers_empty_when_no_live():
     assert live_score_markers([], {"matches": []}) == []
 
 
-def test_tournament_pin_exists_and_is_north_of_filter_pin():
-    from src.components.map_view import tournament_pin, FILTER_PIN
-    pin = tournament_pin()
-    assert pin.id == "tournament-pin"
-    assert pin.position[0] > FILTER_PIN[0]      # higher latitude => above on the map
+def test_map_controls_overlay_has_both_buttons():
+    from src.components.map_view import build_map_controls
+
+    overlay = build_map_controls()
+    assert overlay.id == "map-controls-overlay"
+    ids = {getattr(n, "id", None) for n in _walk(overlay)}
+    # Tournament Stats and Team Travel Map are now fixed-overlay icon buttons.
+    assert "tournament-control" in ids
+    assert "filter-control" in ids
 
 
-def test_build_map_includes_tournament_pin_layer():
-    import dash_leaflet as dl
-    from src.components.map_view import build_map
-    m = build_map([])
-    layer_ids = {c.id for c in m.children if isinstance(c, dl.LayerGroup)}
-    assert "tournament-pin-layer" in layer_ids
+def test_map_controls_tournament_button_is_above_filter_button():
+    from src.components.map_view import build_map_controls
+
+    overlay = build_map_controls()
+    button_ids = [
+        nid for n in _walk(overlay)
+        if (nid := getattr(n, "id", None)) in ("tournament-control", "filter-control")
+    ]
+    # Stacked top-to-bottom: Tournament Stats first, Team Travel Map below it.
+    assert button_ids == ["tournament-control", "filter-control"]
+
+
+def test_map_controls_buttons_have_tooltip_labels():
+    import dash_mantine_components as dmc
+    from src.components.map_view import build_map_controls
+
+    labels = {
+        t.label for t in _walk(build_map_controls()) if isinstance(t, dmc.Tooltip)
+    }
+    assert {"Tournament Stats", "Team Travel Map"} <= labels
+
+
+def test_map_controls_buttons_are_theme_aware():
+    import dash_mantine_components as dmc
+    from src.components.map_view import build_map_controls
+
+    icons = [n for n in _walk(build_map_controls()) if isinstance(n, dmc.ActionIcon)]
+    assert len(icons) == 2
+    # "default" variant renders the icon in the theme text color (black in light,
+    # white in dark), matching the live match-score items.
+    assert all(b.variant == "default" for b in icons)
+
+
+def test_map_controls_overlay_is_fixed_bottom_left():
+    from src.components.map_view import build_map_controls
+
+    style = build_map_controls().style
+    assert style["position"] == "fixed"
+    assert "bottom" in style and "left" in style

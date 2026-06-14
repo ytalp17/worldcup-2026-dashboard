@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import dash_leaflet as dl
+import dash_mantine_components as dmc
+from dash import html
+from dash_iconify import DashIconify
 
 from src.components.live_strip import abbr
 from src.data.venues import Venue
@@ -22,61 +25,60 @@ NA_MIN_ZOOM = 5
 # markers of this type and opens the detail drawer for the clicked one.
 MARKER_TYPE = "venue-marker"
 
-# Fixed control pin pushed to the far lower-left corner of the static view; it
-# opens the filter drawer. Kept at the edge to leave room for more control pins.
-FILTER_PIN = [19.5, -134.5]
+# Fixed map controls live in a bottom-left overlay (see build_map_controls),
+# not on the map itself. Each is an icon button that opens its drawer; a
+# callback hides the whole overlay in Team mode.
+_MAP_CONTROLS_STYLE = {
+    "position": "fixed",
+    "bottom": "16px",
+    "left": "16px",
+    "zIndex": 1500,
+    "pointerEvents": "auto",
+}
 
 
-def filter_pin() -> dl.DivMarker:
-    plane = (
-        '<div class="filter-pin" data-icon="plane">'
-        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" '
-        'stroke="currentColor" stroke-width="2" stroke-linecap="round" '
-        'stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3'
-        'c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3'
-        'L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2'
-        'c.4-.3.6-.7.5-1.2z"/></svg>'
-        "</div>"
+def map_controls_style(visible: bool = True) -> dict:
+    """Style for the bottom-left controls overlay; hidden (display:none) off the
+    calendar/Time view. Base positioning is always preserved."""
+    style = dict(_MAP_CONTROLS_STYLE)
+    if not visible:
+        style["display"] = "none"
+    return style
+
+
+def _control_button(button_id: str, icon: str, label: str) -> dmc.Tooltip:
+    return dmc.Tooltip(
+        label=label,
+        position="right",
+        withArrow=True,
+        children=dmc.ActionIcon(
+            DashIconify(icon=icon, width=22),
+            id=button_id,
+            n_clicks=0,
+            # "default" variant tracks the theme: bordered, with the icon in the
+            # standard text color (dark in light mode, light in dark mode) — the
+            # same color the live match-score items use.
+            variant="default",
+            size="xl",
+            radius="xl",
+        ),
     )
-    return dl.DivMarker(
-        id="filter-pin",
-        position=FILTER_PIN,
-        iconOptions={
-            "html": plane,
-            "className": "filter-pin-icon",
-            "iconSize": [34, 34],
-            "iconAnchor": [17, 17],
-        },
-        children=[dl.Tooltip("Team Travel Map")],
-    )
 
 
-# Tournament Stats control pin, placed just above the Team Travel Map pin.
-TOURNAMENT_PIN = [21.3, -134.5]
-
-
-def tournament_pin() -> dl.DivMarker:
-    trophy = (
-        '<div class="filter-pin" data-icon="trophy">'
-        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" '
-        'stroke="currentColor" stroke-width="2" stroke-linecap="round" '
-        'stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>'
-        '<path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/>'
-        '<path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>'
-        '<path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>'
-        '<path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>'
-        "</div>"
-    )
-    return dl.DivMarker(
-        id="tournament-pin",
-        position=TOURNAMENT_PIN,
-        iconOptions={
-            "html": trophy,
-            "className": "filter-pin-icon",
-            "iconSize": [34, 34],
-            "iconAnchor": [17, 17],
-        },
-        children=[dl.Tooltip("Tournament Stats")],
+def build_map_controls() -> html.Div:
+    """Fixed bottom-left overlay of icon buttons that open the Tournament Stats
+    and Team Travel Map drawers. The outer 'map-controls-overlay' div is toggled
+    to hide it off the calendar/Time view (Team mode)."""
+    return html.Div(
+        dmc.Stack(
+            [
+                _control_button("tournament-control", "tabler:trophy", "Tournament Stats"),
+                _control_button("filter-control", "tabler:plane-tilt", "Team Travel Map"),
+            ],
+            gap="sm",
+        ),
+        id="map-controls-overlay",
+        style=map_controls_style(visible=True),
     )
 
 
@@ -188,8 +190,6 @@ def build_map(venues: list[Venue]) -> dl.Map:
             dl.LayerGroup(id="pulse-layer"),
             dl.LayerGroup(id="live-layer"),
             dl.LayerGroup(id="flow-layer"),
-            dl.LayerGroup(id="filter-pin-layer", children=[filter_pin()]),
-            dl.LayerGroup(id="tournament-pin-layer", children=[tournament_pin()]),
         ],
         center=NA_CENTER,
         zoom=NA_ZOOM,

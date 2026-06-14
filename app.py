@@ -14,7 +14,7 @@ from src.components.flow_layer import flows_for
 from src.components.group_table import build_group_panel, group_rows, live_group_rows
 from src.components.header_calendar import build_match_calendar
 from src.components.layout import build_layout
-from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, filter_pin, live_score_markers, pulse_markers, tournament_pin
+from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, live_score_markers, map_controls_style, pulse_markers
 from src.data.distances import DistanceRepository
 from src.data.flows import build_team_flows, team_cities
 from src.data.groups import build_groups, group_for_team
@@ -287,7 +287,7 @@ def open_stadium_drawer(n_clicks, user_tz, live):
     Output("filter-drawer", "opened"),
     Output("stadium-drawer", "opened", allow_duplicate=True),
     Output("tournament-drawer", "opened", allow_duplicate=True),
-    Input("filter-pin", "n_clicks"),
+    Input("filter-control", "n_clicks"),
     prevent_initial_call=True,
 )
 def open_filter_drawer(n_clicks):
@@ -300,7 +300,7 @@ def open_filter_drawer(n_clicks):
     Output("tournament-drawer", "opened"),
     Output("filter-drawer", "opened", allow_duplicate=True),
     Output("stadium-drawer", "opened", allow_duplicate=True),
-    Input("tournament-pin", "n_clicks"),
+    Input("tournament-control", "n_clicks"),
     prevent_initial_call=True,
 )
 def open_tournament_drawer(n_clicks):
@@ -427,21 +427,14 @@ def toggle_center_widget(team_mode):
 
 
 @callback(
-    Output("filter-pin-layer", "children"),
+    Output("map-controls-overlay", "style"),
     Input("mode-toggle", "checked"),
 )
-def toggle_filter_pin(team_mode):
-    # Runs on initial load too, so a persisted Team mode hides the pin from the
-    # first render. Re-seeding the pin in Time mode is harmless (Dash diffs the DOM).
-    return [] if team_mode else [filter_pin()]
-
-
-@callback(
-    Output("tournament-pin-layer", "children"),
-    Input("mode-toggle", "checked"),
-)
-def toggle_tournament_pin(team_mode):
-    return [] if team_mode else [tournament_pin()]
+def toggle_map_controls(team_mode):
+    # The Tournament Stats / Team Travel Map controls belong to the calendar/Time
+    # view only; hide the whole overlay in Team mode. Runs on initial load too, so
+    # a persisted Team mode hides it from the first render.
+    return map_controls_style(visible=not team_mode)
 
 
 @callback(

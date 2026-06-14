@@ -7,7 +7,7 @@ from dash_iconify import DashIconify
 from src.components.filter_panel import build_filter_drawer
 from src.components.live_match_modal import build_modal
 from src.components.live_strip import build_live_strip
-from src.components.map_view import build_map
+from src.components.map_view import build_map, build_map_controls
 from src.components.mode_switch import mode_switch
 from src.components.tournament_stats import build_tournament_drawer
 from src.data.venues import Venue
@@ -138,6 +138,7 @@ def build_layout(
             drawer,
             filter_drawer,
             build_tournament_drawer(),
+            build_map_controls(),
             build_live_strip(),
             build_modal(),
             dcc.Store(id="carousel-index", data=0, storage_type="local"),

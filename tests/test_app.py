@@ -159,7 +159,7 @@ def test_app_registers_mode_callbacks():
             outputs.add(str(o))
     joined = " ".join(outputs)
     assert "carousel-index.data" in joined
-    assert "filter-pin-layer.children" in joined
+    assert "map-controls-overlay.style" in joined
     assert "carousel-wrapper.style" in joined
     assert "flow-layer.children" in joined
     assert "pulse-layer.children" in joined
