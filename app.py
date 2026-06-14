@@ -659,8 +659,10 @@ clientside_callback(
 )
 
 def _backfill_player_stats():
-    """One-time refresh of the player-stats cache from past scheduled dates.
-    Idempotent: update_player_stats skips finished matches already on disk."""
+    """Refresh the player-stats cache from past scheduled dates, once per process
+    start (on first WS connect). Cheaply idempotent: update_player_stats skips the
+    per-match fetch for finished matches already on disk, so repeats only cost one
+    matches_on() list call per past date."""
     today = date.today()
     now = time.monotonic()
     for d in sorted({m.date for m in MATCHES if m.date <= today}):
