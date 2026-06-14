@@ -1,8 +1,8 @@
 """FIFA World Cup 2026 - Stadium Image Downloader.
 
-Reads assets/data/fifa_wc2026_stadiums.csv (the single source of truth) and
+Reads assets/data/venues.csv (the single source of truth) and
 downloads each stadium image into assets/stadiums/ so the Dash app can serve
-them from /assets/stadiums/<Image_Filename>.
+them from /assets/stadiums/<image_filename>.
 
 Run from anywhere:  python scripts/download_stadium_images.py
 """
@@ -18,7 +18,7 @@ from pathlib import Path
 import certifi
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-CSV_PATH = PROJECT_ROOT / "assets" / "data" / "fifa_wc2026_stadiums.csv"
+CSV_PATH = PROJECT_ROOT / "assets" / "data" / "venues.csv"
 OUTPUT_DIR = PROJECT_ROOT / "assets" / "stadiums"
 
 # FIFA's CDN serves a resized/optimised render only when this transform query
@@ -50,8 +50,8 @@ def download_images() -> None:
 
     success, failed = 0, []
     for row in rows:
-        filename = row["Image_Filename"].strip()
-        url = _full_url(row["Image_URL"].strip())
+        filename = row["image_filename"].strip()
+        url = _full_url(row["image_url"].strip())
         filepath = OUTPUT_DIR / filename
 
         if not url:

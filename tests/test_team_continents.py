@@ -12,7 +12,7 @@ from src.data.team_continents import (
     grouped_team_options,
 )
 
-MATCHES = Path(__file__).parent.parent / "assets" / "data" / "wc2026_matches.csv"
+MATCHES = Path(__file__).parent.parent / "assets" / "data" / "matches.csv"
 
 
 def _group_stage_teams():
