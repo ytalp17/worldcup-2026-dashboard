@@ -241,3 +241,18 @@ def test_live_score_markers_one_per_live_venue():
 def test_live_score_markers_empty_when_no_live():
     from src.components.map_view import live_score_markers
     assert live_score_markers([], {"matches": []}) == []
+
+
+def test_tournament_pin_exists_and_is_north_of_filter_pin():
+    from src.components.map_view import tournament_pin, FILTER_PIN
+    pin = tournament_pin()
+    assert pin.id == "tournament-pin"
+    assert pin.position[0] > FILTER_PIN[0]      # higher latitude => above on the map
+
+
+def test_build_map_includes_tournament_pin_layer():
+    import dash_leaflet as dl
+    from src.components.map_view import build_map
+    m = build_map([])
+    layer_ids = {c.id for c in m.children if isinstance(c, dl.LayerGroup)}
+    assert "tournament-pin-layer" in layer_ids
