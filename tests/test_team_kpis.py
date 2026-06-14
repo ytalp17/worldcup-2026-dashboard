@@ -84,3 +84,24 @@ def test_build_kpi_strip_has_id():
     assert strip.id == "kpi-strip"
     cards = [n for n in _walk(strip) if getattr(n, "className", "") == "stat-card"]
     assert len(cards) == 7
+
+
+def test_federation_card_shows_confederation_and_logo():
+    stats = TeamStats(
+        avg_age=29.8, avg_height=1.84, squad_value=1, value_display="€1M",
+        foot_right_pct=80, foot_left_pct=15, squad_size=26,
+        confederation="CONMEBOL",
+        confederation_logo="/assets/confederation_logos/CONMEBOL.svg",
+    )
+    cards = kpi_cards(stats)
+    all_text = " ".join(t for c in cards for t in _texts(c))
+    assert "CONMEBOL" in all_text
+    assert "Federation" in all_text
+    imgs = [n for c in cards for n in _walk(c) if isinstance(n, dmc.Image)]
+    assert any(getattr(i, "src", "") == "/assets/confederation_logos/CONMEBOL.svg"
+               for i in imgs)
+
+
+def test_no_abroad_card():
+    all_text = " ".join(t for c in kpi_cards(REAL) for t in _texts(c))
+    assert "Abroad" not in all_text

@@ -94,3 +94,11 @@ def test_manager_age_from_csv():
     assert manager_age_for("Brazil") == 67       # Carlo Ancelotti
     assert manager_age_for("Germany") == 38      # Julian Nagelsmann
     assert manager_age_for("Atlantis") is None
+
+
+def test_confederation_from_csv():
+    from src.data.team_continents import confederation_for
+    assert confederation_for("Brazil") == "CONMEBOL"
+    assert confederation_for("USA") == "CONCACAF"
+    assert confederation_for("Germany") == "UEFA"
+    assert confederation_for("Atlantis") is None

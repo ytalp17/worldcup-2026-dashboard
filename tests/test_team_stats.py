@@ -44,10 +44,10 @@ def test_compute_team_stats():
     assert stats.foot_right_pct == 67
     assert stats.foot_left_pct == 33
     assert stats.squad_size == 3
-    # No data sources yet for these.
+    # No data sources passed in for these.
     assert stats.fifa_rank is None
     assert stats.manager is None
-    assert stats.abroad is None
+    assert stats.confederation is None
 
 
 def test_compute_team_stats_is_division_safe():
@@ -104,3 +104,13 @@ def test_compute_team_stats_passes_manager_age():
 
 def test_compute_team_stats_manager_age_default_none():
     assert compute_team_stats(Squad("X", (_player(),))).manager_age is None
+
+
+def test_compute_team_stats_passes_confederation_and_logo():
+    stats = compute_team_stats(
+        Squad("Brazil", (_player(),)),
+        confederation="CONMEBOL",
+        confederation_logo="/assets/confederation_logos/CONMEBOL.svg",
+    )
+    assert stats.confederation == "CONMEBOL"
+    assert stats.confederation_logo == "/assets/confederation_logos/CONMEBOL.svg"

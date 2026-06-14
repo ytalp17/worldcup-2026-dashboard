@@ -31,6 +31,7 @@ from src.data.lineups import LineupRepository, lineup_for_team
 from src.data.squads import Squad, SquadRepository, squad_for_team
 from src.data.team_stats import compute_team_stats
 from src.data.team_continents import (
+    confederation_for,
     fifa_rank_for,
     grouped_team_options,
     manager_age_for,
@@ -46,6 +47,7 @@ from src.data.venues import VenueRepository
 DATA_DIR = Path(__file__).parent / "assets" / "data"
 IMAGE_DIR = Path(__file__).parent / "assets" / "stadiums"
 MANAGER_FLAGS_DIR = Path(__file__).parent / "assets" / "manager_flags"
+CONFED_LOGOS_DIR = Path(__file__).parent / "assets" / "confederation_logos"
 
 VENUES = VenueRepository(DATA_DIR / "venues.csv", IMAGE_DIR).load()
 VENUES_BY_CITY = {v.city: v for v in VENUES}
@@ -121,6 +123,10 @@ def team_stats_payload(index):
     flag = None
     if nationality and (MANAGER_FLAGS_DIR / f"{nationality}.png").exists():
         flag = app.get_asset_url(f"manager_flags/{nationality}.png")
+    confederation = confederation_for(team)
+    confed_logo = None
+    if confederation and (CONFED_LOGOS_DIR / f"{confederation}.svg").exists():
+        confed_logo = app.get_asset_url(f"confederation_logos/{confederation}.svg")
     return compute_team_stats(
         squad,
         fifa_rank=fifa_rank_for(team),
@@ -128,6 +134,8 @@ def team_stats_payload(index):
         manager_nationality=nationality,
         manager_flag=flag,
         manager_age=manager_age_for(team),
+        confederation=confederation,
+        confederation_logo=confed_logo,
     )
 
 
