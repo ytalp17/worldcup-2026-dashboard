@@ -1,7 +1,7 @@
 from pathlib import Path
 from src.data.squads import Player, Squad, SquadRepository, squad_for_team
 
-CSV = Path(__file__).parent.parent / "assets" / "data" / "world_cup_2026_squads.csv"
+CSV = Path(__file__).parent.parent / "assets" / "data" / "squads.csv"
 
 
 def _load():

@@ -1,11 +1,9 @@
 from datetime import date
 from pathlib import Path
 
-from src.data.host_cities import HostCityRepository
 from src.data.match_calendar import MatchCalendar
 from src.data.matches import MatchRepository
-from src.data.stadiums import StadiumRepository
-from src.data.venues import build_venues
+from src.data.venues import VenueRepository
 
 DATA = Path(__file__).parent.parent / "assets" / "data"
 IMAGE_DIR = DATA.parent / "stadiums"
@@ -13,11 +11,9 @@ TODAY = date(2026, 5, 30)
 
 
 def _calendar(today=TODAY):
-    cities = HostCityRepository(DATA / "fifa_2026_host_cities.csv").load()
-    stadiums = StadiumRepository(DATA / "fifa_wc2026_stadiums.csv").load()
-    venues = build_venues(cities, stadiums, IMAGE_DIR)
+    venues = VenueRepository(DATA / "venues.csv", IMAGE_DIR).load()
     stadium_to_city = {v.stadium_name: v.city for v in venues}
-    matches = MatchRepository(DATA / "wc2026_matches.csv").load()
+    matches = MatchRepository(DATA / "matches.csv").load()
     return MatchCalendar(matches, stadium_to_city, today=today)
 
 

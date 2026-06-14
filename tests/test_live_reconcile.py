@@ -39,7 +39,7 @@ def test_find_stadium_against_real_schedule():
     from pathlib import Path
     from src.data.matches import MatchRepository
     matches = MatchRepository(
-        Path("assets/data/wc2026_matches.csv")).load()
+        Path("assets/data/matches.csv")).load()
     index = build_stadium_index(matches)
     # Match #4 in the real schedule: USA vs Paraguay at Los Angeles Stadium.
     assert find_stadium("USA", "Paraguay", index) == "Los Angeles Stadium"

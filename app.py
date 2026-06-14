@@ -15,14 +15,11 @@ from src.components.group_table import build_group_panel, group_rows, live_group
 from src.components.header_calendar import build_match_calendar
 from src.components.layout import build_layout
 from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, filter_pin, live_score_markers, pulse_markers
-from src.data.altitudes import AltitudeRepository
 from src.data.distances import DistanceRepository
 from src.data.flows import build_team_flows, team_cities
 from src.data.groups import build_groups, group_for_team
-from src.data.host_cities import HostCityRepository
 from src.data.match_calendar import MatchCalendar
 from src.data.matches import MatchRepository, matches_by_stadium
-from src.data.stadiums import StadiumRepository
 from src.components.formation_pitch import build_formation_panel, formation_title, pitch_src
 from src.components.leaders_card import build_leaders_card
 from src.components.squad_table import build_squad_panel, squad_rows
@@ -38,26 +35,23 @@ from src.data.live.client import HighlightlyClient
 from src.data.live.reconcile import build_stadium_index
 from src.data.env_config import load_env_file
 from src.data.live.service import LiveDataService, next_delay
-from src.data.venues import build_venues
+from src.data.venues import VenueRepository
 
 DATA_DIR = Path(__file__).parent / "assets" / "data"
 IMAGE_DIR = Path(__file__).parent / "assets" / "stadiums"
 
-CITIES = HostCityRepository(DATA_DIR / "fifa_2026_host_cities.csv").load()
-STADIUMS = StadiumRepository(DATA_DIR / "fifa_wc2026_stadiums.csv").load()
-ALTITUDES = AltitudeRepository(DATA_DIR / "wc2026_stadium_altitude.csv").load()
-DISTANCES = DistanceRepository(DATA_DIR / "team_distances.csv").load()
-VENUES = build_venues(CITIES, STADIUMS, IMAGE_DIR, ALTITUDES)
+VENUES = VenueRepository(DATA_DIR / "venues.csv", IMAGE_DIR).load()
 VENUES_BY_CITY = {v.city: v for v in VENUES}
+DISTANCES = DistanceRepository(DATA_DIR / "teams.csv").load()
 
-MATCHES = MatchRepository(DATA_DIR / "wc2026_matches.csv").load()
+MATCHES = MatchRepository(DATA_DIR / "matches.csv").load()
 MATCHES_BY_STADIUM = matches_by_stadium(MATCHES)
 
 TEAM_FLOWS = build_team_flows(MATCHES, VENUES, distances=DISTANCES)
 TEAM_OPTIONS = grouped_team_options(sorted(TEAM_FLOWS))
 TEAM_NAMES = team_order(TEAM_FLOWS)
 GROUPS = build_groups(MATCHES)
-SQUADS = SquadRepository(DATA_DIR / "world_cup_2026_squads.csv").load()
+SQUADS = SquadRepository(DATA_DIR / "squads.csv").load()
 LINEUPS = LineupRepository(DATA_DIR / "estimated_starting_eleven.json").load()
 
 STADIUM_TO_CITY = {v.stadium_name: v.city for v in VENUES}

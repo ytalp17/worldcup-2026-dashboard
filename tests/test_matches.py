@@ -5,7 +5,7 @@ import pytest
 
 from src.data.matches import Match, MatchRepository, is_placeholder, matches_by_stadium
 
-CSV_PATH = Path(__file__).parent.parent / "assets" / "data" / "wc2026_matches.csv"
+CSV_PATH = Path(__file__).parent.parent / "assets" / "data" / "matches.csv"
 
 
 def _load():

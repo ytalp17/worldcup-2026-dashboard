@@ -4,23 +4,19 @@ from pathlib import Path
 import pytest
 
 from src.data.flows import FlowStop, TeamFlow, build_team_flows, team_cities, team_color
-from src.data.host_cities import HostCityRepository
 from src.data.matches import Match, MatchRepository
-from src.data.stadiums import StadiumRepository
-from src.data.venues import build_venues
+from src.data.venues import VenueRepository
 
 DATA = Path(__file__).parent.parent / "assets" / "data"
 IMAGE_DIR = DATA.parent / "stadiums"
 
 
 def _venues():
-    cities = HostCityRepository(DATA / "fifa_2026_host_cities.csv").load()
-    stadiums = StadiumRepository(DATA / "fifa_wc2026_stadiums.csv").load()
-    return build_venues(cities, stadiums, IMAGE_DIR)
+    return VenueRepository(DATA / "venues.csv", IMAGE_DIR).load()
 
 
 def _flows():
-    matches = MatchRepository(DATA / "wc2026_matches.csv").load()
+    matches = MatchRepository(DATA / "matches.csv").load()
     return build_team_flows(matches, _venues())
 
 
@@ -68,7 +64,7 @@ def test_unmatched_stadium_raises():
 
 def test_build_team_flows_stamps_distance_from_dict():
     flows = build_team_flows(
-        MatchRepository(DATA / "wc2026_matches.csv").load(),
+        MatchRepository(DATA / "matches.csv").load(),
         _venues(),
         distances={"Brazil": 1839.7},
     )
