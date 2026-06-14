@@ -6,7 +6,7 @@ from pathlib import Path
 
 from src.data.live import models, player_store
 from src.data.live.player_stats import parse_player_stats
-from src.data.live.reconcile import canonical_team, find_stadium
+from src.data.live.reconcile import canonical_team, find_stadium, normalize
 
 logger = logging.getLogger(__name__)
 
@@ -184,7 +184,7 @@ class LiveDataService:
             for r in rows:
                 if canonical_team(r.team) != target:
                     continue
-                key = r.player_id if r.player_id else r.player.strip().lower()
+                key = r.player_id if r.player_id else normalize(r.player)
                 g = groups.get(key)
                 if g is None:
                     g = {"player": r.player, "goals": 0, "assists": 0,
@@ -203,7 +203,7 @@ class LiveDataService:
         def ranked(value_fn, keep_fn):
             out = [{"player": g["player"], "value": value_fn(g), "apps": len(g["matches"])}
                    for g in groups.values() if keep_fn(g)]
-            out.sort(key=lambda d: d["value"], reverse=True)
+            out.sort(key=lambda d: (-d["value"], d["player"]))
             return out
 
         return {
