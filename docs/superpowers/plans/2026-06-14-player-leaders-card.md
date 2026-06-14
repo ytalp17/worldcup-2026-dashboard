@@ -188,6 +188,8 @@ def parse_player_stats(match_id: int, events, detail) -> list[PlayerMatchStat]:
             slot(team, player, pid)["yellow"] += 1
         elif etype == "Red Card":
             slot(team, player, pid)["red"] += 1
+        elif etype == "Own Goal":
+            slot(team, player, pid)   # scorer row exists but is NOT credited a goal
 
     for side in ("homeTeam", "awayTeam"):
         td = (detail or {}).get(side) or {}
