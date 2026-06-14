@@ -87,3 +87,10 @@ def test_manager_nationality_cleaned_and_aliased():
     # "Bosnia" normalized to the full canonical country name.
     assert manager_nationality_for("Bosnia and Herzegovina") == "Bosnia and Herzegovina"
     assert manager_nationality_for("Atlantis") is None
+
+
+def test_manager_age_from_csv():
+    from src.data.team_continents import manager_age_for
+    assert manager_age_for("Brazil") == 67       # Carlo Ancelotti
+    assert manager_age_for("Germany") == 38      # Julian Nagelsmann
+    assert manager_age_for("Atlantis") is None

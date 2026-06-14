@@ -33,15 +33,19 @@ def stat_card(icon, label, value=None, sub=None, ring=None, sub_node=None) -> dm
 
 
 def _manager_sub(stats: TeamStats):
-    """Footer for the manager card: nationality flag + country when known,
-    else None (so stat_card falls back to the plain 'head coach' label)."""
-    if not stats.manager_nationality:
+    """Footer for the manager card: nationality flag + country and age when
+    known, else None (so stat_card falls back to the plain 'head coach' label)."""
+    if not stats.manager_nationality and stats.manager_age is None:
         return None
+    label = stats.manager_nationality or ""
+    if stats.manager_age is not None:
+        age = f"{stats.manager_age}"
+        label = f"{label} · {age}" if label else age
     parts = []
     if stats.manager_flag:
         parts.append(dmc.Image(src=stats.manager_flag, w=18, h=12, fit="contain",
                                className="stat-card__flag"))
-    parts.append(dmc.Text(stats.manager_nationality, size="xs", c="dimmed",
+    parts.append(dmc.Text(label, size="xs", c="dimmed",
                           className="stat-card__sub"))
     return dmc.Group(parts, gap=4, wrap="nowrap", align="center")
 

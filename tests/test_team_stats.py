@@ -95,3 +95,12 @@ def test_compute_team_stats_passes_manager_nationality_and_flag():
 def test_compute_team_stats_manager_extras_default_none():
     stats = compute_team_stats(Squad("X", (_player(),)))
     assert stats.manager_nationality is None and stats.manager_flag is None
+
+
+def test_compute_team_stats_passes_manager_age():
+    stats = compute_team_stats(Squad("Brazil", (_player(),)), manager_age=67)
+    assert stats.manager_age == 67
+
+
+def test_compute_team_stats_manager_age_default_none():
+    assert compute_team_stats(Squad("X", (_player(),))).manager_age is None

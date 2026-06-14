@@ -64,12 +64,24 @@ def _load_team_manager_nationalities(csv_path: Path = _CSV_PATH) -> dict[str, st
     }
 
 
+def _load_team_manager_ages(csv_path: Path = _CSV_PATH) -> dict[str, int]:
+    df = pd.read_csv(csv_path)
+    if "coach_age" not in df.columns:
+        return {}
+    return {
+        str(row["team"]): int(row["coach_age"])
+        for _, row in df.iterrows()
+        if pd.notna(row["coach_age"])
+    }
+
+
 # Team -> continent / FIFA code / head coach / coach nationality / FIFA rank.
 TEAM_CONTINENT: dict[str, str] = _load_team_continents()
 TEAM_CODE: dict[str, str] = _load_team_codes()
 TEAM_MANAGER: dict[str, str] = _load_team_managers()
 TEAM_FIFA_RANK: dict[str, int] = _load_team_ranks()
 TEAM_MANAGER_NATIONALITY: dict[str, str] = _load_team_manager_nationalities()
+TEAM_MANAGER_AGE: dict[str, int] = _load_team_manager_ages()
 
 # Raw coach_nationality values are free-text ("Morocco/Belgium",
 # "UK (born in Northampton)"). Reduce to a single canonical country.
@@ -109,6 +121,11 @@ def manager_nationality_for(team: str) -> str | None:
     """Head coach's nationality as a single canonical country, or None."""
     raw = TEAM_MANAGER_NATIONALITY.get(team)
     return _clean_nationality(raw) if raw else None
+
+
+def manager_age_for(team: str) -> int | None:
+    """Head coach's age in years, or None when unknown."""
+    return TEAM_MANAGER_AGE.get(team)
 
 
 def grouped_team_options(teams: list[str]) -> list[dict]:

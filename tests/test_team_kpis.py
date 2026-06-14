@@ -68,6 +68,17 @@ def test_manager_card_shows_nationality_and_flag():
                for i in imgs)
 
 
+def test_manager_card_shows_age():
+    stats = TeamStats(
+        avg_age=29.8, avg_height=1.84, squad_value=1, value_display="€1M",
+        foot_right_pct=80, foot_left_pct=15, squad_size=26,
+        manager="Carlo Ancelotti", manager_nationality="Italy",
+        manager_flag="/assets/manager_flags/Italy.png", manager_age=67,
+    )
+    all_text = " ".join(t for c in kpi_cards(stats) for t in _texts(c))
+    assert "Italy" in all_text and "67" in all_text
+
+
 def test_build_kpi_strip_has_id():
     strip = build_kpi_strip(REAL)
     assert strip.id == "kpi-strip"

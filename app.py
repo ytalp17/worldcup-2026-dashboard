@@ -33,6 +33,7 @@ from src.data.team_stats import compute_team_stats
 from src.data.team_continents import (
     fifa_rank_for,
     grouped_team_options,
+    manager_age_for,
     manager_for,
     manager_nationality_for,
 )
@@ -126,6 +127,7 @@ def team_stats_payload(index):
         manager=manager_for(team),
         manager_nationality=nationality,
         manager_flag=flag,
+        manager_age=manager_age_for(team),
     )
 
 
