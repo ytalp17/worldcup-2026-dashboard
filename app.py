@@ -27,6 +27,7 @@ from src.components.leaders_card import (
     leaders_row_data,
 )
 from src.components.squad_table import build_squad_panel, squad_rows
+from src.components.tournament_stats import tab_options, tourn_columns, tourn_row_data
 from src.components.live_match_modal import build_modal, modal_body
 from src.components.live_strip import overlay_style, strip_items
 from src.components.team_kpis import build_kpi_strip, kpi_cards
@@ -80,11 +81,12 @@ _API_KEY = os.environ.get("HIGHLIGHTLY_API_KEY")
 # Per-match player-stats cache (gitignored). The live_feed loop maintains it;
 # team_leaders reads it for the leaders card.
 PLAYER_STORE_PATH = DATA_DIR / "live_player_stats.csv"
+TEAM_STATS_PATH = DATA_DIR / "live_team_stats.csv"
 # No-key mode: when the env var is unset the app runs purely on static data,
 # so dev and the whole test suite work offline.
 LIVE = (
     LiveDataService(HighlightlyClient(api_key=_API_KEY), STADIUM_INDEX,
-                    player_store=PLAYER_STORE_PATH)
+                    player_store=PLAYER_STORE_PATH, team_store=TEAM_STATS_PATH)
     if _API_KEY else None
 )
 
@@ -130,6 +132,15 @@ def leaders_payload(stat, index):
     team = center_team(TEAM_NAMES, index or 0)
     leaders = LIVE.team_leaders(team) if LIVE is not None else {}
     return leaders_row_data(leaders, stat), leaders_columns(stat), team
+
+
+def tournament_grid_payload(scope, tab, live):
+    """(rowData, columnDefs) for the tournament grid. Empty rows when offline."""
+    standings = (live or {}).get("standings") or {}
+    tl = LIVE.tournament_team_leaders(standings) if LIVE is not None else {}
+    pl = LIVE.tournament_player_leaders() if LIVE is not None else {}
+    rows = tourn_row_data(scope, tab, tl, pl, standings)
+    return rows, tourn_columns(scope, tab)
 
 
 def team_stats_payload(index):
@@ -254,6 +265,7 @@ def drawer_for_city(city: str | None, user_tz: str | None = None, live: dict | N
     Output("stadium-drawer", "title"),
     Output("stadium-drawer", "children"),
     Output("filter-drawer", "opened", allow_duplicate=True),
+    Output("tournament-drawer", "opened", allow_duplicate=True),
     Input({"type": MARKER_TYPE, "index": ALL}, "n_clicks"),
     State("user-tz", "data"),
     State("live-store", "data"),
@@ -263,24 +275,38 @@ def open_stadium_drawer(n_clicks, user_tz, live):
     # user_tz is a State snapshot: if the tz probe hasn't resolved yet, the drawer falls back to venue-local time (window is brief, acceptable per design).
     # Ignore the callback firing when markers mount with n_clicks=None.
     if not any(n_clicks):
-        return no_update, no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update, no_update
     triggered = ctx.triggered_id
     city = triggered.get("index") if isinstance(triggered, dict) else None
     opened, title, children = drawer_for_city(city, user_tz, live)
-    # Opening the stadium drawer closes the filter drawer (both are left-side).
-    return opened, title, children, (False if opened else no_update)
+    # Opening the stadium drawer closes the filter and tournament drawers.
+    return opened, title, children, (False if opened else no_update), False
 
 
 @callback(
     Output("filter-drawer", "opened"),
     Output("stadium-drawer", "opened", allow_duplicate=True),
+    Output("tournament-drawer", "opened", allow_duplicate=True),
     Input("filter-pin", "n_clicks"),
     prevent_initial_call=True,
 )
 def open_filter_drawer(n_clicks):
     if not n_clicks:
-        return no_update, no_update
-    return True, False  # open the filter drawer, close the stadium drawer
+        return no_update, no_update, no_update
+    return True, False, False  # open the filter drawer, close the stadium + tournament drawers
+
+
+@callback(
+    Output("tournament-drawer", "opened"),
+    Output("filter-drawer", "opened", allow_duplicate=True),
+    Output("stadium-drawer", "opened", allow_duplicate=True),
+    Input("tournament-pin", "n_clicks"),
+    prevent_initial_call=True,
+)
+def open_tournament_drawer(n_clicks):
+    if not n_clicks:
+        return no_update, no_update, no_update
+    return True, False, False
 
 
 @callback(
@@ -411,6 +437,15 @@ def toggle_filter_pin(team_mode):
 
 
 @callback(
+    Output("tournament-pin-layer", "children"),
+    Input("mode-toggle", "checked"),
+)
+def toggle_tournament_pin(team_mode):
+    from src.components.map_view import tournament_pin
+    return [] if team_mode else [tournament_pin()]
+
+
+@callback(
     Output("live-strip-overlay", "style"),
     Input("mode-toggle", "checked"),
 )
@@ -508,6 +543,27 @@ def update_squad_panel(index):
 def update_leaders_panel(stat, index, live):
     rows, cols, team = leaders_payload(stat, index)
     return rows, cols, team
+
+
+@callback(
+    Output("tourn-tabs", "data"),
+    Output("tourn-tabs", "value"),
+    Input("tourn-scope", "value"),
+)
+def set_tournament_tabs(scope):
+    opts = tab_options(scope)
+    return opts, opts[0]
+
+
+@callback(
+    Output("tourn-grid", "rowData"),
+    Output("tourn-grid", "columnDefs"),
+    Input("tourn-scope", "value"),
+    Input("tourn-tabs", "value"),
+    Input("live-store", "data"),
+)
+def update_tournament_grid(scope, tab, live):
+    return tournament_grid_payload(scope, tab, live)
 
 
 @callback(
@@ -658,15 +714,15 @@ clientside_callback(
     Input("journey-grid", "selectedRows"),
 )
 
-def _backfill_player_stats():
-    """Refresh the player-stats cache from past scheduled dates, once per process
-    start (on first WS connect). Cheaply idempotent: update_player_stats skips the
-    per-match fetch for finished matches already on disk, so repeats only cost one
-    matches_on() list call per past date."""
+def _backfill_live_stats():
+    """Refresh both per-match caches from past scheduled dates, once per process
+    start. Cheaply idempotent: updaters skip finished matches already on disk."""
     today = date.today()
     now = time.monotonic()
     for d in sorted({m.date for m in MATCHES if m.date <= today}):
-        LIVE.update_player_stats(LIVE.matches_on(d.isoformat(), now), now)
+        day = LIVE.matches_on(d.isoformat(), now)
+        LIVE.update_player_stats(day, now)
+        LIVE.update_team_stats(day, now)
 
 
 # Always register the persistent WS callback so the client can always resolve it
@@ -678,12 +734,13 @@ async def live_feed():
     ws = ctx.websocket
     if ws is None or LIVE is None:
         return
-    await asyncio.to_thread(_backfill_player_stats)
+    await asyncio.to_thread(_backfill_live_stats)
     while not ws.is_shutdown:
         now = asyncio.get_running_loop().time()
         snap = await asyncio.to_thread(LIVE.snapshot, date.today().isoformat(), now)
         set_props("live-store", {"data": snap})
         await asyncio.to_thread(LIVE.update_player_stats, snap["matches"], now)
+        await asyncio.to_thread(LIVE.update_team_stats, snap["matches"], now)
         await asyncio.sleep(next_delay(snap))
 
 

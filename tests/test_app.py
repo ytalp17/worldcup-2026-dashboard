@@ -231,3 +231,34 @@ def test_leaders_payload_cards_tab_splits_yellow_red():
     import app
     _rows, cols, _team = app.leaders_payload("Cards", 3)
     assert [c["headerName"] for c in cols] == ["#", "Player", "🟨", "🟥", "Apps"]
+
+
+def test_tournament_grid_payload_team_standings():
+    import app
+    rows, cols = app.tournament_grid_payload("Team", "Standings", {"standings": {}})
+    assert [c["headerName"] for c in cols][:2] == ["Pos", "Team"]
+    assert isinstance(rows, list)
+
+
+def test_tournament_grid_payload_players_goals():
+    import app
+    rows, cols = app.tournament_grid_payload("Players", "Goals", {})
+    assert [c["headerName"] for c in cols] == ["#", "Player", "Team", "Goals", "Ap"]
+    assert isinstance(rows, list)
+
+
+def test_app_layout_has_tournament_drawer():
+    import app
+    from dash_mantine_components import Drawer
+
+    def walk(n):
+        yield n
+        ch = getattr(n, "children", None)
+        if isinstance(ch, (list, tuple)):
+            for c in ch:
+                yield from walk(c)
+        elif ch is not None:
+            yield from walk(ch)
+
+    ids = {n.id for n in walk(app.app.layout) if isinstance(n, Drawer)}
+    assert "tournament-drawer" in ids
