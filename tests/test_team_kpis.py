@@ -76,7 +76,7 @@ def test_manager_card_shows_age():
         manager_flag="/assets/manager_flags/Italy.png", manager_age=67,
     )
     all_text = " ".join(t for c in kpi_cards(stats) for t in _texts(c))
-    assert "Italy" in all_text and "67" in all_text
+    assert "Italy" in all_text and "67 yrs" in all_text   # age carries a unit
 
 
 def test_build_kpi_strip_has_id():

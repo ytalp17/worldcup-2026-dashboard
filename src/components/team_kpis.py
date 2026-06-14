@@ -39,7 +39,7 @@ def _manager_sub(stats: TeamStats):
         return None
     label = stats.manager_nationality or ""
     if stats.manager_age is not None:
-        age = f"{stats.manager_age}"
+        age = f"{stats.manager_age} yrs"
         label = f"{label} · {age}" if label else age
     parts = []
     if stats.manager_flag:
