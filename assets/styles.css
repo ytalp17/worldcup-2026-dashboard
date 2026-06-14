@@ -581,6 +581,82 @@ body,
     display: none !important;
 }
 
+/* --- dark-mode grid readability ---
+   Every app grid runs transparent over a dark card/drawer in dark mode, where
+   the quartz-dark theme's default cell/header text comes out as a muted grey
+   that's hard to read. Lift the text to high contrast for the dark theme only
+   (the .ag-theme-quartz light variant is untouched). Applies to every grid
+   (group / squad / leaders / tournament / journey) since they all carry the
+   theme class. */
+.ag-theme-quartz-dark {
+    --ag-foreground-color: #f1f3f5;            /* cell text: near-white */
+    --ag-data-color: #f1f3f5;
+    --ag-header-foreground-color: #c1c2c5;     /* headers: light grey, still legible */
+    --ag-secondary-foreground-color: #c1c2c5;
+    --ag-row-hover-color: rgba(255, 255, 255, 0.07);
+    --ag-border-color: rgba(255, 255, 255, 0.10);
+    --ag-header-column-separator-color: rgba(255, 255, 255, 0.10);
+}
+
+/* --- themed scrollbars ---
+   The default OS scrollbars (and the bright corner "box" where the vertical and
+   horizontal bars meet) clash with the dark UI. Style the track, thumb and
+   corner for both schemes, tuned darker in dark mode. Covers every scrollable
+   area: the grids, the live strip, the mobile card stack, the drawers. */
+* {
+    scrollbar-width: thin;                              /* Firefox */
+    scrollbar-color: rgba(0, 0, 0, 0.28) transparent;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.28);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.42);
+    background-clip: padding-box;
+}
+
+[data-mantine-color-scheme="dark"] * {
+    scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+[data-mantine-color-scheme="dark"] ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.22);
+    background-clip: padding-box;
+}
+
+[data-mantine-color-scheme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.36);
+    background-clip: padding-box;
+}
+
+/* LIVE score badge floating over a stadium with an in-play match. Red by
+   default; a calmer dark blue in dark mode so it reads against the dark map
+   instead of glaring. */
+.live-badge {
+    background: #e03131;
+    color: #fff;
+}
+
+[data-mantine-color-scheme="dark"] .live-badge {
+    background: #1864ab;
+    color: #e7f0f7;
+}
+
 /* Mobile: stack every card in one column (map first), scrolling vertically. */
 @media (max-width: 768px) {
     .main-split--team {

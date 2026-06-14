@@ -147,10 +147,11 @@ def _live_badge_html(match: dict) -> str:
     pair = f"{abbr(match.get('home', ''))} {score} {abbr(match.get('away', ''))}"
     clock = match.get("clock")
     minute = f"&nbsp;{clock}'" if clock is not None else ""
-    # Inline-styled so no extra CSS file is needed; non-interactive overlay.
+    # Layout is inline; the colours live in the .live-badge CSS class so the
+    # theme can recolour it (red in light mode, dark blue in dark mode).
     return (
-        '<div style="display:flex;align-items:center;gap:3px;'
-        'background:#e03131;color:#fff;font:700 10px/1 sans-serif;'
+        '<div class="live-badge" style="display:flex;align-items:center;gap:3px;'
+        'font:700 10px/1 sans-serif;'
         'padding:2px 6px;border-radius:7px;white-space:nowrap;'
         'box-shadow:0 1px 3px rgba(0,0,0,.4);">'
         f'<span style="font-size:8px;">●</span>{pair}{minute}</div>'
