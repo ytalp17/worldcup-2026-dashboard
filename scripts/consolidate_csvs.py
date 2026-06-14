@@ -114,6 +114,7 @@ def _parse_managers() -> dict[str, tuple[str, str, str]]:
     }
     lines = [l.strip() for l in (DATA / "managers.md").read_text(encoding="utf-8").splitlines() if l.strip()]
     recs = lines[5:]  # drop the 5-cell header
+    assert len(recs) % 5 == 0, f"managers.md: {len(recs)} record lines not a multiple of 5"
     out: dict[str, tuple[str, str, str]] = {}
     for i in range(0, len(recs), 5):
         team_raw, coach, since, _prev, nat = recs[i:i + 5]
