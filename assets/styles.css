@@ -1,7 +1,12 @@
 html,
 body,
 #react-entry-point,
-#react-entry-point > div {
+/* The app shell fills the viewport. MantineProvider renders no wrapper, so its
+   children (the shell AND the fixed overlays) are direct children of
+   #react-entry-point — target the shell by id so a broad `> div` rule doesn't
+   stretch the fixed bottom overlays (map controls, live strip) to full height
+   and push their content off the top of the screen. */
+#appshell {
     height: 100vh;
     width: 100vw;
     margin: 0;
