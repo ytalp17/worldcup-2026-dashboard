@@ -163,6 +163,9 @@ def test_app_registers_mode_callbacks():
     assert "carousel-wrapper.style" in joined
     assert "flow-layer.children" in joined
     assert "pulse-layer.children" in joined
+    # Every ag-grid follows the color scheme; the leaders grid's theme swap was
+    # missing, leaving it dark-themed (unreadable) in light mode.
+    assert "leaders-grid.className" in joined
 
 
 def test_active_cities_decider_threads_user_tz():
