@@ -102,3 +102,11 @@ def test_confederation_from_csv():
     assert confederation_for("USA") == "CONCACAF"
     assert confederation_for("Germany") == "UEFA"
     assert confederation_for("Atlantis") is None
+
+
+def test_confederation_continent_mapping():
+    from src.data.team_continents import confederation_continent
+    assert confederation_continent("CONMEBOL") == "South America"
+    assert confederation_continent("UEFA") == "Europe"
+    assert confederation_continent("AFC") == "Asia"
+    assert confederation_continent(None) is None

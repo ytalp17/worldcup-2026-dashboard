@@ -51,6 +51,7 @@ class TeamStats:
     manager_age: int | None = None
     confederation: str | None = None
     confederation_logo: str | None = None  # asset src for the confederation logo
+    confederation_region: str | None = None  # continent the confederation governs
 
 
 def _mean(values: list[float]) -> float | None:
@@ -63,7 +64,8 @@ def compute_team_stats(squad: Squad, fifa_rank: int | None = None,
                        manager_flag: str | None = None,
                        manager_age: int | None = None,
                        confederation: str | None = None,
-                       confederation_logo: str | None = None) -> TeamStats:
+                       confederation_logo: str | None = None,
+                       confederation_region: str | None = None) -> TeamStats:
     players = squad.players
     ages = [int(p.age) for p in players if p.age.isdigit()]
     heights = []
@@ -92,4 +94,5 @@ def compute_team_stats(squad: Squad, fifa_rank: int | None = None,
         manager_age=manager_age,
         confederation=confederation,
         confederation_logo=confederation_logo,
+        confederation_region=confederation_region,
     )

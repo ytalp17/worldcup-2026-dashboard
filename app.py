@@ -31,6 +31,7 @@ from src.data.lineups import LineupRepository, lineup_for_team
 from src.data.squads import Squad, SquadRepository, squad_for_team
 from src.data.team_stats import compute_team_stats
 from src.data.team_continents import (
+    confederation_continent,
     confederation_for,
     fifa_rank_for,
     grouped_team_options,
@@ -136,6 +137,7 @@ def team_stats_payload(index):
         manager_age=manager_age_for(team),
         confederation=confederation,
         confederation_logo=confed_logo,
+        confederation_region=confederation_continent(confederation),
     )
 
 

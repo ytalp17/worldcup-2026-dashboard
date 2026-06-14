@@ -8,13 +8,8 @@ from src.data.team_stats import TeamStats
 PLACEHOLDER = "—"
 
 
-def stat_card(icon, label, value=None, sub=None, ring=None, sub_node=None,
-              body_node=None, bg_image=None) -> dmc.Box:
-    """A small KPI card: icon + label on top, a big value (or a ring/custom body)
-    below, and an optional dimmed sub-label. ``body_node``/``ring`` replace the
-    text value; ``sub_node`` takes precedence over plain-text ``sub`` for richer
-    footers; ``bg_image`` renders a faint watermark logo behind the content."""
-    head = dmc.Group(
+def _head(icon, label) -> dmc.Group:
+    return dmc.Group(
         [
             DashIconify(icon=icon, width=14, className="stat-card__icon"),
             dmc.Text(label, size="xs", c="dimmed"),
@@ -23,27 +18,48 @@ def stat_card(icon, label, value=None, sub=None, ring=None, sub_node=None,
         wrap="nowrap",
         align="center",
     )
+
+
+def stat_card(icon, label, value=None, sub=None, ring=None, sub_node=None,
+              body_node=None) -> dmc.Box:
+    """A small KPI card: icon + label on top, a big value (or a ring/custom body)
+    below, and an optional dimmed sub-label. ``body_node``/``ring`` replace the
+    text value; ``sub_node`` takes precedence over plain-text ``sub`` for richer
+    footers."""
     if body_node is not None:
         body = body_node
     elif ring is not None:
         body = ring
     else:
         body = dmc.Text(value, className="stat-card__value", fw=700)
-    children = [head, body]
+    children = [_head(icon, label), body]
     if sub_node is not None:
         children.append(sub_node)
     elif sub:
         children.append(dmc.Text(sub, size="xs", c="dimmed",
                                  className="stat-card__sub"))
-    if bg_image:
-        return dmc.Box(
-            [
-                dmc.Image(src=bg_image, fit="contain", className="stat-card__bg"),
-                dmc.Box(children, className="stat-card__content"),
-            ],
-            className="stat-card stat-card--bg",
-        )
     return dmc.Box(children, className="stat-card")
+
+
+def _federation_card(stats: TeamStats) -> dmc.Box:
+    """Federation card: label + confederation code on the left, the
+    confederation logo anchored to the right end of the card."""
+    code = stats.confederation or PLACEHOLDER
+    left_children = [_head("tabler:shield", "Federation"),
+                     dmc.Text(code, fw=700, className="stat-card__fedcode")]
+    if stats.confederation_region:
+        left_children.append(dmc.Text(stats.confederation_region, size="xs",
+                                      c="dimmed", className="stat-card__sub"))
+    left = dmc.Box(left_children, className="stat-card__fedtext")
+    row = [left]
+    if stats.confederation_logo:
+        row.append(dmc.Image(src=stats.confederation_logo, fit="contain",
+                             className="stat-card__fedlogo"))
+    return dmc.Box(
+        dmc.Group(row, justify="space-between", wrap="nowrap", align="center",
+                  className="stat-card__fedrow"),
+        className="stat-card",
+    )
 
 
 def _manager_sub(stats: TeamStats):
@@ -109,9 +125,7 @@ def kpi_cards(stats: TeamStats) -> list[dmc.Box]:
         stat_card("tabler:ruler-2", "Avg height", height, sub="metres"),
         stat_card("tabler:trophy", "FIFA rank", rank, sub="world"),
         stat_card("tabler:coin", "Value", stats.value_display, sub="total"),
-        stat_card("tabler:shield", "Federation",
-                  value=stats.confederation or PLACEHOLDER,
-                  bg_image=stats.confederation_logo),
+        _federation_card(stats),
         stat_card("tabler:shoe", "Foot", body_node=_foot_bar(stats),
                   sub_node=_foot_sub(stats)),
         stat_card("tabler:user-star", "Manager", stats.manager or PLACEHOLDER,

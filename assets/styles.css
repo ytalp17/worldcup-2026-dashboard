@@ -283,7 +283,6 @@ body,
 }
 
 .stat-card {
-    position: relative;
     flex: 1 1 0;
     min-width: 0;
     display: flex;
@@ -297,26 +296,36 @@ body,
     overflow: hidden;
 }
 
-/* Faint watermark logo behind a card's content (e.g. Federation). */
-.stat-card__bg {
-    position: absolute;
-    inset: 8px;
-    width: calc(100% - 16px);
-    height: calc(100% - 16px);
-    object-fit: contain;
-    opacity: 0.12;
-    pointer-events: none;
-    z-index: 0;
+/* Federation card: label + code on the left, logo anchored to the right end. */
+.stat-card__fedrow {
+    height: 100%;
+    width: 100%;
 }
 
-.stat-card__content {
-    position: relative;
-    z-index: 1;
+.stat-card__fedtext {
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     gap: 4px;
-    height: 100%;
+}
+
+.stat-card__fedcode {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-card__fedlogo {
+    flex: 0 0 auto;
+    height: auto;
+    width: auto;
+    max-height: 50px;
+    max-width: 50px;
+    align-self: center;
 }
 
 /* Foot split bar: left-foot vs right-foot share on one horizontal track. */

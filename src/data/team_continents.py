@@ -145,6 +145,22 @@ def confederation_for(team: str) -> str | None:
     return TEAM_CONFEDERATION.get(team)
 
 
+# Continent each confederation governs (mapped onto our six-continent scheme).
+CONFEDERATION_CONTINENT = {
+    "AFC": "Asia",
+    "CAF": "Africa",
+    "CONCACAF": "North America",
+    "CONMEBOL": "South America",
+    "OFC": "Oceania",
+    "UEFA": "Europe",
+}
+
+
+def confederation_continent(code: str | None) -> str | None:
+    """Continent governed by a confederation code, or None when unknown."""
+    return CONFEDERATION_CONTINENT.get(code) if code else None
+
+
 def grouped_team_options(teams: list[str]) -> list[dict]:
     """DMC MultiSelect grouped data, continents in CONTINENT_ORDER, teams sorted."""
     options: list[dict] = []

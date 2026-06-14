@@ -107,3 +107,15 @@ def test_federation_card_shows_confederation_and_logo():
 def test_no_abroad_card():
     all_text = " ".join(t for c in kpi_cards(REAL) for t in _texts(c))
     assert "Abroad" not in all_text
+
+
+def test_federation_card_shows_continent_on_third_line():
+    stats = TeamStats(
+        avg_age=29.8, avg_height=1.84, squad_value=1, value_display="€1M",
+        foot_right_pct=80, foot_left_pct=15, squad_size=26,
+        confederation="CONMEBOL",
+        confederation_logo="/assets/confederation_logos/CONMEBOL.svg",
+        confederation_region="South America",
+    )
+    all_text = " ".join(t for c in kpi_cards(stats) for t in _texts(c))
+    assert "South America" in all_text
