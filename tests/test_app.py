@@ -247,6 +247,21 @@ def test_tournament_grid_payload_players_goals():
     assert isinstance(rows, list)
 
 
+def test_tournament_grid_payload_standings_populates_from_live_store():
+    # The Standings tab reads the live-store standings directly, so it populates
+    # even offline (LIVE is None). Verifies the sort + position wiring end to end.
+    import app
+    live = {"standings": {
+        "Group A": [{"team": "USA", "points": 6, "goal_diff": 3, "goals_for": 5,
+                     "goals_against": 2, "played": 2, "won": 2, "drawn": 0, "lost": 0}],
+        "Group B": [{"team": "Brazil", "points": 9, "goal_diff": 6, "goals_for": 8,
+                     "goals_against": 2, "played": 3, "won": 3, "drawn": 0, "lost": 0}],
+    }}
+    rows, _cols = app.tournament_grid_payload("Team", "Standings", live)
+    assert [r["team"] for r in rows] == ["Brazil", "USA"]   # 9 pts before 6
+    assert rows[0]["pos"] == 1 and rows[1]["pos"] == 2
+
+
 def test_app_layout_has_tournament_drawer():
     import app
     from dash_mantine_components import Drawer

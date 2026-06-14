@@ -14,7 +14,7 @@ from src.components.flow_layer import flows_for
 from src.components.group_table import build_group_panel, group_rows, live_group_rows
 from src.components.header_calendar import build_match_calendar
 from src.components.layout import build_layout
-from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, filter_pin, live_score_markers, pulse_markers
+from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, filter_pin, live_score_markers, pulse_markers, tournament_pin
 from src.data.distances import DistanceRepository
 from src.data.flows import build_team_flows, team_cities
 from src.data.groups import build_groups, group_for_team
@@ -441,7 +441,6 @@ def toggle_filter_pin(team_mode):
     Input("mode-toggle", "checked"),
 )
 def toggle_tournament_pin(team_mode):
-    from src.components.map_view import tournament_pin
     return [] if team_mode else [tournament_pin()]
 
 
@@ -462,6 +461,16 @@ def toggle_live_strip(team_mode):
 )
 def close_filter_drawer_in_team_mode(team_mode):
     # Entering Team mode closes the (right-side) filter drawer; leaving it alone otherwise.
+    return False if team_mode else no_update
+
+
+@callback(
+    Output("tournament-drawer", "opened", allow_duplicate=True),
+    Input("mode-toggle", "checked"),
+    prevent_initial_call=True,
+)
+def close_tournament_drawer_in_team_mode(team_mode):
+    # Team mode hides the tournament pin, so also close its (right-side) drawer.
     return False if team_mode else no_update
 
 
