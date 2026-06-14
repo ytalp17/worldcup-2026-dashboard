@@ -629,17 +629,20 @@ clientside_callback(
     Input("journey-grid", "selectedRows"),
 )
 
-if LIVE is not None:
-    @callback(persistent=True)
-    async def live_feed():
-        ws = ctx.websocket
-        if ws is None:
-            return
-        while not ws.is_shutdown:
-            now = asyncio.get_running_loop().time()
-            snap = await asyncio.to_thread(LIVE.snapshot, date.today().isoformat(), now)
-            set_props("live-store", {"data": snap})
-            await asyncio.sleep(next_delay(snap))
+# Always register the persistent WS callback so the client can always resolve it
+# (a conditional registration leaves a connecting client with a callback the
+# server doesn't know, which raises "Callback function not found"). When there's
+# no API key the callback simply returns and the app stays on static data.
+@callback(persistent=True)
+async def live_feed():
+    ws = ctx.websocket
+    if ws is None or LIVE is None:
+        return
+    while not ws.is_shutdown:
+        now = asyncio.get_running_loop().time()
+        snap = await asyncio.to_thread(LIVE.snapshot, date.today().isoformat(), now)
+        set_props("live-store", {"data": snap})
+        await asyncio.sleep(next_delay(snap))
 
 
 if __name__ == "__main__":
