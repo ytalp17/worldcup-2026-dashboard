@@ -18,6 +18,12 @@ def test_normalize_collapses_whitespace_and_case():
     assert normalize("  United   STATES ") == "united states"
 
 
+def test_canonical_team_maps_bosnia_ampersand_to_official_and_spelling():
+    # The live feed sends "Bosnia & Herzegovina"; the static/official name (and
+    # the country_logos filename) uses "and". They must canonicalize the same.
+    assert canonical_team("Bosnia & Herzegovina") == canonical_team("Bosnia and Herzegovina")
+
+
 def test_find_stadium_exact_pair():
     index = build_stadium_index([_m("USA", "Paraguay", "Los Angeles Stadium")])
     assert find_stadium("USA", "Paraguay", index) == "Los Angeles Stadium"

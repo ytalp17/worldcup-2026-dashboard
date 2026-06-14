@@ -29,15 +29,16 @@ def _columns_for(scope, tab):
         rank = {"headerName": "#", "field": "rank", "width": 44, "sortable": False}
         player = {"headerName": "Player", "field": "player", "flex": 1,
                   "minWidth": 120, "sortable": True}
-        team = {"headerName": "Team", "field": "team", "width": 110, "sortable": True}
+        team = {"headerName": "Team", "field": "team", "width": 124,
+                "sortable": True, "cellRenderer": "TeamCell"}
         if tab == "Cards":
             return [rank, player, team, _num("🟨", "yellow", 50),
                     _num("🟥", "red", 50), _num("Ap", "apps", 50)]
         # Goals/Assists both rank on the single aggregated `value` field.
         return [rank, player, team, _num(tab, "value", 70), _num("Ap", "apps", 50)]
 
-    team = {"headerName": "Team", "field": "team", "flex": 1, "minWidth": 120,
-            "sortable": True}
+    team = {"headerName": "Team", "field": "team", "flex": 1, "minWidth": 130,
+            "sortable": True, "cellRenderer": "TeamCell"}
     if tab == "Attack & xG":
         return [team, _num("Goals", "goals", 60), _num("xG", "xg", 56),
                 _num("xA", "xa", 56), _num("BigCh", "big_chances", 64),

@@ -13,6 +13,7 @@ TEAM_ALIASES = {
     "dr congo": "congo dr",
     "cape verde": "cabo verde",
     "czech republic": "czechia",
+    "bosnia & herzegovina": "bosnia and herzegovina",
 }
 
 

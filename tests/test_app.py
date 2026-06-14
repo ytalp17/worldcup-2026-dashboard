@@ -248,6 +248,21 @@ def test_tournament_grid_payload_players_goals():
     assert isinstance(rows, list)
 
 
+def test_attach_team_flags_adds_flag_url_and_display_name():
+    import app
+    rows = app.attach_team_flags([
+        {"team": "Korea Republic", "goals": 2},
+        {"team": "Bosnia and Herzegovina", "goals": 1},
+    ])
+    # Flag filename uses the canonical name (matches country_logos/<canonical>.svg);
+    # the displayed team uses the friendly display name.
+    assert rows[0]["flag"].endswith("country_logos/Korea Republic.svg")
+    assert rows[0]["team"] == "South Korea"
+    assert rows[0]["goals"] == 2                       # other fields preserved
+    assert rows[1]["flag"].endswith("country_logos/Bosnia and Herzegovina.svg")
+    assert rows[1]["team"] == "Bosnia & Herzegovina"
+
+
 def test_app_layout_has_tournament_drawer():
     import app
     from dash_mantine_components import Drawer

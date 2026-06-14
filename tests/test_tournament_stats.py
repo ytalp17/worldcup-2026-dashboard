@@ -48,6 +48,16 @@ def test_player_cards_columns_split_yellow_red():
     assert [c["headerName"] for c in cols] == ["#", "Player", "Team", "🟨", "🟥", "Ap"]
 
 
+def test_team_column_uses_flag_cell_renderer_in_both_scopes():
+    # The Team column renders a country flag next to the name via TeamCell.
+    team_col = next(c for c in tourn_columns("Team", "Attack & xG")
+                    if c["headerName"] == "Team")
+    assert team_col["cellRenderer"] == "TeamCell"
+    player_team_col = next(c for c in tourn_columns("Players", "Goals")
+                           if c["headerName"] == "Team")
+    assert player_team_col["cellRenderer"] == "TeamCell"
+
+
 def test_team_attack_rows_passthrough():
     cols = tourn_columns("Team", "Attack & xG")
     assert cols[0]["headerName"] == "Team"

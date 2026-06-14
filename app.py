@@ -31,7 +31,7 @@ from src.components.tournament_stats import tab_options, tourn_columns, tourn_ro
 from src.components.live_match_modal import build_modal, modal_body
 from src.components.live_strip import overlay_style, strip_items
 from src.components.team_kpis import build_kpi_strip, kpi_cards
-from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, team_order
+from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, display_name, team_order
 from src.data.lineups import LineupRepository, lineup_for_team
 from src.data.squads import Squad, SquadRepository, squad_for_team
 from src.data.team_stats import compute_team_stats
@@ -45,7 +45,7 @@ from src.data.team_continents import (
     manager_nationality_for,
 )
 from src.data.live.client import HighlightlyClient
-from src.data.live.reconcile import build_stadium_index
+from src.data.live.reconcile import build_stadium_index, canonical_team
 from src.data.env_config import load_env_file
 from src.data.live.service import LiveDataService, next_delay
 from src.data.venues import VenueRepository
@@ -65,6 +65,9 @@ MATCHES_BY_STADIUM = matches_by_stadium(MATCHES)
 TEAM_FLOWS = build_team_flows(MATCHES, VENUES, distances=DISTANCES)
 TEAM_OPTIONS = grouped_team_options(sorted(TEAM_FLOWS))
 TEAM_NAMES = team_order(TEAM_FLOWS)
+# Canonical (normalized) team name -> official cased name, so a raw/aliased live
+# team name resolves to the country_logos/<official>.svg filename and display name.
+_NORM_TO_OFFICIAL = {canonical_team(t): t for t in TEAM_NAMES}
 GROUPS = build_groups(MATCHES)
 SQUADS = SquadRepository(DATA_DIR / "squads.csv").load()
 LINEUPS = LineupRepository(DATA_DIR / "estimated_starting_eleven.json").load()
@@ -134,12 +137,26 @@ def leaders_payload(stat, index):
     return leaders_row_data(leaders, stat), leaders_columns(stat), team
 
 
+def attach_team_flags(rows):
+    """Add a `flag` asset URL to each row and swap the raw API team name for its
+    display name, so the tournament grid's Team column can render the flag next
+    to the label (via the TeamCell cellRenderer). The flag filename uses the
+    canonical team name, matching assets/country_logos/<canonical>.svg."""
+    out = []
+    for r in rows:
+        raw = r.get("team", "")
+        official = _NORM_TO_OFFICIAL.get(canonical_team(raw), raw)
+        out.append({**r, "team": display_name(official),
+                    "flag": app.get_asset_url(f"country_logos/{official}.svg")})
+    return out
+
+
 def tournament_grid_payload(scope, tab, live):
     """(rowData, columnDefs) for the tournament grid. Empty rows when offline."""
     standings = (live or {}).get("standings") or {}
     tl = LIVE.tournament_team_leaders(standings) if LIVE is not None else {}
     pl = LIVE.tournament_player_leaders() if LIVE is not None else {}
-    rows = tourn_row_data(scope, tab, tl, pl)
+    rows = attach_team_flags(tourn_row_data(scope, tab, tl, pl))
     return rows, tourn_columns(scope, tab)
 
 
