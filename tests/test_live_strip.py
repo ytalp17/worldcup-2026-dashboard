@@ -41,3 +41,30 @@ def test_strip_items_one_per_match_with_match_id():
 def test_strip_items_empty_when_no_matches():
     assert strip_items({"matches": []}) == []
     assert strip_items(None) == []
+
+
+def _blob(live, **kw):
+    return str([it.to_plotly_json() for it in strip_items(live, **kw)])
+
+
+def test_strip_scheduled_shows_local_time_not_word():
+    live = {"matches": [{"match_id": 1, "home": "Brazil", "away": "Mexico",
+            "home_score": None, "away_score": None, "state": "scheduled",
+            "is_live": False, "kickoff": "2026-06-13T22:00:00+00:00"}]}
+    blob = _blob(live, user_tz="America/New_York")   # 22:00Z -> 18:00 NY
+    assert "18:00" in blob
+    assert "scheduled" not in blob.lower()
+
+
+def test_strip_live_keeps_live_badge():
+    live = {"matches": [{"match_id": 1, "home": "Brazil", "away": "Mexico",
+            "home_score": 1, "away_score": 0, "state": "live", "is_live": True,
+            "clock": 30, "kickoff": "2026-06-13T22:00:00+00:00"}]}
+    assert "LIVE" in _blob(live, user_tz="America/New_York").upper()
+
+
+def test_strip_finished_shows_ft():
+    live = {"matches": [{"match_id": 1, "home": "Brazil", "away": "Mexico",
+            "home_score": 2, "away_score": 1, "state": "finished",
+            "is_live": False, "kickoff": "2026-06-13T22:00:00+00:00"}]}
+    assert "FT" in _blob(live, user_tz="America/New_York")

@@ -227,12 +227,15 @@ def test_live_score_markers_one_per_live_venue():
     ]
     live = {"matches": [
         {"venue": "Dallas Stadium", "is_live": True, "home": "Brazil",
-         "away": "Mexico", "home_score": 2, "away_score": 1, "match_id": 42},
+         "away": "Mexico", "home_score": 2, "away_score": 1, "clock": 67,
+         "match_id": 42},
     ]}
     markers = live_score_markers(venues, live)
     assert len(markers) == 1  # only the live Dallas venue
-    # The score text appears somewhere in the rendered marker html.
-    assert "2-1" in str(markers[0].to_plotly_json())
+    blob = str(markers[0].to_plotly_json())
+    assert "2-1" in blob                       # score
+    assert "BRA" in blob and "MEX" in blob     # team abbreviations
+    assert "67" in blob                        # live minute
 
 
 def test_live_score_markers_empty_when_no_live():

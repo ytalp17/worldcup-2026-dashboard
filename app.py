@@ -339,11 +339,12 @@ def update_live_layer(live):
     Output("live-strip", "children"),
     Input("match-calendar", "value"),
     Input("live-store", "data"),
+    State("user-tz", "data"),
 )
-def render_live_strip(selected_date, live):
+def render_live_strip(selected_date, live, user_tz):
     fetch = (lambda d: LIVE.matches_on(d, time.monotonic())) if LIVE is not None else None
     matches = strip_day_matches(selected_date, date.today(), live, fetch)
-    return strip_items({"matches": matches})
+    return strip_items({"matches": matches}, user_tz=user_tz)
 
 
 @callback(

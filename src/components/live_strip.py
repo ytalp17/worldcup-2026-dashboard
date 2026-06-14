@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from datetime import datetime
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
 import dash_mantine_components as dmc
 from dash import html
 
@@ -22,13 +25,30 @@ def _score(m: dict) -> str:
     return f"{m['home_score']} - {m['away_score']}"
 
 
-def _badge(m: dict):
+def _local_time(iso_utc: str | None, user_tz: str | None) -> str | None:
+    """Format a UTC ISO kickoff as 'HH:MM' in the user's zone, or None."""
+    if not iso_utc or not user_tz:
+        return None
+    try:
+        when = datetime.fromisoformat(iso_utc.replace("Z", "+00:00"))
+        return when.astimezone(ZoneInfo(user_tz)).strftime("%H:%M")
+    except (ValueError, ZoneInfoNotFoundError):
+        return None
+
+
+def _badge(m: dict, user_tz: str | None = None):
     if m.get("is_live"):
         return dmc.Badge("LIVE", color="red", variant="filled", size="sm")
+    if m.get("state") == "finished":
+        return dmc.Badge("FT", color="gray", variant="light", size="sm")
+    # Scheduled / upcoming: show the kickoff in the viewer's local time.
+    local = _local_time(m.get("kickoff"), user_tz)
+    if local:
+        return dmc.Badge(local, color="gray", variant="light", size="sm")
     return dmc.Badge(m.get("state", ""), color="gray", variant="light", size="sm")
 
 
-def strip_items(live: dict | None) -> list:
+def strip_items(live: dict | None, user_tz: str | None = None) -> list:
     """One clickable item per match; the pattern-matching id carries match_id so
     the modal callback can open from a click. Empty list when no matches."""
     items = []
@@ -40,7 +60,7 @@ def strip_items(live: dict | None) -> list:
                 style={"cursor": "pointer"},
                 children=dmc.Paper(
                     dmc.Group(
-                        [_badge(m),
+                        [_badge(m, user_tz),
                          dmc.Text(f"{abbr(m['home'])} {_score(m)} {abbr(m['away'])}",
                                   size="sm", fw=600)],
                         gap="xs",
@@ -86,7 +106,7 @@ def build_live_strip(live: dict | None = None):
             id="live-strip",
             gap="sm",
             wrap="nowrap",
-            style={"overflowX": "auto", "maxWidth": "92vw"},
+            style={"overflowX": "auto", "maxWidth": "98vw"},
         ),
         id="live-strip-overlay",
         style=overlay_style(visible=True),

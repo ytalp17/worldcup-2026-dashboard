@@ -144,6 +144,7 @@ class LiveDataService:
             "home_score": m.home_score,
             "away_score": m.away_score,
             "is_live": m.is_live,
+            "kickoff": m.kickoff.isoformat() if m.kickoff else None,
         }
 
 

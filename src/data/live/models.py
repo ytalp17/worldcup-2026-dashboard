@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 
 _HALF_TIME = {"halftime", "half time", "ht", "break"}
@@ -48,6 +49,7 @@ class LiveMatch:
     clock: int | None
     home_score: int | None
     away_score: int | None
+    kickoff: datetime | None = None  # scheduled kickoff (UTC), when known
 
     @property
     def is_live(self) -> bool:
@@ -73,6 +75,16 @@ class Standing:
     points: int
 
 
+def _parse_kickoff(raw: dict) -> datetime | None:
+    value = raw.get("date")
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
 def parse_match(raw: dict) -> LiveMatch:
     state = raw.get("state") or {}
     score = (state.get("score") or {}).get("current")
@@ -85,6 +97,7 @@ def parse_match(raw: dict) -> LiveMatch:
         clock=state.get("clock"),
         home_score=home_score,
         away_score=away_score,
+        kickoff=_parse_kickoff(raw),
     )
 
 

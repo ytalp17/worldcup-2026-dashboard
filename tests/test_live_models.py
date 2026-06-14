@@ -327,3 +327,19 @@ class TestParseLineupsFromFixture:
         result = parse_lineups({})
         assert result["home"] == {"formation": "", "starters": [], "subs": []}
         assert result["away"] == {"formation": "", "starters": [], "subs": []}
+
+
+def test_parse_match_reads_kickoff_utc():
+    from src.data.live.models import parse_match
+    raw = {"id": 5, "homeTeam": {"name": "Brazil"}, "awayTeam": {"name": "Mexico"},
+           "date": "2026-06-13T22:00:00.000Z", "state": {}}
+    m = parse_match(raw)
+    assert m.kickoff is not None and m.kickoff.tzinfo is not None
+    assert m.kickoff.hour == 22
+
+
+def test_parse_match_kickoff_none_when_missing():
+    from src.data.live.models import parse_match
+    m = parse_match({"id": 5, "homeTeam": {"name": "A"},
+                     "awayTeam": {"name": "B"}, "state": {}})
+    assert m.kickoff is None

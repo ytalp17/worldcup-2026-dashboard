@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dash_leaflet as dl
 
+from src.components.live_strip import abbr
 from src.data.venues import Venue
 
 # Themed base tiles (keyless CartoDB). The app swaps the TileLayer url between
@@ -110,15 +111,18 @@ def live_match_for_venue(stadium_name: str, live: dict | None) -> dict | None:
 
 
 def _live_badge_html(match: dict) -> str:
-    home, away = match.get("home_score"), match.get("away_score")
-    score = f"{home}-{away}" if home is not None else "LIVE"
+    home_s, away_s = match.get("home_score"), match.get("away_score")
+    score = f"{home_s}-{away_s}" if home_s is not None else "vs"
+    pair = f"{abbr(match.get('home', ''))} {score} {abbr(match.get('away', ''))}"
+    clock = match.get("clock")
+    minute = f"&nbsp;{clock}'" if clock is not None else ""
     # Inline-styled so no extra CSS file is needed; non-interactive overlay.
     return (
         '<div style="display:flex;align-items:center;gap:3px;'
         'background:#e03131;color:#fff;font:700 10px/1 sans-serif;'
-        'padding:2px 5px;border-radius:7px;white-space:nowrap;'
+        'padding:2px 6px;border-radius:7px;white-space:nowrap;'
         'box-shadow:0 1px 3px rgba(0,0,0,.4);">'
-        f'<span style="font-size:8px;">●</span>{score}</div>'
+        f'<span style="font-size:8px;">●</span>{pair}{minute}</div>'
     )
 
 
@@ -139,7 +143,7 @@ def live_score_markers(venues, live: dict | None) -> list:
                     "html": _live_badge_html(match),
                     "className": "venue-live-badge-icon",
                     # Offset the badge up-right of the dot so both are visible.
-                    "iconSize": [44, 16],
+                    "iconSize": [104, 16],
                     "iconAnchor": [-6, 24],
                 },
             )
