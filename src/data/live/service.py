@@ -7,7 +7,7 @@ from pathlib import Path
 from src.data.live import models, player_store
 from src.data.live import team_stats_store
 from src.data.live.player_stats import parse_player_stats
-from src.data.live.team_match_stats import parse_team_match_stats
+from src.data.live.team_match_stats import STAT_KEYS, parse_team_match_stats
 from src.data.live.reconcile import canonical_team, find_stadium, normalize
 
 logger = logging.getLogger(__name__)
@@ -244,6 +244,131 @@ class LiveDataService:
                             lambda g: (g["yellow"] + g["red"]) > 0,
                             lambda g: {"yellow": g["yellow"], "red": g["red"]}),
         }
+
+    def tournament_player_leaders(self) -> dict:
+        """Player leaders across the whole tournament (every team). Same grouping
+        as team_leaders but unscoped, with a Team column. {} when no store."""
+        if self._player_store is None:
+            return {}
+        by_match = player_store.load(self._player_store)
+        groups: dict = {}
+        for rows in by_match.values():
+            for r in rows:
+                key = r.player_id if r.player_id else (canonical_team(r.team), normalize(r.player))
+                g = groups.get(key)
+                if g is None:
+                    g = {"player": r.player, "team": r.team, "goals": 0, "assists": 0,
+                         "yellow": 0, "red": 0, "matches": set()}
+                    groups[key] = g
+                if len(r.player) > len(g["player"]):
+                    g["player"] = r.player
+                g["goals"] += r.goals
+                g["assists"] += r.assists
+                g["yellow"] += r.yellow
+                g["red"] += r.red
+                g["matches"].add(r.match_id)
+
+        def ranked(value_fn, keep_fn, extra_fn=None):
+            out = []
+            for g in groups.values():
+                if not keep_fn(g):
+                    continue
+                row = {"player": g["player"], "team": g["team"],
+                       "value": value_fn(g), "apps": len(g["matches"])}
+                if extra_fn is not None:
+                    row.update(extra_fn(g))
+                out.append(row)
+            out.sort(key=lambda d: (-d["value"], d["player"]))
+            return out
+
+        return {
+            "goals": ranked(lambda g: g["goals"], lambda g: g["goals"] > 0),
+            "assists": ranked(lambda g: g["assists"], lambda g: g["assists"] > 0),
+            "cards": ranked(lambda g: g["yellow"] + g["red"],
+                            lambda g: (g["yellow"] + g["red"]) > 0,
+                            lambda g: {"yellow": g["yellow"], "red": g["red"]}),
+        }
+
+    def tournament_team_leaders(self, standings=None) -> dict:
+        """Team leaders across the tournament: per-team sums of counting stats,
+        mean possession, recomputed shot/pass accuracy, and goals from standings.
+        Returns {"attack"|"possession"|"defense"|"discipline": [row, ...]}.
+        {} when no team store."""
+        if self._team_store is None:
+            return {}
+        by_match = team_stats_store.load(self._team_store)
+        agg: dict = {}
+        for rows in by_match.values():
+            for r in rows:
+                key = canonical_team(r.team)
+                a = agg.get(key)
+                if a is None:
+                    a = {"team": r.team, "sums": {k: 0.0 for k in STAT_KEYS},
+                         "poss": [], "matches": 0}
+                    agg[key] = a
+                for k in STAT_KEYS:
+                    a["sums"][k] += r.stats.get(k, 0.0)
+                a["poss"].append(r.stats.get("possession", 0.0))
+                a["matches"] += 1
+
+        # Goals from standings (canonical team -> goals_for).
+        gf = {}
+        for table in (standings or {}).values():
+            for s in table:
+                gf[canonical_team(s["team"])] = s.get("goals_for", 0)
+
+        def _i(x):
+            return int(round(x))
+
+        def _pct(num, den):
+            return round(num / den * 100, 1) if den else 0.0
+
+        attack, possession, defense, discipline = [], [], [], []
+        for key, a in agg.items():
+            s = a["sums"]
+            apps = a["matches"]
+            shots = s["shots_on"] + s["shots_off"] + s["shots_blocked"]
+            attack.append({
+                "team": a["team"], "goals": gf.get(key, 0),
+                "xg": round(s["xg"], 2), "xa": round(s["xa"], 2),
+                "big_chances": _i(s["big_chances"]), "shots": _i(shots),
+                "shots_on": _i(s["shots_on"]), "shots_off": _i(s["shots_off"]),
+                "shot_acc": _pct(s["shots_on"], shots),
+                "shots_in_box": _i(s["shots_in_box"]),
+                "shots_blocked": _i(s["shots_blocked"]),
+                "corners": _i(s["corners"]), "apps": apps,
+            })
+            possession.append({
+                "team": a["team"],
+                "possession": round(sum(a["poss"]) / apps * 100, 1) if apps else 0.0,
+                "passes_total": _i(s["passes_total"]),
+                "pass_acc": _pct(s["passes_succ"], s["passes_total"]),
+                "key_passes": _i(s["key_passes"]),
+                "passes_final_third": _i(s["passes_final_third"]),
+                "long_passes": _i(s["long_passes"]),
+                "crosses": _i(s["crosses"]), "crosses_succ": _i(s["crosses_succ"]),
+                "dribbles": _i(s["dribbles"]), "dribbles_succ": _i(s["dribbles_succ"]),
+                "apps": apps,
+            })
+            defense.append({
+                "team": a["team"], "tackles": _i(s["tackles"]),
+                "tackles_succ": _i(s["tackles_succ"]),
+                "interceptions": _i(s["interceptions"]),
+                "clearances": _i(s["clearances"]), "aerials": _i(s["aerials"]),
+                "aerials_won": _i(s["aerials_won"]), "gk_saves": _i(s["gk_saves"]),
+                "apps": apps,
+            })
+            discipline.append({
+                "team": a["team"], "yellow": _i(s["yellow"]), "red": _i(s["red"]),
+                "fouls": _i(s["fouls"]), "offsides": _i(s["offsides"]), "apps": apps,
+            })
+
+        attack.sort(key=lambda r: (-r["goals"], -r["xg"], r["team"]))
+        possession.sort(key=lambda r: (-r["possession"], r["team"]))
+        defense.sort(key=lambda r: (-r["tackles_succ"], r["team"]))
+        discipline.sort(key=lambda r: (-r["yellow"], -r["red"], r["team"]))
+        return {"attack": attack, "possession": possession,
+                "defense": defense, "discipline": discipline}
 
     def _match_dict(self, m: models.LiveMatch) -> dict:
         return {

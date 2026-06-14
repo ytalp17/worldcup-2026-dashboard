@@ -404,3 +404,77 @@ def test_update_team_stats_overwrites_live(tmp_path):
 def test_update_team_stats_noop_without_store():
     svc = LiveDataService(_TeamStatsClient(), _index())   # no team_store
     svc.update_team_stats([{"match_id": 1, "state": "finished"}], now=0.0)  # no crash
+
+
+# ---------------------------------------------------------------------------
+# tournament_player_leaders / tournament_team_leaders
+# ---------------------------------------------------------------------------
+
+from src.data.live.player_stats import PlayerMatchStat  # noqa: E402
+from src.data.live.team_match_stats import TeamMatchStat, STAT_KEYS  # noqa: E402
+
+
+def _pstat(mid, team, player, pid, goals=0, assists=0, yellow=0, red=0):
+    return PlayerMatchStat(match_id=mid, team=team, player=player, player_id=pid,
+                           goals=goals, assists=assists, yellow=yellow, red=red)
+
+
+def _tstat(mid, team, **ov):
+    stats = {k: 0.0 for k in STAT_KEYS}
+    stats.update(ov)
+    return TeamMatchStat(match_id=mid, team=team, stats=stats)
+
+
+def test_tournament_player_leaders_aggregates_all_teams(tmp_path):
+    path = tmp_path / "ps.csv"
+    player_store.upsert(path, 1, "finished",
+                        [_pstat(1, "USA", "F. Balogun", 100, goals=2, yellow=1),
+                         _pstat(1, "Brazil", "Vinicius", 200, goals=1, assists=1)])
+    player_store.upsert(path, 2, "finished",
+                        [_pstat(2, "USA", "F. Balogun", 100, goals=1)])
+    svc = LiveDataService(_FakeClient(), _index(), player_store=path)
+    L = svc.tournament_player_leaders()
+    goals = L["goals"]
+    assert goals[0]["player"] == "F. Balogun"
+    assert goals[0]["team"] == "USA"
+    assert goals[0]["value"] == 3        # 2 + 1 across two matches
+    assert goals[0]["apps"] == 2
+    cards = L["cards"][0]
+    assert cards["yellow"] == 1 and cards["red"] == 0
+
+
+def test_tournament_player_leaders_empty_without_store():
+    svc = LiveDataService(_FakeClient(), _index())
+    assert svc.tournament_player_leaders() == {}
+
+
+def test_tournament_team_leaders_sums_avgs_and_ratios(tmp_path):
+    path = tmp_path / "ts.csv"
+    team_stats_store.upsert(path, 1, "finished",
+                            [_tstat(1, "USA", xg=1.5, shots_on=4, shots_off=6,
+                                    passes_total=400, passes_succ=300, possession=0.6,
+                                    yellow=1)])
+    team_stats_store.upsert(path, 2, "finished",
+                            [_tstat(2, "USA", xg=0.5, shots_on=2, shots_off=4,
+                                    passes_total=600, passes_succ=480, possession=0.5,
+                                    yellow=2)])
+    svc = LiveDataService(_FakeClient(), _index(), team_store=path)
+    standings = {"Group A": [{"team": "USA", "goals_for": 5, "goals_against": 2,
+                              "goal_diff": 3, "points": 6, "played": 2,
+                              "won": 2, "drawn": 0, "lost": 0}]}
+    T = svc.tournament_team_leaders(standings)
+    atk = next(r for r in T["attack"] if r["team"] == "USA")
+    assert atk["xg"] == 2.0                 # summed
+    assert atk["shots"] == 16               # (4+6)+(2+4)
+    assert atk["goals"] == 5                # from standings GF
+    assert atk["apps"] == 2
+    poss = next(r for r in T["possession"] if r["team"] == "USA")
+    assert poss["possession"] == 55.0       # mean(0.6,0.5)*100
+    assert poss["pass_acc"] == 78.0         # 780/1000 *100
+    disc = next(r for r in T["discipline"] if r["team"] == "USA")
+    assert disc["yellow"] == 3
+
+
+def test_tournament_team_leaders_empty_without_store():
+    svc = LiveDataService(_FakeClient(), _index())
+    assert svc.tournament_team_leaders() == {}
