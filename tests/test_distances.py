@@ -28,21 +28,17 @@ def test_non_numeric_distance_raises(tmp_path):
 from pathlib import Path
 
 from src.data.flows import build_team_flows, path_distance_km
-from src.data.host_cities import HostCityRepository
 from src.data.matches import MatchRepository
-from src.data.stadiums import StadiumRepository
-from src.data.venues import build_venues
+from src.data.venues import VenueRepository
 
 DATA = Path(__file__).parent.parent / "assets" / "data"
 IMAGE_DIR = DATA.parent / "stadiums"
-CSV_PATH = DATA / "team_distances.csv"
+CSV_PATH = DATA / "teams.csv"
 
 
 def test_csv_matches_recomputed_distances():
-    cities = HostCityRepository(DATA / "fifa_2026_host_cities.csv").load()
-    stadiums = StadiumRepository(DATA / "fifa_wc2026_stadiums.csv").load()
-    venues = build_venues(cities, stadiums, IMAGE_DIR)
-    matches = MatchRepository(DATA / "wc2026_matches.csv").load()
+    venues = VenueRepository(DATA / "venues.csv", IMAGE_DIR).load()
+    matches = MatchRepository(DATA / "matches.csv").load()
     flows = build_team_flows(matches, venues)
 
     on_disk = DistanceRepository(CSV_PATH).load()

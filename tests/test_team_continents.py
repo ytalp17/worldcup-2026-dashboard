@@ -5,7 +5,9 @@ import pytest
 
 from src.data.team_continents import (
     CONTINENT_ORDER,
+    TEAM_CODE,
     TEAM_CONTINENT,
+    code_for,
     continent_for,
     grouped_team_options,
 )
@@ -20,9 +22,9 @@ def _group_stage_teams():
 
 
 def test_mapping_is_sourced_from_csv():
-    csv_path = Path(__file__).parent.parent / "assets" / "data" / "team_continents.csv"
+    csv_path = Path(__file__).parent.parent / "assets" / "data" / "teams.csv"
     df = pd.read_csv(csv_path)
-    assert set(df.columns) >= {"team", "continent"}
+    assert {"team", "continent", "code"} <= set(df.columns)
     from_csv = {str(r["team"]): str(r["continent"]) for _, r in df.iterrows()}
     assert TEAM_CONTINENT == from_csv
 
@@ -51,3 +53,16 @@ def test_grouped_options_shape_and_order():
     assert groups == [c for c in CONTINENT_ORDER if c in groups]
     sa = next(g for g in options if g["group"] == "South America")
     assert sa["items"] == [{"value": "Brazil", "label": "Brazil"}]
+
+
+def test_code_for_known_and_unknown():
+    assert code_for("Korea Republic") == "KOR"
+    assert code_for("USA") == "USA"
+    assert code_for("Côte d'Ivoire") == "CIV"
+    with pytest.raises(ValueError):
+        code_for("Atlantis")
+
+
+def test_team_code_map_covers_all_teams():
+    assert len(TEAM_CODE) == 48
+    assert all(len(c) == 3 for c in TEAM_CODE.values())
