@@ -272,7 +272,6 @@ class _StatsClient(_FakeClient):
     def __init__(self):
         super().__init__()
         self.event_calls = {}
-        self.detail_calls = {}
 
     def events(self, match_id):
         self.event_calls[match_id] = self.event_calls.get(match_id, 0) + 1
@@ -282,14 +281,6 @@ class _StatsClient(_FakeClient):
             {"team": {"name": "USA"}, "type": "Yellow Card", "player": "T. Adams",
              "playerId": 300},
         ]
-
-    def match(self, match_id):
-        self.detail_calls[match_id] = self.detail_calls.get(match_id, 0) + 1
-        return [{"id": match_id,
-                 "homeTeam": {"name": "USA", "topPlayers": [
-                     {"name": "Folarin Balogun",
-                      "statistics": [{"name": "Rating", "value": 8.0}]}]},
-                 "awayTeam": {"name": "Paraguay", "topPlayers": []}}]
 
 
 def test_update_player_stats_fetches_and_stores_finished(tmp_path):
@@ -340,8 +331,11 @@ def test_team_leaders_groups_and_ranks(tmp_path):
     assert goals[0]["value"] == 2          # one goal in each of two matches
     assert goals[0]["apps"] == 2
     assert leaders["assists"][0]["value"] == 2     # C. Pulisic, two assists
-    assert leaders["cards"][0]["value"] == 2       # T. Adams, two yellows
-    assert leaders["rating"][0]["value"] == 8.0    # avg of 8.0 and 8.0
+    cards = leaders["cards"][0]
+    assert cards["value"] == 2                     # T. Adams, total cards
+    assert cards["yellow"] == 2                     # two yellows across two matches
+    assert cards["red"] == 0
+    assert "rating" not in leaders                  # API exposes no per-player rating
 
 
 def test_team_leaders_empty_without_store():

@@ -227,7 +227,7 @@ def test_leaders_payload_columns_and_team():
     assert isinstance(rows, list)   # empty in no-key test env, but well-formed
 
 
-def test_leaders_payload_rating_tab_header():
+def test_leaders_payload_cards_tab_splits_yellow_red():
     import app
-    _rows, cols, _team = app.leaders_payload("Rating", 3)
-    assert cols[2]["headerName"] == "Rating"
+    _rows, cols, _team = app.leaders_payload("Cards", 3)
+    assert [c["headerName"] for c in cols] == ["#", "Player", "🟨", "🟥", "Apps"]

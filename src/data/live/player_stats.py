@@ -20,7 +20,6 @@ class PlayerMatchStat:
     assists: int
     yellow: int
     red: int
-    rating: float | None
 
 
 def _team_name(raw) -> str:
@@ -30,11 +29,12 @@ def _team_name(raw) -> str:
     return str(team or "")
 
 
-def parse_player_stats(match_id: int, events, detail) -> list[PlayerMatchStat]:
-    """One row per player who appears in events or topPlayers for this match.
+def parse_player_stats(match_id: int, events) -> list[PlayerMatchStat]:
+    """One row per player who appears in this match's events.
 
-    Events drive goals/assists/cards (keyed by playerId when present, else
-    normalized name). topPlayers (no id) supply rating, keyed by normalized name.
+    Events drive goals/assists/cards, keyed by playerId when present, else
+    normalized name. (The API exposes no per-player rating, so there is no
+    topPlayers/detail source here — events are the only per-player data.)
     """
     agg: dict = {}
 
@@ -43,7 +43,7 @@ def parse_player_stats(match_id: int, events, detail) -> list[PlayerMatchStat]:
         cur = agg.get(key)
         if cur is None:
             cur = {"team": team, "player": player, "player_id": pid,
-                   "goals": 0, "assists": 0, "yellow": 0, "red": 0, "rating": None}
+                   "goals": 0, "assists": 0, "yellow": 0, "red": 0}
             agg[key] = cur
         return cur
 
@@ -63,18 +63,5 @@ def parse_player_stats(match_id: int, events, detail) -> list[PlayerMatchStat]:
             slot(team, player, pid)["red"] += 1
         elif etype == "Own Goal":
             slot(team, player, pid)   # scorer row exists but is NOT credited a goal
-
-    for side in ("homeTeam", "awayTeam"):
-        td = (detail or {}).get(side) or {}
-        tname = td.get("name", "")
-        for tp in (td.get("topPlayers") or []):
-            stats = {s.get("name"): s.get("value") for s in (tp.get("statistics") or [])}
-            rating = stats.get("Rating")
-            cur = slot(tname, tp.get("name", ""), None)
-            if rating is not None:
-                try:
-                    cur["rating"] = float(rating)
-                except (TypeError, ValueError):
-                    cur["rating"] = None
 
     return [PlayerMatchStat(match_id=match_id, **v) for v in agg.values()]

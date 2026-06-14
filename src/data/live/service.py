@@ -142,7 +142,7 @@ class LiveDataService:
         """Refresh the player-stats cache from today's matches.
 
         Finished & already stored -> skip (no fetch). Finished & new, or live ->
-        fetch events + detail once and overwrite that match's rows. Each match is
+        fetch events once and overwrite that match's rows. Each match is
         independent: a failure is logged and skipped, leaving the cache intact.
         """
         if self._player_store is None:
@@ -160,10 +160,7 @@ class LiveDataService:
             if not (finished or state in live_states):
                 continue
             try:
-                events = self._client.events(mid)
-                detail = self._client.match(mid)
-                detail_obj = detail[0] if isinstance(detail, list) and detail else detail
-                rows = parse_player_stats(mid, events, detail_obj)
+                rows = parse_player_stats(mid, self._client.events(mid))
                 player_store.upsert(self._player_store, mid, state, rows)
             except Exception:
                 logger.exception("player stats update failed for match %s", mid)
@@ -171,9 +168,10 @@ class LiveDataService:
     def team_leaders(self, team: str) -> dict:
         """Per-stat ranked leader rows for `team` aggregated across its matches.
 
-        Returns {"goals"|"assists"|"cards"|"rating": [{player, value, apps}, ...]}.
+        Returns {"goals"|"assists"|"cards": [{player, value, apps, ...}, ...]}.
         Players are grouped by playerId when present, else normalized name. Each
         list is filtered to players with a value for that stat and sorted desc.
+        The "cards" rows also carry yellow/red breakdown alongside the total.
         """
         if self._player_store is None:
             return {}
@@ -188,7 +186,7 @@ class LiveDataService:
                 g = groups.get(key)
                 if g is None:
                     g = {"player": r.player, "goals": 0, "assists": 0,
-                         "yellow": 0, "red": 0, "ratings": [], "matches": set()}
+                         "yellow": 0, "red": 0, "matches": set()}
                     groups[key] = g
                 if len(r.player) > len(g["player"]):
                     g["player"] = r.player        # prefer the fuller name
@@ -196,13 +194,18 @@ class LiveDataService:
                 g["assists"] += r.assists
                 g["yellow"] += r.yellow
                 g["red"] += r.red
-                if r.rating is not None:
-                    g["ratings"].append(r.rating)
                 g["matches"].add(r.match_id)
 
-        def ranked(value_fn, keep_fn):
-            out = [{"player": g["player"], "value": value_fn(g), "apps": len(g["matches"])}
-                   for g in groups.values() if keep_fn(g)]
+        def ranked(value_fn, keep_fn, extra_fn=None):
+            out = []
+            for g in groups.values():
+                if not keep_fn(g):
+                    continue
+                row = {"player": g["player"], "value": value_fn(g),
+                       "apps": len(g["matches"])}
+                if extra_fn is not None:
+                    row.update(extra_fn(g))
+                out.append(row)
             out.sort(key=lambda d: (-d["value"], d["player"]))
             return out
 
@@ -210,9 +213,8 @@ class LiveDataService:
             "goals": ranked(lambda g: g["goals"], lambda g: g["goals"] > 0),
             "assists": ranked(lambda g: g["assists"], lambda g: g["assists"] > 0),
             "cards": ranked(lambda g: g["yellow"] + g["red"],
-                            lambda g: (g["yellow"] + g["red"]) > 0),
-            "rating": ranked(lambda g: round(sum(g["ratings"]) / len(g["ratings"]), 2),
-                             lambda g: len(g["ratings"]) > 0),
+                            lambda g: (g["yellow"] + g["red"]) > 0,
+                            lambda g: {"yellow": g["yellow"], "red": g["red"]}),
         }
 
     def _match_dict(self, m: models.LiveMatch) -> dict:

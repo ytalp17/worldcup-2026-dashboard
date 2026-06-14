@@ -17,13 +17,6 @@ EVENTS = [
     {"team": {"name": "USA"}, "type": "Red Card", "player": "T. Adams",
      "playerId": 999, "assist": None, "assistingPlayerId": None},
 ]
-DETAIL = {
-    "homeTeam": {"name": "USA", "topPlayers": [
-        {"name": "Folarin Balogun", "statistics": [
-            {"name": "Goals", "value": 2}, {"name": "Rating", "value": 8.4}]},
-    ]},
-    "awayTeam": {"name": "Paraguay", "topPlayers": []},
-}
 
 
 def _by_player(rows):
@@ -31,7 +24,7 @@ def _by_player(rows):
 
 
 def test_goals_count_excludes_own_goal_and_cancelled():
-    rows = parse_player_stats(7, EVENTS, DETAIL)
+    rows = parse_player_stats(7, EVENTS)
     balogun = next(r for r in rows if r.player_id == 22352589)
     assert balogun.goals == 2          # two Goal events; VAR-cancelled not counted
     bob = next(r for r in rows if r.player_id == 31412381)
@@ -39,34 +32,25 @@ def test_goals_count_excludes_own_goal_and_cancelled():
 
 
 def test_assists_tallied_to_assisting_player():
-    rows = parse_player_stats(7, EVENTS, DETAIL)
+    rows = parse_player_stats(7, EVENTS)
     by_id = {r.player_id: r for r in rows}
     assert by_id[2891].assists == 1            # C. Pulisic
     assert by_id[26088111].assists == 1        # M. Tillman
 
 
 def test_cards_tallied():
-    rows = parse_player_stats(7, EVENTS, DETAIL)
+    rows = parse_player_stats(7, EVENTS)
     by_id = {r.player_id: r for r in rows}
     assert by_id[31554866].yellow == 1
     assert by_id[999].red == 1
 
 
-def test_rating_from_top_players():
-    rows = parse_player_stats(7, EVENTS, DETAIL)
-    rated = [r for r in rows if r.rating is not None]
-    assert len(rated) == 1
-    assert rated[0].player == "Folarin Balogun"
-    assert rated[0].rating == 8.4
-    assert rated[0].team == "USA"
-
-
 def test_returns_player_match_stat_with_match_id():
-    rows = parse_player_stats(7, EVENTS, DETAIL)
+    rows = parse_player_stats(7, EVENTS)
     assert rows and all(isinstance(r, PlayerMatchStat) for r in rows)
     assert all(r.match_id == 7 for r in rows)
 
 
 def test_handles_empty_inputs():
-    assert parse_player_stats(7, [], {}) == []
-    assert parse_player_stats(7, None, None) == []
+    assert parse_player_stats(7, []) == []
+    assert parse_player_stats(7, None) == []

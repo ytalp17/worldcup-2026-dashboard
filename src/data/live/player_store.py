@@ -9,7 +9,7 @@ from src.data.live.player_stats import PlayerMatchStat
 # A gitignored cache of per-match player stats. `state` records the match state
 # at write time so the updater can skip finished matches already on disk.
 FIELDS = ["match_id", "team", "player", "player_id",
-          "goals", "assists", "yellow", "red", "rating", "state"]
+          "goals", "assists", "yellow", "red", "state"]
 
 
 def load(path) -> dict[int, list[PlayerMatchStat]]:
@@ -30,7 +30,6 @@ def load(path) -> dict[int, list[PlayerMatchStat]]:
                 assists=int(row["assists"]),
                 yellow=int(row["yellow"]),
                 red=int(row["red"]),
-                rating=float(row["rating"]) if row["rating"] else None,
             ))
     return out
 
@@ -67,7 +66,6 @@ def upsert(path, match_id: int, state: str, rows) -> None:
                 "player_id": s.player_id if s.player_id is not None else "",
                 "goals": s.goals, "assists": s.assists,
                 "yellow": s.yellow, "red": s.red,
-                "rating": s.rating if s.rating is not None else "",
                 "state": state,
             })
     os.replace(tmp, p)
