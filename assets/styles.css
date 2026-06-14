@@ -356,7 +356,7 @@ body,
     margin-top: -2px;
 }
 
-/* --- Leaders card (placeholder until matches start) --- */
+/* --- Leaders card (player-leaders grid per statistic) --- */
 .leaders-panel {
     display: flex;
     flex-direction: column;
@@ -374,14 +374,25 @@ body,
     overflow: hidden;
 }
 
-.leaders-empty {
+.leaders-grid {
     flex: 1 1 auto;
-    min-height: 0;
+    min-height: 0;      /* allow the flex child to shrink so the grid scrolls */
+    --ag-background-color: transparent;
+    --ag-odd-row-background-color: transparent;
+    --ag-header-background-color: transparent;
+    --ag-borders: none;
+    --ag-row-border-width: 0;
+    --ag-font-size: 13px;
 }
 
-.leaders-empty__icon {
+.leaders-grid .ag-cell,
+.leaders-grid .ag-header-cell {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
+.leaders-grid__rank {
     color: var(--mantine-color-dimmed);
-    opacity: 0.7;
 }
 
 /* --- group standings table (lives in the table card) --- */
