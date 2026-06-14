@@ -34,7 +34,8 @@ Columns:
 ```
 city, country, official_name, stadium_name, location, capacity, opened,
 info, image_filename, image_url, latitude, longitude,
-altitude_m, altitude_ft, altitude_tier, region_cluster, airport_code
+altitude_m, altitude_ft, altitude_tier, region_cluster, airport_code,
+timezone, tz_label
 ```
 - `city` canonical form = `San Francisco`, `New York/New Jersey` (the form the app
   already uses for timezone + altitude lookup). `host_cities.csv`'s
@@ -42,6 +43,9 @@ altitude_m, altitude_ft, altitude_tier, region_cluster, airport_code
 - `stadium_name` = WC2026-generic name ("Mexico City Stadium"), the **match-join key**
   (matches in `matches.csv` reference this). Unchanged.
 - `official_name` = common stadium name ("Estadio Azteca").
+- `timezone` (IANA, e.g. `America/Chicago`) + `tz_label` (e.g. `Central Time`) absorb
+  the hardcoded `CITY_TIMEZONES` dict from `src/data/timezones.py` — pure per-venue
+  data that should live in the CSV, not in code. `timezones.py` is then **deleted**.
 - `image_url`, `altitude_ft`, `altitude_tier`, `region_cluster`, `airport_code` are
   currently unused but **preserved** so no information is lost.
 
@@ -86,8 +90,9 @@ Rename of `world_cup_2026_squads.csv`. Content unchanged.
 ### New / changed
 - **`src/data/venues.py`**: add `VenueRepository(csv_path, image_dir).load() -> list[Venue]`
   that reads `venues.csv` directly (no fuzzy substring join). `Venue` keeps all current
-  fields; gains optional `region_cluster: str | None`, `airport_code: str | None`.
-  `timezone_for(city)` + `has_image` logic preserved. Remove `build_venues`.
+  fields including `timezone`/`tz_label` (now read straight from the CSV); gains optional
+  `region_cluster: str | None`, `airport_code: str | None`. `has_image` logic preserved.
+  Remove `build_venues`.
 - **`src/data/team_continents.py`**: load `teams.csv`; keep `TEAM_CONTINENT`,
   `continent_for`, `grouped_team_options`, `CONTINENT_ORDER`. Add `TEAM_CODE: dict[str,str]`
   and `code_for(team) -> str`.
@@ -98,7 +103,16 @@ Rename of `world_cup_2026_squads.csv`. Content unchanged.
 - `src/data/host_cities.py` (`HostCity`, `HostCityRepository`)
 - `src/data/stadiums.py` (`Stadium`, `StadiumRepository`)
 - `src/data/altitudes.py` (`AltitudeRepository`)
+- `src/data/timezones.py` (`CITY_TIMEZONES`, `timezone_for`) — data folded into `venues.csv`
 - `build_venues` in `venues.py`
+
+### Static maps deliberately KEPT (not CSV duplication)
+These are translation / presentation logic, not restated CSV data, so they stay:
+- `src/data/squads.py::_CANONICAL` and `src/data/lineups.py::_SLUG_TO_CANONICAL` —
+  reconcile inconsistent team spellings/slugs from heterogeneous sources onto the
+  app-canonical names (e.g. squad CSV `Cape Verde` → `Cabo Verde`).
+- `src/data/live/reconcile.py::TEAM_ALIASES` — maps live-API team names to canonical.
+- `src/data/team_continents.py::CONTINENT_ORDER` — fixed UI sort order, not data.
 
 ### app.py wiring
 Replace lines 46-50:
@@ -135,16 +149,16 @@ squads.csv ─► SquadRepository ─► SQUADS
 ## Testing (TDD, per CLAUDE.md)
 - **New** `tests/test_venues.py`: `VenueRepository.load()` returns 16 venues; each row
   has matching `official_name`/`stadium_name`; altitude attached; lat/lon range-validated
-  (raises on out-of-range); `has_image` reflects file presence; `airport_code`/
-  `region_cluster` populated.
+  (raises on out-of-range); `has_image` reflects file presence; `timezone`/`tz_label`,
+  `airport_code`/`region_cluster` populated.
 - **Update** `tests/test_team_continents.py`: load from `teams.csv`; add `code_for`
   (`Korea Republic`→`KOR`) + missing-team raises.
 - **Update** `tests/test_distances.py`: read `teams.csv`.
 - **Update** `tests/test_matches.py`, `tests/test_squads.py`, `tests/test_flows.py`,
   `tests/test_match_calendar.py`, `tests/test_live_reconcile.py`: repoint CSV paths.
 - **Delete** `tests/test_host_cities.py`, `tests/test_stadiums.py`,
-  `tests/test_altitudes.py` — their loaders are gone; join/validation coverage moves
-  into `test_venues.py`.
+  `tests/test_altitudes.py`, `tests/test_timezones.py` — their loaders are gone;
+  join/validation/timezone coverage moves into `test_venues.py`.
 - Full suite green and offline (no-key mode unaffected).
 
 ## Out of scope (YAGNI)
