@@ -5,7 +5,9 @@ import logging
 from pathlib import Path
 
 from src.data.live import models, player_store
+from src.data.live import team_stats_store
 from src.data.live.player_stats import parse_player_stats
+from src.data.live.team_match_stats import parse_team_match_stats
 from src.data.live.reconcile import canonical_team, find_stadium, normalize
 
 logger = logging.getLogger(__name__)
@@ -29,12 +31,13 @@ class LiveDataService:
     """
 
     def __init__(self, client, stadium_index, league_id=LEAGUE_ID, season=SEASON,
-                 player_store=None):
+                 player_store=None, team_store=None):
         self._client = client
         self._stadium_index = stadium_index
         self._league_id = league_id
         self._season = season
         self._player_store = Path(player_store) if player_store else None
+        self._team_store = Path(team_store) if team_store else None
         self._cache: dict[str, tuple[float, object]] = {}
         self._last_good: dict | None = None
 
@@ -164,6 +167,31 @@ class LiveDataService:
                 player_store.upsert(self._player_store, mid, state, rows)
             except Exception:
                 logger.exception("player stats update failed for match %s", mid)
+
+    def update_team_stats(self, matches, now: float) -> None:
+        """Refresh the team-stats cache from today's matches (mirrors
+        update_player_stats). Finished & already stored -> skip; finished-new or
+        live -> fetch /statistics once and overwrite that match's rows."""
+        if self._team_store is None:
+            return
+        stored = team_stats_store.stored_match_states(self._team_store)
+        live_states = {models.MatchState.LIVE.value, models.MatchState.HALF_TIME.value}
+        for m in matches:
+            mid = m.get("match_id")
+            state = m.get("state")
+            if mid is None:
+                continue
+            finished = state == models.MatchState.FINISHED.value
+            if finished and stored.get(mid) == models.MatchState.FINISHED.value:
+                continue
+            if not (finished or state in live_states):
+                continue
+            try:
+                parsed = models.parse_statistics(self._client.statistics(mid))
+                rows = parse_team_match_stats(mid, parsed)
+                team_stats_store.upsert(self._team_store, mid, state, rows)
+            except Exception:
+                logger.exception("team stats update failed for match %s", mid)
 
     def team_leaders(self, team: str) -> dict:
         """Per-stat ranked leader rows for `team` aggregated across its matches.

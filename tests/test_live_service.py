@@ -341,3 +341,66 @@ def test_team_leaders_groups_and_ranks(tmp_path):
 def test_team_leaders_empty_without_store():
     svc = LiveDataService(_StatsClient(), _index())
     assert svc.team_leaders("USA") == {}
+
+
+# ---------------------------------------------------------------------------
+# update_team_stats
+# ---------------------------------------------------------------------------
+
+from src.data.live import team_stats_store  # noqa: E402
+
+
+class _TeamStatsClient(_FakeClient):
+    def __init__(self):
+        super().__init__()
+        self.stat_calls = {}
+
+    def statistics(self, match_id):
+        self.stat_calls[match_id] = self.stat_calls.get(match_id, 0) + 1
+        return [
+            {"team": {"name": "USA"}, "statistics": [
+                {"displayName": "Expected Goals", "value": 1.5},
+                {"displayName": "Shots on target", "value": 4},
+                {"displayName": "Possession", "value": 0.6},
+                {"displayName": "Yellow cards", "value": 2}]},
+            {"team": {"name": "Paraguay"}, "statistics": [
+                {"displayName": "Expected Goals", "value": 0.7},
+                {"displayName": "Possession", "value": 0.4}]},
+        ]
+
+
+def test_update_team_stats_fetches_and_stores_finished(tmp_path):
+    path = tmp_path / "ts.csv"
+    c = _TeamStatsClient()
+    svc = LiveDataService(c, _index(), team_store=path)
+    svc.update_team_stats([{"match_id": 1, "state": MatchState.FINISHED.value}], now=0.0)
+    assert team_stats_store.stored_match_states(path) == {1: MatchState.FINISHED.value}
+    assert c.stat_calls[1] == 1
+    loaded = team_stats_store.load(path)
+    usa = next(r for r in loaded[1] if r.team == "USA")
+    assert usa.stats["xg"] == 1.5
+
+
+def test_update_team_stats_skips_already_stored_finished(tmp_path):
+    path = tmp_path / "ts.csv"
+    c = _TeamStatsClient()
+    svc = LiveDataService(c, _index(), team_store=path)
+    m = [{"match_id": 1, "state": MatchState.FINISHED.value}]
+    svc.update_team_stats(m, now=0.0)
+    svc.update_team_stats(m, now=1.0)
+    assert c.stat_calls[1] == 1
+
+
+def test_update_team_stats_overwrites_live(tmp_path):
+    path = tmp_path / "ts.csv"
+    c = _TeamStatsClient()
+    svc = LiveDataService(c, _index(), team_store=path)
+    m = [{"match_id": 2, "state": MatchState.LIVE.value}]
+    svc.update_team_stats(m, now=0.0)
+    svc.update_team_stats(m, now=1.0)
+    assert c.stat_calls[2] == 2
+
+
+def test_update_team_stats_noop_without_store():
+    svc = LiveDataService(_TeamStatsClient(), _index())   # no team_store
+    svc.update_team_stats([{"match_id": 1, "state": "finished"}], now=0.0)  # no crash
