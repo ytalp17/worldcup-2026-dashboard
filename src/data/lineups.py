@@ -4,9 +4,9 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-# Scrape slugs (from scrape_mylineups.py / estimated_starting_eleven.json) whose
-# canonical FIFA name (as used everywhere else in the app — see TEAM_NAMES /
-# src/data/squads.py) differs from a plain title-case of the slug.
+# Lineup slugs (the keys in estimated_starting_eleven.json) whose canonical FIFA
+# name (as used everywhere else in the app — see TEAM_NAMES / src/data/squads.py)
+# differs from a plain title-case of the slug.
 _SLUG_TO_CANONICAL = {
     "bosnia-and-herzegovina": "Bosnia and Herzegovina",
     "cape-verde": "Cabo Verde",

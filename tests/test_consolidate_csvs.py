@@ -30,8 +30,8 @@ def test_venues_csv_shape_and_join():
 def test_teams_csv_shape_and_codes():
     df = pd.read_csv(DATA / "teams.csv")
     assert len(df) == 48
-    # The migration produces these columns; later steps (e.g. rankings.py) may
-    # enrich teams.csv with additional columns such as fifa_rank.
+    # The migration produces these columns; later enrichment may add further
+    # columns such as fifa_rank.
     assert {
         "team", "continent", "distance_km", "code", "confederation",
         "coach", "coach_nationality", "coach_since",

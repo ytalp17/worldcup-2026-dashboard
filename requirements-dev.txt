@@ -1,6 +1,5 @@
 # Optional tooling for local verification (not needed to run the app).
-# scripts/download_stadium_images.py uses certifi (also in requirements.txt).
-# scripts/e2e_check.py drives a headless browser:
+# Headless browser for manual UI checks:
 playwright
 # wc2026_pitches.py renders the estimated-XI pitch PNGs (build-time only; the
 # app serves the generated images as static assets):

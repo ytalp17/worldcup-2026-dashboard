@@ -2,8 +2,8 @@
 """
 World Cup 2026 — estimated starting-XI pitch images, one per team per theme.
 
-Input : assets/data/estimated_starting_eleven.json (produced by
-        scrape_mylineups.py): {slug: {name, formation, coach, xi:[[surname,num]]}}.
+Input : assets/data/estimated_starting_eleven.json (committed under assets/data):
+        {slug: {name, formation, coach, xi:[[surname,num]]}}.
         Players are GK -> defence -> midfield -> attack, matching the order
         mplsoccer's get_formation() returns position slots in.
 Output: assets/pitches/<slug>-dark.png and <slug>-light.png — horizontal pitch
