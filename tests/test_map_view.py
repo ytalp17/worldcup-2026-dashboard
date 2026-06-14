@@ -117,16 +117,28 @@ def test_map_bounds_are_a_hard_wall():
 
 def test_map_fixed_initial_view_no_zoom_out():
     m = build_map(VENUES)
-    assert m.center == [36.0, -95.0]
+    assert m.center == [32.5, -94.86]
     assert m.zoom == 5
-    # minZoom equals the initial zoom, so the user can zoom in but not out.
+    # Zoom is locked: minZoom == maxZoom == the initial zoom.
     assert m.minZoom == 5
+    assert m.maxZoom == 5
 
 
-def test_map_is_not_draggable():
+def test_map_zoom_is_fully_locked():
     m = build_map(VENUES)
-    # Static position: no panning via drag, box-zoom drag, or keyboard arrows.
-    assert m.dragging is False
+    # No zooming at all: wheel, double-click, and pinch are disabled, and the
+    # min/max zoom collapse onto the initial zoom.
+    assert m.scrollWheelZoom is False
+    assert m.doubleClickZoom is False
+    assert m.touchZoom is False
+    assert m.minZoom == m.maxZoom == m.zoom
+
+
+def test_map_is_pannable_but_zoom_locked():
+    m = build_map(VENUES)
+    # Pannable via drag (constrained to maxBounds), but no zoom gestures:
+    # box-zoom (shift-drag) and keyboard (which also binds +/- zoom) stay off.
+    assert m.dragging is True
     assert m.boxZoom is False
     assert m.keyboard is False
 

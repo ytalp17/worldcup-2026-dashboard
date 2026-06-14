@@ -11,10 +11,10 @@ LIGHT_TILE = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
 DARK_TILE = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
 TILE_ATTRIBUTION = "© OpenStreetMap contributors © CARTO"
 
-# SW and NE corners of a box snug to USA, Mexico, and Canada.
-NA_BOUNDS = [[18.0, -145.0], [50.0, -50.0]]
+# SW and NE corners of the box around USA, Mexico, and Canada.
+NA_BOUNDS = [[12.00, -130.12], [53.00, -59.59]]
 
-NA_CENTER = [36.0, -95.0]
+NA_CENTER = [32.50, -94.86]
 NA_ZOOM = 5
 NA_MIN_ZOOM = 5
 
@@ -194,12 +194,16 @@ def build_map(venues: list[Venue]) -> dl.Map:
         center=NA_CENTER,
         zoom=NA_ZOOM,
         minZoom=NA_MIN_ZOOM,
+        maxZoom=NA_ZOOM,  # min == max == initial: zoom is fully locked
         maxBounds=NA_BOUNDS,
         maxBoundsViscosity=1.0,
-        # Static position: zoomable but not pannable.
-        dragging=False,
-        boxZoom=False,
-        keyboard=False,
-        zoomControl=False,  # hide the +/- buttons (wheel/dbl-click still zoom in)
+        # Pannable within the bounds, but zoom is fully locked.
+        dragging=True,
+        boxZoom=False,           # shift-drag box-zoom is a zoom gesture: off
+        keyboard=False,          # arrow keys also bind +/- zoom: off
+        zoomControl=False,       # hide the +/- buttons
+        scrollWheelZoom=False,   # no wheel zoom
+        doubleClickZoom=False,   # no double-click zoom
+        touchZoom=False,         # no pinch zoom on touch devices
         style={"height": "100%", "width": "100%"},
     )
