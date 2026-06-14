@@ -343,3 +343,19 @@ def test_parse_match_kickoff_none_when_missing():
     m = parse_match({"id": 5, "homeTeam": {"name": "A"},
                      "awayTeam": {"name": "B"}, "state": {}})
     assert m.kickoff is None
+
+
+def test_parse_standings_keeps_goals_for_and_against():
+    from src.data.live.models import parse_standings
+    raw = {"groups": [
+        {"name": "Group A", "standings": [
+            {"team": {"name": "Mexico"}, "points": 3,
+             "total": {"games": 1, "wins": 1, "draws": 0, "loses": 0,
+                       "scoredGoals": 4, "receivedGoals": 1}},
+        ]},
+    ]}
+    table = parse_standings(raw)
+    row = table["Group A"][0]
+    assert row.goals_for == 4
+    assert row.goals_against == 1
+    assert row.goal_diff == 3

@@ -73,6 +73,8 @@ class Standing:
     lost: int
     goal_diff: int
     points: int
+    goals_for: int = 0
+    goals_against: int = 0
 
 
 def _parse_kickoff(raw: dict) -> datetime | None:
@@ -182,14 +184,18 @@ def parse_standings(raw: dict) -> dict[str, list[Standing]]:
         rows = []
         for s in group.get("standings", []):
             total = s.get("total") or {}
+            scored = int(total.get("scoredGoals", 0))
+            received = int(total.get("receivedGoals", 0))
             rows.append(Standing(
                 team=(s.get("team") or {}).get("name", ""),
                 played=int(total.get("games", 0)),
                 won=int(total.get("wins", 0)),
                 drawn=int(total.get("draws", 0)),
                 lost=int(total.get("loses", 0)),
-                goal_diff=int(total.get("scoredGoals", 0)) - int(total.get("receivedGoals", 0)),
+                goal_diff=scored - received,
                 points=int(s.get("points", 0)),
+                goals_for=scored,
+                goals_against=received,
             ))
         table[name] = rows
     return table
