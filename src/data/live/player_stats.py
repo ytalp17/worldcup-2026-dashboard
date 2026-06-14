@@ -39,7 +39,7 @@ def parse_player_stats(match_id: int, events, detail) -> list[PlayerMatchStat]:
     agg: dict = {}
 
     def slot(team: str, player: str, pid) -> dict:
-        key = pid if pid else normalize(player)
+        key = pid if pid is not None else normalize(player)
         cur = agg.get(key)
         if cur is None:
             cur = {"team": team, "player": player, "player_id": pid,
@@ -72,6 +72,9 @@ def parse_player_stats(match_id: int, events, detail) -> list[PlayerMatchStat]:
             rating = stats.get("Rating")
             cur = slot(tname, tp.get("name", ""), None)
             if rating is not None:
-                cur["rating"] = rating
+                try:
+                    cur["rating"] = float(rating)
+                except (TypeError, ValueError):
+                    cur["rating"] = None
 
     return [PlayerMatchStat(match_id=match_id, **v) for v in agg.values()]
