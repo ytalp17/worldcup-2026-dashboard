@@ -75,7 +75,7 @@ def _metric_after(metric, canon, mid, stats, players, goals_by_match, meta):
     if metric == "assists":
         return sum(p.assists for p in players.get(mid, [])
                    if matchday.canonical(p.team) == canon)
-    opp = aggregate._opponent(canon, meta.get(mid, {}).get("teams", ()))
+    opp = aggregate.opponent(canon, meta.get(mid, {}).get("teams", ()))
     ga = gm.get(opp, 0) if opp else 0
     if metric == "conceded":
         return ga

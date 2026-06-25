@@ -23,7 +23,7 @@ def team_match_goals(stats_by_match: dict, players_by_match: dict) -> dict:
     return out
 
 
-def _opponent(team_canon: str, teams: tuple) -> str | None:
+def opponent(team_canon: str, teams: tuple) -> str | None:
     others = [t for t in teams if t != team_canon]
     return others[0] if others else None
 
@@ -61,7 +61,7 @@ def build_record(team_official: str, team_canon: str, chrono_mids: list,
         # result from per-match goals
         gm = goals_by_match.get(mid, {})
         gf = gm.get(team_canon, 0)
-        opp = _opponent(team_canon, meta.get(mid, {}).get("teams", ()))
+        opp = opponent(team_canon, meta.get(mid, {}).get("teams", ()))
         ga = gm.get(opp, 0) if opp else 0
         rec["goals"] += gf
         rec["goals_conceded"] += ga
