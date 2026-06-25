@@ -5,6 +5,10 @@ import plotly.graph_objects as go
 from src.components.analysis import theme
 from src.data.analysis import aggregate
 
+# Capture at module scope so dumbbell_figure (which shadows `theme` as a
+# string param) can reference these without calling theme.<anything>.
+DUMBBELL = theme.DUMBBELL
+
 VIEWS = [
     {"id": "ATTACKING_THREAT", "type": "radar", "title": "Attacking threat",
      "caption": "Where each team generates danger (per-90, scaled to the group).",
@@ -97,3 +101,34 @@ def _theme_team_color(teams):
 
 def _theme_team_fill(teams):
     return theme.team_fill_map(teams)
+
+
+def dumbbell_figure(records, theme: str = "dark") -> go.Figure:
+    rows = sorted(records, key=lambda r: (r.get("goals", 0) - r.get("xg", 0.0)))
+    teams = [r["team"] for r in rows]  # ascending -> biggest gap on top
+    lay = theme_layout(theme)
+    fig = go.Figure()
+    for r in rows:
+        over = r.get("goals", 0) >= r.get("xg", 0.0)
+        fig.add_trace(go.Scatter(
+            x=[r["xg"], r["goals"]], y=[r["team"], r["team"]], mode="lines",
+            line=dict(color=DUMBBELL["over"] if over else DUMBBELL["under"],
+                      width=4),
+            hoverinfo="skip", showlegend=False))
+    fig.add_trace(go.Scatter(
+        x=[r["xg"] for r in rows], y=teams, mode="markers", name="xG",
+        marker=dict(color=DUMBBELL["xg"], size=13),
+        hovertemplate="<b>%{y}</b><br>xG: %{x:.2f}<extra></extra>"))
+    fig.add_trace(go.Scatter(
+        x=[r["goals"] for r in rows], y=teams, mode="markers", name="Goals",
+        marker=dict(color=DUMBBELL["goals"], size=13),
+        hovertemplate="<b>%{y}</b><br>Goals: %{x}<extra></extra>"))
+    fig.update_layout(
+        paper_bgcolor=lay["paper_bgcolor"], plot_bgcolor=lay["plot_bgcolor"],
+        font=lay["font"], margin=dict(l=80, r=30, t=10, b=40), autosize=True,
+        showlegend=False,
+        xaxis=dict(title="Goals (with xG)", gridcolor=lay["gridcolor_hint"],
+                   zeroline=False),
+        yaxis=dict(categoryorder="array", categoryarray=teams,
+                   gridcolor="rgba(0,0,0,0)"))
+    return fig
