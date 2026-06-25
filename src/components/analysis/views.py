@@ -132,3 +132,43 @@ def dumbbell_figure(records, theme: str = "dark") -> go.Figure:
         yaxis=dict(categoryorder="array", categoryarray=teams,
                    gridcolor="rgba(0,0,0,0)"))
     return fig
+
+
+def race_frame_count(history: dict) -> int:
+    return max((len(v) for v in history.values()), default=0)
+
+
+def race_figure(history, metric, frame, theme: str = "dark",
+                color_map=None) -> go.Figure:
+    teams = list(history.keys())
+    cmap = color_map or _theme_team_color(teams)
+    n = race_frame_count(history)
+    f = max(0, min(frame, n - 1)) if n else 0
+    vals = []
+    for t in teams:
+        series = history[t]
+        vals.append((t, series[f] if f < len(series) else (series[-1] if series else 0)))
+    vals.sort(key=lambda tv: tv[1])  # ascending -> leader on top
+    lay = theme_layout(theme)
+    fig = go.Figure(go.Bar(
+        x=[v for _t, v in vals], y=[t for t, _v in vals], orientation="h",
+        marker=dict(color=[cmap[t] for t, _v in vals]),
+        text=[f"{v:g}" for _t, v in vals], textposition="outside",
+        hovertemplate="<b>%{y}</b><br>" + accessors_label(metric) +
+                      ": %{x:g}<extra></extra>"))
+    fig.update_layout(
+        paper_bgcolor=lay["paper_bgcolor"], plot_bgcolor=lay["plot_bgcolor"],
+        font=lay["font"], margin=dict(l=80, r=40, t=10, b=30), autosize=True,
+        showlegend=False,
+        xaxis=dict(title=accessors_label(metric), gridcolor=lay["gridcolor_hint"],
+                   zeroline=False),
+        yaxis=dict(gridcolor="rgba(0,0,0,0)"),
+        annotations=[dict(x=1, y=1.08, xref="paper", yref="paper",
+                          xanchor="right", showarrow=False,
+                          text=f"Matchday {f + 1}")])
+    return fig
+
+
+def accessors_label(metric: str) -> str:
+    from src.data.analysis.accessors import RACE_METRICS
+    return RACE_METRICS.get(metric, metric)
