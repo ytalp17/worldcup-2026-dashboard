@@ -879,7 +879,7 @@ def move_analysis_view(_prev, _next, index):
     Input("analysis-race-frame", "data"),
     Input("carousel-index", "data"),
     Input("live-store", "data"),
-    State("color-scheme-toggle", "checked"),
+    Input("color-scheme-toggle", "checked"),
 )
 def render_analysis(view_index, race_metric, frame, carousel_index, _live, dark):
     return analysis_render(view_index, race_metric, carousel_index,
