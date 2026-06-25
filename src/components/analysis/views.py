@@ -197,3 +197,45 @@ def funnel_figure(records, theme: str = "dark", color_map=None) -> go.Figure:
         font=lay["font"], margin=dict(l=20, r=20, t=30, b=10), autosize=True,
         showlegend=False, funnelmode="stack")
     return fig
+
+
+def _shots_total(r):
+    return r.get("shots_on", 0) + r.get("shots_off", 0) + r.get("shots_blocked", 0)
+
+
+def quadrant_figure(records, theme: str = "dark", color_map=None) -> go.Figure:
+    """xG/shot vs conversion % quadrant chart (view 8: QUALITY_VS_CONV)."""
+    teams = [r["team"] for r in records]
+    # Anti-shadowing: `theme` param is a string here, not the module.
+    # Use _theme_team_color wrapper instead of theme.team_color_map(teams).
+    cmap = color_map or _theme_team_color(teams)
+    lay = theme_layout(theme)
+    xs, ys, txt, cols, cd = [], [], [], [], []
+    for r in records:
+        st = _shots_total(r) or 1
+        xq = round(r.get("xg", 0.0) / st, 3)
+        yc = round(r.get("goals", 0) / st * 100, 1)
+        xs.append(xq); ys.append(yc); txt.append(r["team"])
+        cols.append(cmap[r["team"]])
+        cd.append([r.get("goals", 0), _shots_total(r)])
+    fig = go.Figure(go.Scatter(
+        x=xs, y=ys, mode="markers+text", text=txt, textposition="top center",
+        marker=dict(color=cols, size=16),
+        customdata=cd,
+        hovertemplate="<b>%{text}</b><br>xG/shot: %{x:.3f}<br>"
+                      "Conversion: %{y:.1f}%<br>Goals %{customdata[0]} / "
+                      "Shots %{customdata[1]}<extra></extra>"))
+    mx = sum(xs) / len(xs); my = sum(ys) / len(ys)
+    fig.add_vline(x=mx, line=dict(color=lay["gridcolor_hint"], dash="dot"))
+    fig.add_hline(y=my, line=dict(color=lay["gridcolor_hint"], dash="dot"))
+    for x, y, t in [(max(xs), max(ys), "clinical"), (min(xs), max(ys), "lucky"),
+                    (max(xs), min(ys), "wasteful"), (min(xs), min(ys), "toothless")]:
+        fig.add_annotation(x=x, y=y, text=t, showarrow=False,
+                           opacity=0.4, font=dict(size=10))
+    fig.update_layout(
+        paper_bgcolor=lay["paper_bgcolor"], plot_bgcolor=lay["plot_bgcolor"],
+        font=lay["font"], margin=dict(l=50, r=30, t=10, b=40), autosize=True,
+        showlegend=False,
+        xaxis=dict(title="xG per shot (chance quality)", gridcolor=lay["gridcolor_hint"]),
+        yaxis=dict(title="Conversion % (goals ÷ shots)", gridcolor=lay["gridcolor_hint"]))
+    return fig
