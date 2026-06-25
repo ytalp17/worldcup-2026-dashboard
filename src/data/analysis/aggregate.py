@@ -69,3 +69,42 @@ def build_record(team_official: str, team_canon: str, chrono_mids: list,
 
     rec["possession"] = round(sum(poss) / len(poss), 4) if poss else 0.0
     return rec
+
+
+def per90(value: float, matches_played: int) -> float:
+    """Per-match (~per-90) value; 0 when no matches played."""
+    return round(value / matches_played, 4) if matches_played else 0.0
+
+
+def field_relative(values: list[float]) -> list[float]:
+    """Scale each value to 0-100 relative to the max in the list.
+    Max of 0 -> all zeros (divide-by-zero guard)."""
+    hi = max(values) if values else 0.0
+    if hi <= 0:
+        return [0.0 for _ in values]
+    return [round(v / hi * 100, 1) for v in values]
+
+
+def _display_value(rec: dict, key: str, kind: str) -> float:
+    """The raw value shown in hover and used for scaling: per-match for count
+    metrics, the stored value for rate/normalized metrics."""
+    mp = rec.get("matches_played", 0)
+    val = rec.get(key, 0.0)
+    if kind == "count":
+        return per90(val, mp)
+    return round(val, 4)  # rate (possession) / already-normalized (xg, xa)
+
+
+def radar_series(records: list[dict], metrics: list[tuple]) -> dict:
+    """Scaled (0-100, field-relative) + raw display values per team per axis."""
+    teams = [r["team"] for r in records]
+    axes = [label for _, label, _ in metrics]
+    raw: dict[str, list[float]] = {t: [] for t in teams}
+    scaled: dict[str, list[float]] = {t: [] for t in teams}
+    for key, _label, kind in metrics:
+        col = [_display_value(r, key, kind) for r in records]
+        sc = field_relative(col)
+        for r, v, s in zip(records, col, sc):
+            raw[r["team"]].append(round(v, 2))
+            scaled[r["team"]].append(s)
+    return {"axes": axes, "teams": teams, "scaled": scaled, "raw": raw}
