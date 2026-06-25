@@ -859,11 +859,13 @@ async def live_feed():
     Output("analysis-view-index", "data"),
     Input("analysis-prev", "n_clicks"),
     Input("analysis-next", "n_clicks"),
+    Input("analysis-modal-prev", "n_clicks"),
+    Input("analysis-modal-next", "n_clicks"),
     State("analysis-view-index", "data"),
     prevent_initial_call=True,
 )
-def move_analysis_view(_prev, _next, index):
-    delta = -1 if ctx.triggered_id == "analysis-prev" else 1
+def move_analysis_view(_prev, _next, _mprev, _mnext, index):
+    delta = -1 if ctx.triggered_id in ("analysis-prev", "analysis-modal-prev") else 1
     return advance(index or 0, delta, len(analysis_views.VIEWS))
 
 
@@ -876,6 +878,7 @@ def move_analysis_view(_prev, _next, index):
     Output("analysis-race-controls", "style"),
     Output("analysis-modal-graph", "figure"),
     Output("analysis-modal", "title"),
+    Output("analysis-modal-dots", "children"),
     Input("analysis-view-index", "data"),
     Input("analysis-race-metric", "value"),
     Input("analysis-race-frame", "data"),
@@ -887,9 +890,10 @@ def render_analysis(view_index, race_metric, frame, carousel_index, _live, dark)
     fig, title, caption, caveat, dots_children, race_style = analysis_render(
         view_index, race_metric, carousel_index,
         dark if dark is not None else True, frame)
-    # The expanded modal mirrors the current chart (same figure) and shows the
-    # view's title for context.
-    return fig, title, caption, caveat, dots_children, race_style, fig, title
+    # The expanded modal mirrors the current chart (same figure), title, and
+    # position dots so the in-modal carousel stays in sync with the tile.
+    return (fig, title, caption, caveat, dots_children, race_style,
+            fig, title, dots_children)
 
 
 @callback(

@@ -28,7 +28,9 @@ def test_panel_exposes_required_ids():
                    "analysis-race-metric", "analysis-race-replay",
                    "analysis-view-index", "analysis-race-frame",
                    "analysis-race-interval", "analysis-expand",
-                   "analysis-modal", "analysis-modal-graph"]:
+                   "analysis-modal", "analysis-modal-graph",
+                   "analysis-modal-prev", "analysis-modal-next",
+                   "analysis-modal-dots"]:
         assert needed in ids, f"missing {needed}"
 
 

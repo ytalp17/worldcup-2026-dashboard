@@ -731,6 +731,18 @@ body,
 }
 .analysis-stage .mantine-ActionIcon-root:first-child { left: 2px; }
 .analysis-stage .mantine-ActionIcon-root:last-child { right: 2px; }
+.analysis-modal-stage {
+    position: relative;
+    width: 100%;
+}
+.analysis-modal-stage .mantine-ActionIcon-root {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+}
+.analysis-modal-stage .mantine-ActionIcon-root:first-child { left: 4px; }
+.analysis-modal-stage .mantine-ActionIcon-root:last-child { right: 4px; }
 .analysis-dots-row { display: flex; gap: 5px; align-items: center; }
 .analysis-dot {
     width: 6px; height: 6px; border-radius: 50%;

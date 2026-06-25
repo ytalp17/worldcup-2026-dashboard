@@ -53,11 +53,21 @@ def _expand_button():
 
 
 def _expanded_modal():
-    """A large centered modal mirroring the current chart for a roomier view."""
+    """A large centered modal mirroring the current chart for a roomier view.
+    Carries its own carousel arrows + position dots, wired to the same view
+    index, so the user can browse the rest of the charts while expanded."""
     return dmc.Modal(
-        id="analysis-modal", title="", size="90%", centered=True,
-        children=dcc.Graph(id="analysis-modal-graph", config=_GRAPH_CONFIG,
-                           style={"height": "78vh", "width": "100%"}))
+        id="analysis-modal", title="", size="92%", centered=True,
+        children=[
+            html.Div(
+                [_arrow("analysis-modal-prev", "mdi:chevron-left", "Previous chart"),
+                 dcc.Graph(id="analysis-modal-graph", config=_GRAPH_CONFIG,
+                           style={"height": "74vh", "width": "100%"}),
+                 _arrow("analysis-modal-next", "mdi:chevron-right", "Next chart")],
+                className="analysis-modal-stage"),
+            dmc.Group(dots(0, len(views.VIEWS)), id="analysis-modal-dots",
+                      justify="center", gap="xs", className="analysis-dots"),
+        ])
 
 
 def build_analysis_panel() -> dmc.Box:
