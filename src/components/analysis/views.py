@@ -227,6 +227,70 @@ def defend_figure(records, theme: str = "dark") -> go.Figure:
     return fig
 
 
+def _pad(lo, hi, frac=0.1):
+    span = (hi - lo) or (abs(hi) or 1.0)
+    return lo - span * frac, hi + span * frac
+
+
+def bubble_figure(records, theme: str = "dark", color_map=None) -> go.Figure:
+    # Empty-records guard: avoid ValueError on min/max of empty sequences.
+    if not records:
+        lay = theme_layout(theme)
+        return go.Figure(layout=dict(paper_bgcolor=lay["paper_bgcolor"],
+                                     plot_bgcolor=lay["plot_bgcolor"], font=lay["font"]))
+    teams = [r["team"] for r in records]
+    # Anti-shadowing: `theme` param is a string here, not the module.
+    # Use _theme_team_color wrapper instead of theme.team_color_map(teams).
+    cmap = color_map or _theme_team_color(teams)
+    lay = theme_layout(theme)
+    xs = [r.get("passes_total", 0.0) for r in records]
+    ys = [r.get("passes_final_third", 0.0) for r in records]
+    acc = [round(r.get("passes_succ", 0.0) / (r.get("passes_total", 0.0) or 1) * 100, 1)
+           for r in records]
+    fig = go.Figure(go.Scatter(
+        x=xs, y=ys, mode="markers+text", text=teams, textposition="top center",
+        marker=dict(size=[a * 0.6 for a in acc], color=[cmap[t] for t in teams],
+                    sizemode="diameter", line=dict(width=1, color="rgba(0,0,0,0.3)")),
+        customdata=[[a, round(ft / (tp or 1) * 100, 1)]
+                    for a, ft, tp in zip(acc, ys, xs)],
+        hovertemplate="<b>%{text}</b><br>Total passes: %{x:.0f}<br>"
+                      "Into final third: %{y:.0f}<br>Accuracy: %{customdata[0]}%<br>"
+                      "Final-third share: %{customdata[1]}%<extra></extra>"))
+    fig.update_layout(
+        paper_bgcolor=lay["paper_bgcolor"], plot_bgcolor=lay["plot_bgcolor"],
+        font=lay["font"], margin=dict(l=50, r=30, t=10, b=40), autosize=True,
+        showlegend=False,
+        xaxis=dict(title="Total passes", gridcolor=lay["gridcolor_hint"],
+                   range=list(_pad(min(xs), max(xs)))),
+        yaxis=dict(title="Passes into final third", gridcolor=lay["gridcolor_hint"],
+                   range=list(_pad(min(ys), max(ys)))))
+    return fig
+
+
+def build_figure(view, *, records=None, history=None, race_metric="points",
+                 frame=0, theme="dark") -> go.Figure:
+    t = view["type"]
+    teams = [r["team"] for r in (records or [])] or list((history or {}).keys())
+    # Anti-shadowing: `theme` param is a string here, not the module.
+    # Use _theme_team_color wrapper instead of theme.team_color_map(teams).
+    cmap = _theme_team_color(teams)
+    if t == "radar":
+        return radar_figure(records, view, theme)
+    if t == "dumbbell":
+        return dumbbell_figure(records, theme)
+    if t == "race":
+        return race_figure(history or {}, race_metric, frame, theme, color_map=cmap)
+    if t == "funnel":
+        return funnel_figure(records, theme, color_map=cmap)
+    if t == "quadrant":
+        return quadrant_figure(records, theme, color_map=cmap)
+    if t == "defend":
+        return defend_figure(records, theme)
+    if t == "bubble":
+        return bubble_figure(records, theme, color_map=cmap)
+    raise ValueError(f"unknown view type: {t}")
+
+
 def quadrant_figure(records, theme: str = "dark", color_map=None) -> go.Figure:
     """xG/shot vs conversion % quadrant chart (view 8: QUALITY_VS_CONV)."""
     if not records:
