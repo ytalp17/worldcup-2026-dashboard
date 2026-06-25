@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from src.components.analysis import theme
 from src.data.analysis import aggregate
@@ -172,3 +173,27 @@ def race_figure(history, metric, frame, theme: str = "dark",
 def accessors_label(metric: str) -> str:
     from src.data.analysis.accessors import RACE_METRICS
     return RACE_METRICS.get(metric, metric)
+
+
+def funnel_figure(records, theme: str = "dark", color_map=None) -> go.Figure:
+    """2×2 small-multiples shot funnel: shots → on target → goals (view 7)."""
+    teams = [r["team"] for r in records]
+    cmap = color_map or _theme_team_color(teams)
+    lay = theme_layout(theme)
+    fig = make_subplots(rows=2, cols=2, subplot_titles=teams[:4],
+                        vertical_spacing=0.18, horizontal_spacing=0.12)
+    for i, r in enumerate(records[:4]):
+        total = r.get("shots_on", 0) + r.get("shots_off", 0) + r.get("shots_blocked", 0)
+        x = [total, r.get("shots_on", 0), r.get("goals", 0)]
+        fig.add_trace(go.Funnel(
+            y=["Shots", "On target", "Goals"], x=x, name=r["team"],
+            marker=dict(color=cmap[r["team"]]),
+            textinfo="value+percent previous",
+            hovertemplate="<b>%{y}</b>: %{x}<br>%{percentInitial} of all shots"
+                          "<extra></extra>"),
+            row=i // 2 + 1, col=i % 2 + 1)
+    fig.update_layout(
+        paper_bgcolor=lay["paper_bgcolor"], plot_bgcolor=lay["plot_bgcolor"],
+        font=lay["font"], margin=dict(l=20, r=20, t=30, b=10), autosize=True,
+        showlegend=False, funnelmode="stack")
+    return fig
