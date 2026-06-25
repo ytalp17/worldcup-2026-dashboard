@@ -6,9 +6,10 @@ from plotly.subplots import make_subplots
 from src.components.analysis import theme
 from src.data.analysis import aggregate
 
-# Capture at module scope so dumbbell_figure (which shadows `theme` as a
-# string param) can reference these without calling theme.<anything>.
+# Capture at module scope so functions that shadow `theme` as a string param
+# can reference these without calling theme.<anything>.
 DUMBBELL = theme.DUMBBELL
+DEFEND_COLORS = theme.DEFEND_COLORS
 
 VIEWS = [
     {"id": "ATTACKING_THREAT", "type": "radar", "title": "Attacking threat",
@@ -201,6 +202,29 @@ def funnel_figure(records, theme: str = "dark", color_map=None) -> go.Figure:
 
 def _shots_total(r):
     return r.get("shots_on", 0) + r.get("shots_off", 0) + r.get("shots_blocked", 0)
+
+
+_DEFEND_ACTIONS = [("tackles_succ", "Tackles won"), ("interceptions", "Interceptions"),
+                   ("clearances", "Clearances"), ("aerials_won", "Aerials won")]
+
+
+def defend_figure(records, theme: str = "dark") -> go.Figure:
+    teams = [r["team"] for r in records]
+    lay = theme_layout(theme)
+    fig = go.Figure()
+    for key, label in _DEFEND_ACTIONS:
+        y = [aggregate.per90(r.get(key, 0.0), r.get("matches_played", 0)) for r in records]
+        fig.add_trace(go.Bar(
+            x=teams, y=y, name=label, marker=dict(color=DEFEND_COLORS[key]),
+            hovertemplate="<b>%{x}</b><br>" + label + " (per 90): %{y:.1f}<extra></extra>"))
+    fig.update_layout(
+        barmode="stack",
+        paper_bgcolor=lay["paper_bgcolor"], plot_bgcolor=lay["plot_bgcolor"],
+        font=lay["font"], margin=dict(l=40, r=20, t=10, b=30), autosize=True,
+        showlegend=True, legend=dict(orientation="h", y=1.1, font=dict(size=10)),
+        xaxis=dict(gridcolor="rgba(0,0,0,0)"),
+        yaxis=dict(title="Defensive actions per 90", gridcolor=lay["gridcolor_hint"]))
+    return fig
 
 
 def quadrant_figure(records, theme: str = "dark", color_map=None) -> go.Figure:
