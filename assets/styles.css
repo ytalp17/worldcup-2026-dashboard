@@ -707,16 +707,18 @@ body,
     height: 100%;
     width: 100%;
     min-height: 0;
-    gap: 4px;
-    padding: 8px 6px;
+    gap: 2px;
+    padding: 4px 3px;
 }
 .analysis-header { flex: 0 0 auto; }
 .analysis-caption { flex: 0 0 auto; }
-.analysis-caveat { flex: 0 0 auto; min-height: 14px; }
+.analysis-caveat { flex: 0 0 auto; min-height: 0; }
 .analysis-stage {
     position: relative;
     flex: 1 1 auto;
     min-height: 0;
+    /* bleed past the panel's side padding so the plot uses the full tile width */
+    margin: 0 -3px;
     display: flex;
     align-items: stretch;
 }

@@ -7,11 +7,10 @@ from dash_iconify import DashIconify
 from src.components.analysis import views
 from src.data.analysis.accessors import RACE_METRICS
 
+# No modebar / graph preferences: hide the Plotly toolbar entirely so the
+# tile shows only the chart. The graph stays responsive to its container.
 _GRAPH_CONFIG = {
-    "displaylogo": False,
-    "displayModeBar": True,
-    "modeBarButtonsToRemove": ["select2d", "lasso2d", "autoScale2d",
-                               "zoomIn2d", "zoomOut2d", "toggleSpikelines"],
+    "displayModeBar": False,
     "responsive": True,
 }
 

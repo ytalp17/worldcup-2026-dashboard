@@ -31,10 +31,11 @@ def test_panel_exposes_required_ids():
         assert needed in ids, f"missing {needed}"
 
 
-def test_graph_modebar_is_trimmed():
+def test_graph_modebar_is_hidden():
     root = panel.build_analysis_panel()
-    graph = next(n for n in _walk(root) if isinstance(n, dcc.Graph))
-    assert graph.config.get("displaylogo") is False
+    graph = next((n for n in _walk(root) if isinstance(n, dcc.Graph)), None)
+    assert graph is not None, "dcc.Graph not found"
+    assert graph.config.get("displayModeBar") is False
 
 
 def test_dots_marks_active():
