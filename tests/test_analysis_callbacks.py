@@ -48,3 +48,5 @@ def test_render_goals_conceded_adds_direction_caveat(tmp_path, monkeypatch):
 def test_next_frame_stops_at_last():
     assert appmod.analysis_next_frame(0, 3) == (1, False)
     assert appmod.analysis_next_frame(2, 3) == (2, True)  # clamp + disable at end
+    assert appmod.analysis_next_frame(0, 1) == (0, True)   # single matchday: stop immediately
+    assert appmod.analysis_next_frame(0, 2) == (1, True)   # two matchdays: step once, then stop
