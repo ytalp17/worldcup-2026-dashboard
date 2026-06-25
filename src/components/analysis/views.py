@@ -205,6 +205,10 @@ def _shots_total(r):
 
 def quadrant_figure(records, theme: str = "dark", color_map=None) -> go.Figure:
     """xG/shot vs conversion % quadrant chart (view 8: QUALITY_VS_CONV)."""
+    if not records:
+        lay = theme_layout(theme)
+        return go.Figure(layout=dict(paper_bgcolor=lay["paper_bgcolor"],
+                                     plot_bgcolor=lay["plot_bgcolor"], font=lay["font"]))
     teams = [r["team"] for r in records]
     # Anti-shadowing: `theme` param is a string here, not the module.
     # Use _theme_team_color wrapper instead of theme.team_color_map(teams).

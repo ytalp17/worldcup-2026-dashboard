@@ -25,3 +25,8 @@ def test_quadrant_has_crosshair_lines():
     fig = views.quadrant_figure(_recs())
     # two reference lines (median/mean crosshair) added as shapes
     assert len(fig.layout.shapes) >= 2
+
+
+def test_quadrant_empty_records_returns_empty_figure_without_crashing():
+    fig = views.quadrant_figure([])
+    assert len(fig.data) == 0
