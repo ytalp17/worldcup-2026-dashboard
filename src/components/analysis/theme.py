@@ -41,14 +41,13 @@ def plotly_layout(theme: str = "dark", **overrides) -> dict:
     base = dict(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color=fg, size=12),
+        font=dict(color=fg, size=10),
         margin=dict(l=40, r=20, t=10, b=30),
         autosize=True,
         showlegend=False,  # views render a slim custom legend strip instead
         hoverlabel=dict(bgcolor="#23262B" if dark else "#FFFFFF",
                         font_color=fg, bordercolor=grid),
         colorway=TEAM_COLORS,
-        modebar=dict(orientation="v"),
         gridcolor_hint=grid,  # consumed by view builders for axis grid color
     )
     base.update(overrides)

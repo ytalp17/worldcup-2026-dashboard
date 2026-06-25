@@ -45,15 +45,32 @@ def _race_controls():
         id="analysis-race-controls", gap="xs", style={"display": "none"})
 
 
+def _expand_button():
+    return dmc.ActionIcon(
+        DashIconify(icon="mdi:arrow-expand-all", width=18),
+        id="analysis-expand", variant="subtle", size="md", radius="xl",
+        **{"aria-label": "Expand chart"})
+
+
+def _expanded_modal():
+    """A large centered modal mirroring the current chart for a roomier view."""
+    return dmc.Modal(
+        id="analysis-modal", title="", size="90%", centered=True,
+        children=dcc.Graph(id="analysis-modal-graph", config=_GRAPH_CONFIG,
+                           style={"height": "78vh", "width": "100%"}))
+
+
 def build_analysis_panel() -> dmc.Box:
     return dmc.Box(
         [
             dcc.Store(id="analysis-view-index", data=0),
             dcc.Store(id="analysis-race-frame", data=0),
             dcc.Interval(id="analysis-race-interval", interval=900, disabled=True),
+            _expanded_modal(),
             dmc.Group(
                 [dmc.Title(id="analysis-title", order=5),
-                 _race_controls()],
+                 dmc.Group([_race_controls(), _expand_button()],
+                           gap="xs", align="center", wrap="nowrap")],
                 justify="space-between", align="center",
                 className="analysis-header"),
             dmc.Text(id="analysis-caption", size="xs", c="dimmed",

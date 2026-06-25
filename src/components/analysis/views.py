@@ -87,7 +87,7 @@ def radar_figure(records, view, theme: str = "dark") -> go.Figure:
             angularaxis=dict(gridcolor=lay["gridcolor_hint"]),
         ),
         paper_bgcolor=lay["paper_bgcolor"], font=lay["font"],
-        margin=dict(l=40, r=40, t=6, b=14), showlegend=False, autosize=True,
+        margin=dict(l=40, r=40, t=18, b=14), showlegend=False, autosize=True,
     )
     return fig
 
@@ -127,7 +127,7 @@ def dumbbell_figure(records, theme: str = "dark") -> go.Figure:
         hovertemplate="<b>%{y}</b><br>Goals: %{x}<extra></extra>"))
     fig.update_layout(
         paper_bgcolor=lay["paper_bgcolor"], plot_bgcolor=lay["plot_bgcolor"],
-        font=lay["font"], margin=dict(l=80, r=20, t=6, b=34), autosize=True,
+        font=lay["font"], margin=dict(l=80, r=20, t=18, b=34), autosize=True,
         showlegend=False,
         xaxis=dict(title="Goals (with xG)", gridcolor=lay["gridcolor_hint"],
                    zeroline=False),
@@ -160,7 +160,7 @@ def race_figure(history, metric, frame, theme: str = "dark",
                       ": %{x:g}<extra></extra>"))
     fig.update_layout(
         paper_bgcolor=lay["paper_bgcolor"], plot_bgcolor=lay["plot_bgcolor"],
-        font=lay["font"], margin=dict(l=80, r=28, t=6, b=26), autosize=True,
+        font=lay["font"], margin=dict(l=80, r=28, t=34, b=26), autosize=True,
         showlegend=False,
         xaxis=dict(title=accessors_label(metric), gridcolor=lay["gridcolor_hint"],
                    zeroline=False),
@@ -195,7 +195,7 @@ def funnel_figure(records, theme: str = "dark", color_map=None) -> go.Figure:
             row=i // 2 + 1, col=i % 2 + 1)
     fig.update_layout(
         paper_bgcolor=lay["paper_bgcolor"], plot_bgcolor=lay["plot_bgcolor"],
-        font=lay["font"], margin=dict(l=12, r=12, t=26, b=6), autosize=True,
+        font=lay["font"], margin=dict(l=12, r=12, t=32, b=6), autosize=True,
         showlegend=False, funnelmode="stack")
     return fig
 
@@ -220,7 +220,7 @@ def defend_figure(records, theme: str = "dark") -> go.Figure:
     fig.update_layout(
         barmode="stack",
         paper_bgcolor=lay["paper_bgcolor"], plot_bgcolor=lay["plot_bgcolor"],
-        font=lay["font"], margin=dict(l=40, r=14, t=10, b=24), autosize=True,
+        font=lay["font"], margin=dict(l=40, r=14, t=28, b=24), autosize=True,
         showlegend=True, legend=dict(orientation="h", y=1.1, font=dict(size=10)),
         xaxis=dict(gridcolor="rgba(0,0,0,0)"),
         yaxis=dict(title="Defensive actions per 90", gridcolor=lay["gridcolor_hint"]))
@@ -258,7 +258,7 @@ def bubble_figure(records, theme: str = "dark", color_map=None) -> go.Figure:
                       "Final-third share: %{customdata[1]}%<extra></extra>"))
     fig.update_layout(
         paper_bgcolor=lay["paper_bgcolor"], plot_bgcolor=lay["plot_bgcolor"],
-        font=lay["font"], margin=dict(l=46, r=24, t=6, b=32), autosize=True,
+        font=lay["font"], margin=dict(l=46, r=24, t=18, b=32), autosize=True,
         showlegend=False,
         xaxis=dict(title="Total passes", gridcolor=lay["gridcolor_hint"],
                    range=list(_pad(min(xs), max(xs)))),
@@ -326,7 +326,7 @@ def quadrant_figure(records, theme: str = "dark", color_map=None) -> go.Figure:
                            opacity=0.4, font=dict(size=10))
     fig.update_layout(
         paper_bgcolor=lay["paper_bgcolor"], plot_bgcolor=lay["plot_bgcolor"],
-        font=lay["font"], margin=dict(l=46, r=24, t=6, b=32), autosize=True,
+        font=lay["font"], margin=dict(l=46, r=24, t=18, b=32), autosize=True,
         showlegend=False,
         xaxis=dict(title="xG per shot (chance quality)", gridcolor=lay["gridcolor_hint"]),
         yaxis=dict(title="Conversion % (goals ÷ shots)", gridcolor=lay["gridcolor_hint"]))

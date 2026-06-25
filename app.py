@@ -874,6 +874,8 @@ def move_analysis_view(_prev, _next, index):
     Output("analysis-caveat", "children"),
     Output("analysis-dots", "children"),
     Output("analysis-race-controls", "style"),
+    Output("analysis-modal-graph", "figure"),
+    Output("analysis-modal", "title"),
     Input("analysis-view-index", "data"),
     Input("analysis-race-metric", "value"),
     Input("analysis-race-frame", "data"),
@@ -882,8 +884,22 @@ def move_analysis_view(_prev, _next, index):
     Input("color-scheme-toggle", "checked"),
 )
 def render_analysis(view_index, race_metric, frame, carousel_index, _live, dark):
-    return analysis_render(view_index, race_metric, carousel_index,
-                           dark if dark is not None else True, frame)
+    fig, title, caption, caveat, dots_children, race_style = analysis_render(
+        view_index, race_metric, carousel_index,
+        dark if dark is not None else True, frame)
+    # The expanded modal mirrors the current chart (same figure) and shows the
+    # view's title for context.
+    return fig, title, caption, caveat, dots_children, race_style, fig, title
+
+
+@callback(
+    Output("analysis-modal", "opened"),
+    Input("analysis-expand", "n_clicks"),
+    State("analysis-modal", "opened"),
+    prevent_initial_call=True,
+)
+def toggle_analysis_modal(_n, opened):
+    return not opened
 
 
 @callback(
