@@ -1,16 +1,32 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from pathlib import Path
 
 import dash_mantine_components as dmc
 
 from src.data.lineups import StartingEleven, format_formation
 
+# Pitch PNGs live under <project>/assets/pitches. We stat the file to derive a
+# cache-busting version query (see pitch_src).
+_ASSETS = Path(__file__).resolve().parents[2] / "assets"
+
 
 def pitch_src(slug: str, asset_url: Callable[[str], str], dark: bool) -> str:
-    """Asset URL for a team's pitch PNG in the requested theme."""
+    """Asset URL for a team's pitch PNG in the requested theme.
+
+    Appends a ``?v=<mtime>`` version query so a regenerated PNG (same filename)
+    is never served stale from the browser cache. Dash's ``get_asset_url`` adds
+    no cache-buster of its own, so without this a fresh image keeps showing the
+    old cached copy until a hard refresh.
+    """
     theme = "dark" if dark else "light"
-    return asset_url(f"pitches/{slug}-{theme}.png")
+    rel = f"pitches/{slug}-{theme}.png"
+    url = asset_url(rel)
+    pitch_file = _ASSETS / rel
+    if pitch_file.exists():
+        url = f"{url}?v={int(pitch_file.stat().st_mtime)}"
+    return url
 
 
 def formation_title(lineup: StartingEleven | None) -> str:

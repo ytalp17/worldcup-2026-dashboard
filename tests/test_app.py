@@ -93,8 +93,9 @@ def test_formation_panel_payload_is_theme_aware():
     # and a theme-correct pitch image src.
     assert "-" in disp
     assert team == app.center_team(app.TEAM_NAMES, 0)
-    assert src_dark.endswith("-dark.png")
-    assert src_light.endswith("-light.png")
+    # src carries a ?v=<mtime> cache-buster, so compare the path portion.
+    assert src_dark.split("?")[0].endswith("-dark.png")
+    assert src_light.split("?")[0].endswith("-light.png")
 
 
 def test_flow_children_for_mode_team_uses_centered_team():
