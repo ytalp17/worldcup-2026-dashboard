@@ -326,3 +326,31 @@ def test_modal_match_id_ignores_non_pattern_trigger():
     import app
     assert app._modal_match_id("scheme-toggle", 1) is None
     assert app._modal_match_id(None, 1) is None
+
+
+# ---------------------------------------------------------------------------
+# Two-phase modal open: target store + id extraction
+# ---------------------------------------------------------------------------
+
+def test_layout_has_live_modal_target_store():
+    import app
+    from dash import dcc
+
+    def walk(n):
+        yield n
+        ch = getattr(n, "children", None)
+        if isinstance(ch, (list, tuple)):
+            for c in ch:
+                yield from walk(c)
+        elif ch is not None:
+            yield from walk(ch)
+
+    store_ids = {n.id for n in walk(app.app.layout) if isinstance(n, dcc.Store)}
+    assert "live-modal-target" in store_ids
+
+
+def test_modal_target_id_extracts_match_id():
+    import app
+    assert app._modal_target_id({"id": 7, "t": 1.0}) == 7
+    assert app._modal_target_id(None) is None
+    assert app._modal_target_id({}) is None

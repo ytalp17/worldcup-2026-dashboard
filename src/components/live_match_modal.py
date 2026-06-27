@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dash_mantine_components as dmc
+from dash import html
 
 
 # ---------------------------------------------------------------------------
@@ -356,12 +357,44 @@ def modal_body(
     return dmc.Stack([header, dmc.Divider(my="sm"), tabs], gap="xs")
 
 
+def loading_body():
+    """Skeleton placeholder shaped like the real body.
+
+    Shown the instant the modal opens (Phase 1), before the live data arrives
+    (Phase 2). Mimicking the layout — title, status badge, tab strip, rows —
+    avoids a spinner-on-blank flash and a layout jump when content lands.
+    """
+    return dmc.Stack(
+        [
+            dmc.Skeleton(height=26, width="58%", radius="sm"),          # title
+            dmc.Skeleton(height=18, width=120, radius="xl"),           # status badge
+            dmc.Divider(my="sm"),
+            dmc.Group(
+                [dmc.Skeleton(height=20, width=70, radius="sm") for _ in range(3)],
+                gap="sm",
+            ),                                                          # tab strip
+            dmc.Stack(
+                [dmc.Skeleton(height=34, radius="md") for _ in range(5)],
+                gap="xs",
+                mt="xs",
+            ),                                                          # rows
+        ],
+        gap="xs",
+        className="live-modal-loading",
+    )
+
+
 def build_modal() -> dmc.Modal:
-    """Mount the closed modal shell; the open callback fills ``children`` on demand."""
+    """Mount the closed modal shell.
+
+    The body lives in a stable ``#live-modal-content`` container so two
+    callbacks can write it: Phase 1 drops in the loading skeleton instantly,
+    Phase 2 swaps in the fetched match detail.
+    """
     return dmc.Modal(
         id="live-match-modal",
         opened=False,
         size="lg",
         zIndex=3000,
-        children=modal_body(None, [], {}, {}),
+        children=html.Div(modal_body(None, [], {}, {}), id="live-modal-content"),
     )

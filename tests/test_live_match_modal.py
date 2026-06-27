@@ -6,6 +6,7 @@ from pathlib import Path
 from src.components.live_match_modal import (
     build_modal,
     event_visual,
+    loading_body,
     modal_body,
     stat_rows,
 )
@@ -222,3 +223,18 @@ def test_build_modal_size_and_z_index():
     props = mod.to_plotly_json()["props"]
     assert props.get("size") == "lg"
     assert props.get("zIndex") == 3000
+
+
+# ---------------------------------------------------------------------------
+# Two-phase open: instant skeleton + stable content container
+# ---------------------------------------------------------------------------
+
+def test_build_modal_wraps_content_in_stable_container():
+    # The body lives in a fixed #live-modal-content div the fill callback targets.
+    assert "live-modal-content" in str(build_modal().to_plotly_json())
+
+
+def test_loading_body_is_skeleton_placeholder():
+    blob = str(loading_body().to_plotly_json())
+    # Several skeletons mimicking the real layout (title, badge, tabs, rows).
+    assert blob.count("Skeleton") >= 8

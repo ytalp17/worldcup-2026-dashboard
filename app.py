@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from pathlib import Path
 
@@ -31,7 +32,7 @@ from src.components.leaders_card import (
 )
 from src.components.squad_table import build_squad_panel, squad_rows
 from src.components.tournament_stats import tab_options, tourn_columns, tourn_row_data
-from src.components.live_match_modal import build_modal, modal_body
+from src.components.live_match_modal import build_modal, loading_body, modal_body
 from src.components.live_strip import overlay_style, strip_items
 from src.components.team_kpis import build_kpi_strip, kpi_cards
 from src.data.team_form import recent_form
@@ -623,27 +624,60 @@ def _modal_match_id(triggered_id, triggered_value):
     return triggered_id.get("index")
 
 
+def _modal_target_id(target):
+    """Extract the match_id from the Phase-1 → Phase-2 handoff payload."""
+    if not isinstance(target, dict):
+        return None
+    return target.get("id")
+
+
+def _fetch_modal_payload(match_id, now):
+    """Fetch the four match-detail datasets concurrently.
+
+    They hit four independent, distinct-keyed caches, so running them in
+    parallel turns first-open latency from ~4 round-trips into ~1.
+    """
+    if LIVE is None:
+        return None, [], {}, {}
+    with ThreadPoolExecutor(max_workers=4) as ex:
+        f_match = ex.submit(LIVE.match_summary, match_id, now)
+        f_events = ex.submit(LIVE.match_events, match_id, now)
+        f_stats = ex.submit(LIVE.match_statistics, match_id, now)
+        f_lineups = ex.submit(LIVE.match_lineups, match_id, now)
+        return f_match.result(), f_events.result(), f_stats.result(), f_lineups.result()
+
+
 @callback(
     Output("live-match-modal", "opened"),
-    Output("live-match-modal", "children"),
+    Output("live-modal-target", "data"),
+    Output("live-modal-content", "children"),
     Input({"type": "live-strip-item", "index": ALL}, "n_clicks"),
     Input({"type": "open-live-modal", "index": ALL}, "n_clicks"),
     prevent_initial_call=True,
 )
 def open_live_modal(strip_clicks, drawer_clicks):
+    # Phase 1 — instant, zero network: open the modal on a real click, show the
+    # skeleton, and hand the match_id (with a nonce so re-opens always re-fill)
+    # to the fill callback.
     trig_value = ctx.triggered[0]["value"] if ctx.triggered else None
     match_id = _modal_match_id(ctx.triggered_id, trig_value)
     if match_id is None:
-        return no_update, no_update
-    now = time.monotonic()
-    if LIVE is not None:
-        match = LIVE.match_summary(match_id, now)
-        events = LIVE.match_events(match_id, now)
-        stats = LIVE.match_statistics(match_id, now)
-        lineups = LIVE.match_lineups(match_id, now)
-    else:
-        match, events, stats, lineups = None, [], {}, {}
-    return True, modal_body(match, events, stats, lineups)
+        return no_update, no_update, no_update
+    return True, {"id": match_id, "t": time.monotonic()}, loading_body()
+
+
+@callback(
+    Output("live-modal-content", "children", allow_duplicate=True),
+    Input("live-modal-target", "data"),
+    prevent_initial_call=True,
+)
+def fill_live_modal(target):
+    # Phase 2 — fetch in the background and swap the real body in for the skeleton.
+    match_id = _modal_target_id(target)
+    if match_id is None:
+        return no_update
+    match, events, stats, lineups = _fetch_modal_payload(match_id, time.monotonic())
+    return modal_body(match, events, stats, lineups)
 
 
 @callback(
