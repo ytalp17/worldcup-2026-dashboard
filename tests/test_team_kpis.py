@@ -33,9 +33,9 @@ def test_stat_card_renders_label_value_sub():
     assert "years" in texts
 
 
-def test_kpi_cards_has_seven_with_real_and_placeholder_values():
+def test_kpi_cards_has_eight_with_real_and_placeholder_values():
     cards = kpi_cards(REAL)
-    assert len(cards) == 7
+    assert len(cards) == 8
     all_text = " ".join(t for c in cards for t in _texts(c))
     # Real, computed values
     assert "29.8" in all_text
@@ -84,8 +84,11 @@ def test_manager_card_shows_age():
 def test_build_kpi_strip_has_id():
     strip = build_kpi_strip(REAL)
     assert strip.id == "kpi-strip"
-    cards = [n for n in _walk(strip) if getattr(n, "className", "") == "stat-card"]
-    assert len(cards) == 7
+    # every card's className starts with "stat-card" (some carry width modifiers)
+    cards = [n for n in _walk(strip)
+             if isinstance(getattr(n, "className", None), str)
+             and n.className.split()[0:1] == ["stat-card"]]
+    assert len(cards) == 8
 
 
 def test_federation_card_shows_confederation_and_logo():
@@ -119,7 +122,7 @@ def test_kpi_cards_are_in_spec_order():
     cards = kpi_cards(REAL)
     assert [_header_label(c) for c in cards] == [
         "Value", "Avg age", "Avg height", "Foot Preference",
-        "FIFA rank", "Federation", "Manager"]
+        "FIFA rank", "Form", "Federation", "Manager"]
 
 
 def test_foot_card_header_renamed_to_foot_preference():
@@ -135,6 +138,63 @@ def test_every_card_header_has_a_nonempty_tooltip():
         tips = [n for n in _walk(c) if isinstance(n, dmc.Tooltip)]
         assert tips, f"{_header_label(c)} card has no tooltip"
         assert all(isinstance(t.label, str) and t.label.strip() for t in tips)
+
+
+def _form_dots(card_or_cards):
+    cards = card_or_cards if isinstance(card_or_cards, list) else [card_or_cards]
+    return [n for c in cards for n in _walk(c)
+            if isinstance(getattr(n, "className", None), str)
+            and n.className.startswith("form-dot")]
+
+
+def _form_card(cards):
+    return next(c for c in cards if _header_label(c) == "Form")
+
+
+def test_form_card_renders_five_slots_padded_with_empties():
+    cards = kpi_cards(REAL, form=["W", "D", "L"])
+    dots = _form_dots(_form_card(cards))
+    assert len(dots) == 5
+    classes = [d.className for d in dots]
+    assert "form-dot--w" in classes[0]
+    assert "form-dot--d" in classes[1]
+    assert "form-dot--l" in classes[2]
+    # the two unplayed slots are hollow
+    assert classes[3].endswith("form-dot--empty")
+    assert classes[4].endswith("form-dot--empty")
+
+
+def test_form_card_all_empty_when_no_games_played():
+    cards = kpi_cards(REAL)  # default form=()
+    dots = _form_dots(_form_card(cards))
+    assert len(dots) == 5
+    assert all(d.className.endswith("form-dot--empty") for d in dots)
+
+
+def test_form_card_orders_chronologically_left_to_right():
+    cards = kpi_cards(REAL, form=["L", "W"])
+    dots = _form_dots(_form_card(cards))
+    assert "form-dot--l" in dots[0].className   # oldest on the left
+    assert "form-dot--w" in dots[1].className   # most recent next
+
+
+def test_form_card_has_tooltip():
+    cards = kpi_cards(REAL, form=["W"])
+    tips = [n for n in _walk(_form_card(cards)) if isinstance(n, dmc.Tooltip)]
+    assert tips and all(t.label.strip() for t in tips)
+
+
+def test_width_modifiers_keep_federation_and_manager_unmodified():
+    # Federation & Manager keep the base flex (no width modifier); the new Form
+    # box gets extra room and the five data boxes give it up.
+    cards = kpi_cards(REAL)
+    by_label = {_header_label(c): c.className for c in cards}
+    assert by_label["Form"].split() == ["stat-card", "stat-card--form"]
+    assert by_label["Federation"] == "stat-card"
+    assert by_label["Manager"] == "stat-card"
+    for narrow in ("Value", "Avg age", "Avg height", "Foot Preference",
+                   "FIFA rank"):
+        assert "stat-card--narrow" in by_label[narrow]
 
 
 def test_federation_card_shows_continent_on_third_line():
