@@ -71,7 +71,8 @@ def test_match_card_shows_tbd_shield_when_unresolved():
     texts = _texts(card)
     assert texts.count("TBD") == 2          # both slots undecided
     from dash_iconify import DashIconify
-    shields = [n for n in _walk(card) if isinstance(n, DashIconify)]
+    shields = [n for n in _walk(card) if isinstance(n, DashIconify)
+               and getattr(n, "className", "") == "ko-shield"]
     assert len(shields) == 2                 # a shield per undecided slot
 
 
@@ -86,6 +87,15 @@ def test_match_card_shows_team_score_and_flag_when_resolved():
     imgs = [n for n in _walk(card) if isinstance(n, dmc.Image)]
     assert any(getattr(i, "src", "").endswith("flags/Mexico.png")
                for i in imgs)
+
+
+def test_match_card_shows_venue():
+    matches = [_m(73, "Group A winners", "Group B runners-up", "Round of 32")]
+    # _m sets stadium="X"
+    br = build_bracket(matches, venues={"X": "AT&T Stadium, Dallas"})
+    card = match_card(br["Round of 32"][0], _asset, user_tz=None,
+                      today=date(2026, 6, 27))
+    assert "AT&T Stadium, Dallas" in _texts(card)
 
 
 def test_format_ko_datetime_relative_and_absolute():

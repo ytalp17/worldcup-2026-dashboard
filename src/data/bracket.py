@@ -59,6 +59,7 @@ class BracketMatch:
     away: Slot
     finished: bool
     feeder_numbers: tuple[int, ...]  # earlier matches feeding this one
+    venue: str = ""                  # where the match is played
 
 
 def _feeders(home_label: str, away_label: str) -> tuple[int, ...]:
@@ -95,7 +96,8 @@ def _resolve_label(label: str, standings: dict, complete_groups: set,
 
 def build_bracket(ko_matches, standings: dict | None = None,
                   complete_groups: set | None = None,
-                  results: dict | None = None) -> dict[str, list[BracketMatch]]:
+                  results: dict | None = None,
+                  venues: dict | None = None) -> dict[str, list[BracketMatch]]:
     """Resolve the knockout schedule into ``{stage: [BracketMatch]}``.
 
     ``standings``: ``{group_name: [team, ...]}`` ordered best-first.
@@ -107,6 +109,7 @@ def build_bracket(ko_matches, standings: dict | None = None,
     standings = standings or {}
     complete_groups = complete_groups or set()
     results = results or {}
+    venues = venues or {}
 
     winners: dict[int, str] = {}
     losers: dict[int, str] = {}
@@ -140,6 +143,7 @@ def build_bracket(ko_matches, standings: dict | None = None,
             away=Slot(away_team, away_score, away_won),
             finished=finished,
             feeder_numbers=_feeders(m.home, m.away),
+            venue=venues.get(m.stadium, m.stadium),
         ))
     return out
 

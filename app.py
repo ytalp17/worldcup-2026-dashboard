@@ -89,6 +89,8 @@ SQUADS = SquadRepository(DATA_DIR / "squads.csv").load()
 LINEUPS = LineupRepository(DATA_DIR / "estimated_starting_eleven.json").load()
 
 STADIUM_TO_CITY = {v.stadium_name: v.city for v in VENUES}
+# Friendly venue label per generic stadium name, for the knockout bracket cards.
+VENUE_LABELS = {v.stadium_name: f"{v.official_name}, {v.city}" for v in VENUES}
 MATCH_CALENDAR = MatchCalendar(MATCHES, STADIUM_TO_CITY, today=date.today())
 
 STADIUM_INDEX = build_stadium_index(MATCHES)
@@ -330,7 +332,8 @@ def knockout_payload(page, live, user_tz):
     standings, complete = _bracket_standings(live)
     results = _knockout_results(time.monotonic())
     bracket = build_bracket(KO_MATCHES, standings=standings,
-                            complete_groups=complete, results=results)
+                            complete_groups=complete, results=results,
+                            venues=VENUE_LABELS)
     page = max(0, min(page or 0, len(STAGE_PAGES) - 1))
     body = render_page(bracket, page, app.get_asset_url, user_tz, date.today())
     return body, page_dots(page)
@@ -511,7 +514,7 @@ def move_knockout_page(_prev, _next, page):
     Output("knockout-dots", "children"),
     Input("knockout-page", "data"),
     Input("live-store", "data"),
-    State("user-tz", "data"),
+    Input("user-tz", "data"),  # re-render kickoff times once the browser tz resolves
 )
 def render_knockout(page, live, user_tz):
     return knockout_payload(page, live, user_tz)

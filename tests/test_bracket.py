@@ -78,6 +78,15 @@ def test_results_set_scores_and_mark_winner_and_propagate():
     assert r16.away.team == "Poland"   # winner of 74 (away won)
 
 
+def test_bracket_carries_venue_label():
+    matches = [_m(73, "Group A winners", "Group B runners-up", "Round of 32")]
+    # without a map, the venue falls back to the schedule's stadium name
+    assert build_bracket(matches)["Round of 32"][0].venue == "X"
+    # with a label map, the friendly venue is used
+    br = build_bracket(matches, venues={"X": "AT&T Stadium, Dallas"})
+    assert br["Round of 32"][0].venue == "AT&T Stadium, Dallas"
+
+
 def test_stage_ties_link_winner_to_its_two_feeders():
     br = build_bracket(_mini_ko())
     ties = stage_ties(br, "Round of 32", "Round of 16")

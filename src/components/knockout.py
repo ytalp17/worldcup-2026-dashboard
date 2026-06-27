@@ -66,12 +66,16 @@ def _slot_row(slot, asset_url):
 def match_card(bm: BracketMatch, asset_url, user_tz, today) -> dmc.Box:
     """A single bracket match card: date/time header over the two team rows."""
     cls = "ko-card ko-card--done" if bm.finished else "ko-card"
-    return dmc.Box(
-        [dmc.Text(format_ko_datetime(bm, user_tz, today), size="xs", c="dimmed",
-                  className="ko-card__time"),
-         _slot_row(bm.home, asset_url),
-         _slot_row(bm.away, asset_url)],
-        className=cls)
+    children = [dmc.Text(format_ko_datetime(bm, user_tz, today), size="xs",
+                         c="dimmed", className="ko-card__time"),
+                _slot_row(bm.home, asset_url),
+                _slot_row(bm.away, asset_url)]
+    if bm.venue:
+        children.append(dmc.Group(
+            [DashIconify(icon="tabler:map-pin", width=12, className="ko-pin"),
+             dmc.Text(bm.venue, size="xs", c="dimmed", className="ko-venue__text")],
+            gap=4, wrap="nowrap", align="center", className="ko-venue"))
+    return dmc.Box(children, className=cls)
 
 
 def _tie_row(winner_match, feeders, asset_url, user_tz, today) -> dmc.Box:

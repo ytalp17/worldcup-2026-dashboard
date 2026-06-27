@@ -870,6 +870,11 @@ body,
 .ko-score { flex: 0 0 auto; min-width: 12px; text-align: right;
     font-variant-numeric: tabular-nums; }
 .ko-shield { color: var(--mantine-color-dimmed); opacity: .55; }
+/* Venue line under the teams: pin + stadium, truncated to keep the card compact */
+.ko-venue { margin-top: 2px; min-width: 0; }
+.ko-pin { color: var(--mantine-color-dimmed); flex: 0 0 auto; opacity: .8; }
+.ko-venue__text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    min-width: 0; }
 /* in a finished match the losing side dims so the winner stands out */
 .ko-card--done .ko-slot:not(.ko-slot--win) .ko-team {
     color: var(--mantine-color-dimmed); }
