@@ -608,6 +608,21 @@ def render_live_strip(selected_date, live, user_tz):
     return strip_items({"matches": matches}, user_tz=user_tz)
 
 
+def _modal_match_id(triggered_id, triggered_value):
+    """Resolve the match_id to open, or ``None`` to do nothing.
+
+    The modal must open ONLY on a real click. Pattern-matching callbacks also
+    fire when new matching components are mounted — e.g. when the venue drawer
+    renders its match cards — and those carry a falsy ``n_clicks`` value. We
+    gate on that value so a drawer-open never pops a stray modal.
+    """
+    if not isinstance(triggered_id, dict):
+        return None
+    if not triggered_value:
+        return None
+    return triggered_id.get("index")
+
+
 @callback(
     Output("live-match-modal", "opened"),
     Output("live-match-modal", "children"),
@@ -616,13 +631,10 @@ def render_live_strip(selected_date, live, user_tz):
     prevent_initial_call=True,
 )
 def open_live_modal(strip_clicks, drawer_clicks):
-    clicks = (strip_clicks or []) + (drawer_clicks or [])
-    if not any(c for c in clicks if c):
+    trig_value = ctx.triggered[0]["value"] if ctx.triggered else None
+    match_id = _modal_match_id(ctx.triggered_id, trig_value)
+    if match_id is None:
         return no_update, no_update
-    triggered = ctx.triggered_id
-    if not isinstance(triggered, dict):
-        return no_update, no_update
-    match_id = triggered["index"]
     now = time.monotonic()
     if LIVE is not None:
         match = LIVE.match_summary(match_id, now)

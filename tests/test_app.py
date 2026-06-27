@@ -301,3 +301,28 @@ def test_app_layout_has_tournament_drawer():
 
     ids = {n.id for n in walk(app.app.layout) if isinstance(n, Drawer)}
     assert "tournament-drawer" in ids
+
+
+# ---------------------------------------------------------------------------
+# _modal_match_id — only open the live-match modal on a REAL click, never when
+# the venue/stadium drawer dynamically mounts new match cards (regression).
+# ---------------------------------------------------------------------------
+
+def test_modal_match_id_opens_on_real_click():
+    import app
+    trig = {"type": "open-live-modal", "index": 42}
+    assert app._modal_match_id(trig, 1) == 42
+
+
+def test_modal_match_id_ignores_card_mount_with_no_click():
+    import app
+    # Opening a drawer mounts new cards → their n_clicks value is None/0.
+    trig = {"type": "open-live-modal", "index": 42}
+    assert app._modal_match_id(trig, None) is None
+    assert app._modal_match_id(trig, 0) is None
+
+
+def test_modal_match_id_ignores_non_pattern_trigger():
+    import app
+    assert app._modal_match_id("scheme-toggle", 1) is None
+    assert app._modal_match_id(None, 1) is None
