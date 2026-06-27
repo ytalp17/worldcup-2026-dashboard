@@ -29,7 +29,12 @@ matplotlib.use("Agg")  # headless
 import matplotlib.pyplot as plt  # noqa: E402
 from mplsoccer import Pitch  # noqa: E402
 
+from src.data.formation_assign import assign_xi_to_slots  # noqa: E402
+from src.data.lineups import canonical_team  # noqa: E402
+from src.data.squads import SquadRepository  # noqa: E402
+
 DATA = Path("assets/data/estimated_starting_eleven.json")
+SQUADS = Path("assets/data/squads.csv")
 OUTDIR = Path("assets/pitches")
 
 # Two palettes so the card honours the app's dark/light switch. Margins are
@@ -57,8 +62,14 @@ THEMES = {
 }
 
 
-def render_team(key: str, data: dict, theme: dict, name: str, outdir) -> Path:
-    """Render one team's pitch for one theme; return the written PNG path."""
+def render_team(key: str, data: dict, theme: dict, name: str, outdir,
+                positions: dict[int, str] | None = None) -> Path:
+    """Render one team's pitch for one theme; return the written PNG path.
+
+    ``positions`` maps shirt number -> real position (from squads.csv); when
+    given, players are placed on the slot matching their real position rather
+    than by raw xi order.
+    """
     outdir = Path(outdir)
     pitch = Pitch(
         pitch_type="opta",
@@ -72,13 +83,19 @@ def render_team(key: str, data: dict, theme: dict, name: str, outdir) -> Path:
     ax.set_facecolor(theme["pitch_color"])
 
     formation = data["formation"]
-    xi = data["xi"]
-    positions = pitch.get_formation(formation)
-    if len(xi) != len(positions):
+    xi = [(str(s), int(n)) for s, n in data["xi"]]
+    slots = pitch.get_formation(formation)
+    if len(xi) != len(slots):
         raise ValueError(
             f"{key}: {len(xi)} players but formation {formation} "
-            f"expects {len(positions)}"
+            f"expects {len(slots)}"
         )
+
+    # Place each player on the slot matching their real position; without a
+    # positions map, fall back to the raw xi order.
+    if positions:
+        slot_xy = [(s.x, s.y) for s in slots]
+        xi = assign_xi_to_slots(slot_xy, xi, positions)
 
     colors = [theme["gk_color"] if i == 0 else theme["node_color"]
               for i in range(len(xi))]
@@ -89,7 +106,7 @@ def render_team(key: str, data: dict, theme: dict, name: str, outdir) -> Path:
 
     # Shirt number centred in each node; surname just beneath it. On a
     # horizontal pitch "beneath" is a smaller y.
-    for pos, (surname, num) in zip(positions, xi):
+    for pos, (surname, num) in zip(slots, xi):
         pitch.annotate(str(num), xy=(pos.x, pos.y), ax=ax, ha="center",
                        va="center", color=theme["number_color"], fontsize=23,
                        fontweight="bold", zorder=4)
@@ -107,10 +124,19 @@ def render_team(key: str, data: dict, theme: dict, name: str, outdir) -> Path:
 
 def main():
     raw = json.loads(DATA.read_text(encoding="utf-8"))
+    squads = SquadRepository(SQUADS).load()
     made = 0
     for slug, data in raw.items():
+        team = canonical_team(slug)
+        squad = squads.get(team)
+        positions = (
+            {p.number: p.position for p in squad.players} if squad else None
+        )
+        if positions is None:
+            print(f"  ! {data['name']:<24} no squad match for '{team}' "
+                  f"— falling back to xi order")
         for name, theme in THEMES.items():
-            render_team(slug, data, theme, name, OUTDIR)
+            render_team(slug, data, theme, name, OUTDIR, positions)
             made += 1
         print(f"  ✓ {data['name']:<24} {data['formation']}")
     print(f"\nGenerated {made} pitch images in ./{OUTDIR}/ "
