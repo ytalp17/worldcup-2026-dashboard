@@ -344,6 +344,42 @@ body,
     background: var(--mantine-color-default-border);
 }
 
+/* Width balance: keep total flex-grow at 7 so Federation & Manager (grow 1)
+   stay the same width. The Form card takes 1.5 and the five computed/rank
+   cards drop to 0.7 each (5×0.7 + 1.5 = 5), so Form's extra room comes out of
+   them, not out of Federation/Manager. flex-basis stays 0 (from .stat-card). */
+.stat-card--narrow { flex-grow: 0.7; }
+.stat-card--form { flex-grow: 1.5; }
+
+/* Recent-form dots: one circle per match, oldest → newest. Win/loss reuse the
+   exact qualification green / elimination red from the group table. */
+.stat-card__form {
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+
+.form-dot {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+
+.form-dot--w { background: #1D9E75; }
+.form-dot--d { background: var(--mantine-color-gray-5); }
+.form-dot--l { background: #e03131; }
+.form-dot--empty {
+    background: transparent;
+    border: 1.5px solid var(--mantine-color-default-border);
+}
+
 .stat-card__icon {
     color: var(--mantine-color-dimmed);
     flex: 0 0 auto;
@@ -694,6 +730,12 @@ body,
     }
     .main-split--team .kpi-strip .stat-card {
         flex: 1 1 30%;
+    }
+    /* Slightly smaller form dots so all five fit the narrow wrapped card. */
+    .main-split--team .kpi-strip .form-dot {
+        width: 13px;
+        height: 13px;
+        font-size: 9px;
     }
     .main-split--team .bento-card--leaders {
         min-height: 200px;

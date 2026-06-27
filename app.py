@@ -32,6 +32,7 @@ from src.components.tournament_stats import tab_options, tourn_columns, tourn_ro
 from src.components.live_match_modal import build_modal, modal_body
 from src.components.live_strip import overlay_style, strip_items
 from src.components.team_kpis import build_kpi_strip, kpi_cards
+from src.data.team_form import recent_form
 from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, display_name, team_order
 from src.components.analysis.panel import build_analysis_panel
 from src.components.analysis import views as analysis_views
@@ -258,6 +259,28 @@ def team_stats_payload(index):
     )
 
 
+def _finished_tournament_matches(now):
+    """All finished WC-2026 match dicts, read from the per-date caches that
+    `_backfill_live_stats` warms on connect (so this stays a cheap cache read,
+    not a burst of API calls). Empty when there's no live service."""
+    if LIVE is None:
+        return []
+    today = date.today()
+    matches = []
+    for d in sorted({m.date for m in MATCHES if m.date <= today}):
+        matches.extend(LIVE.matches_on(d.isoformat(), now))
+    return matches
+
+
+def team_form_payload(index, now=None):
+    """The centred team's recent W/D/L in this tournament (oldest → newest),
+    as a tuple of at most five tokens — for the Form KPI card."""
+    team = center_team(TEAM_NAMES, index or 0)
+    matches = _finished_tournament_matches(
+        now if now is not None else time.monotonic())
+    return tuple(recent_form(team, matches, canonical_team, limit=5))
+
+
 def formation_panel_payload(index, dark):
     """(header_title, team, image_src) for the centred team's estimated XI.
     `dark` (the color-scheme-toggle state) picks the dark/light pitch image."""
@@ -296,7 +319,7 @@ app.layout = build_layout(
         app.get_asset_url,
         dark=True,
     ),
-    kpi_strip=build_kpi_strip(team_stats_payload(0)),
+    kpi_strip=build_kpi_strip(team_stats_payload(0), team_form_payload(0)),
     leaders_panel=build_leaders_card(),
     asset_url=app.get_asset_url,
 )
@@ -674,9 +697,12 @@ def update_formation_panel(index, dark):
 @callback(
     Output("kpi-strip", "children"),
     Input("carousel-index", "data"),
+    Input("live-store", "data"),
 )
-def update_kpi_strip(index):
-    return kpi_cards(team_stats_payload(index))
+def update_kpi_strip(index, _live):
+    # _live is the trigger only: form is read from the per-date caches so the
+    # strip refreshes as results finalise; the snapshot itself carries no history.
+    return kpi_cards(team_stats_payload(index), team_form_payload(index))
 
 
 # Toggling the switch flips both the Mantine color scheme and the base map
