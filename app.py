@@ -302,31 +302,34 @@ def _bracket_standings(live):
 def _knockout_live(now):
     """({number: (home, away, home_score, away_score)}, {number: live match_id})
     for knockout matches the live feed carries. Matched to the schedule by
-    kickoff instant; reads the cache-warmed per-date snapshots, so cheap. A
-    match_id is recorded whenever the feed has the fixture (so the card is
-    clickable); results only when both teams are resolved (not placeholders)."""
+    kickoff instant. The feed publishes the knockout fixtures (real teams + ids,
+    scheduled) ahead of kickoff, so we read every knockout date — not just past
+    ones — which both fills the bracket with real matchups and makes the cards
+    clickable. A card is clickable only once its teams are resolved (not
+    placeholders), so there is always something to show in the modal."""
     if LIVE is None:
         return {}, {}
-    today = date.today()
-    by_date = {}
-    for m in KO_MATCHES:
-        if m.date <= today:
-            by_date.setdefault(m.date.isoformat(), []).append(m)
+    # Pool every knockout date's live matches into one kickoff-keyed index. The
+    # API groups a match under its own date, which can differ from the schedule's
+    # match_date by a day (UTC vs local), so matching globally by kickoff instant
+    # is more reliable than matching within a single date.
+    by_kickoff = {}
+    for date_iso in sorted({m.date.isoformat() for m in KO_MATCHES}):
+        for lm in LIVE.matches_on(date_iso, now):
+            if lm.get("kickoff"):
+                by_kickoff[lm["kickoff"]] = lm
     results, match_ids = {}, {}
-    for date_iso, day_matches in by_date.items():
-        live_day = LIVE.matches_on(date_iso, now)
-        by_kickoff = {lm.get("kickoff"): lm for lm in live_day if lm.get("kickoff")}
-        for m in day_matches:
-            lm = by_kickoff.get(m.kickoff_utc.isoformat())
-            if not lm:
-                continue
-            if lm.get("match_id") is not None:
-                match_ids[m.number] = lm["match_id"]
-            home, away = lm.get("home", ""), lm.get("away", "")
-            if is_placeholder(home) or is_placeholder(away):
-                continue
-            results[m.number] = (official_team(home), official_team(away),
-                                 lm.get("home_score"), lm.get("away_score"))
+    for m in KO_MATCHES:
+        lm = by_kickoff.get(m.kickoff_utc.isoformat())
+        if not lm:
+            continue
+        home, away = lm.get("home", ""), lm.get("away", "")
+        if is_placeholder(home) or is_placeholder(away):
+            continue
+        results[m.number] = (official_team(home), official_team(away),
+                             lm.get("home_score"), lm.get("away_score"))
+        if lm.get("match_id") is not None:
+            match_ids[m.number] = lm["match_id"]
     return results, match_ids
 
 
@@ -976,6 +979,11 @@ def _backfill_live_stats():
         day = LIVE.matches_on(d.isoformat(), now)
         LIVE.update_player_stats(day, now)
         LIVE.update_team_stats(day, now)
+    # Warm the matches_on cache for upcoming knockout dates too, so the
+    # knockout bracket renders (and its cards become clickable) without each
+    # render paying for ~17 future-date fetches.
+    for d in sorted({m.date for m in KO_MATCHES if m.date > today}):
+        LIVE.matches_on(d.isoformat(), now)
 
 
 # Always register the persistent WS callback so the client can always resolve it
