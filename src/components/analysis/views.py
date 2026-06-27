@@ -62,20 +62,39 @@ VIEWS = [
 VIEW_BY_ID = {v["id"]: v for v in VIEWS}
 
 
+def _wrap_label(label: str, width: int = 13) -> str:
+    """Greedily wrap a multi-word axis label onto <=`width`-char lines with
+    <br>, so long labels (e.g. 'Passes into final third') don't run past the
+    plot edge on narrow/mobile screens — no extra margins needed."""
+    words, lines, cur = label.split(), [], ""
+    for w in words:
+        if cur and len(cur) + 1 + len(w) > width:
+            lines.append(cur)
+            cur = w
+        else:
+            cur = f"{cur} {w}".strip()
+    if cur:
+        lines.append(cur)
+    return "<br>".join(lines)
+
+
 def radar_figure(records, view, theme: str = "dark") -> go.Figure:
     series = aggregate.radar_series(records, view["metrics"])
     cmap = _theme_team_color(series["teams"])
     fmap = _theme_team_fill(series["teams"])
-    axes = series["axes"] + series["axes"][:1]  # close the loop
+    labels = series["axes"] + series["axes"][:1]  # close the loop (full labels)
+    theta = [_wrap_label(a) for a in labels]       # wrapped for the angular axis
     fig = go.Figure()
     for t in series["teams"]:
         scaled = series["scaled"][t] + series["scaled"][t][:1]
         raw = series["raw"][t] + series["raw"][t][:1]
         fig.add_trace(go.Scatterpolar(
-            r=scaled, theta=axes, name=t, fill="toself",
+            r=scaled, theta=theta, name=t, fill="toself",
             fillcolor=fmap[t], line=dict(color=cmap[t], width=2),
-            customdata=list(zip(raw, axes)),
-            hovertemplate="<b>%{fullData.name}</b><br>%{theta}: "
+            # customdata carries the raw value + the FULL (unwrapped) label so
+            # the hover stays clean even though the axis text is wrapped.
+            customdata=list(zip(raw, labels)),
+            hovertemplate="<b>%{fullData.name}</b><br>%{customdata[1]}: "
                           "%{customdata[0]}<extra></extra>",
         ))
     lay = theme_layout(theme)
