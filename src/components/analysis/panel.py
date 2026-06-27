@@ -77,12 +77,18 @@ def build_analysis_panel() -> dmc.Box:
             dcc.Store(id="analysis-race-frame", data=0),
             dcc.Interval(id="analysis-race-interval", interval=900, disabled=True),
             _expanded_modal(),
+            # Same header idiom as every other bento card: bold label left,
+            # dimmed context (the view title) right, under the shared divider.
             dmc.Group(
-                [dmc.Title(id="analysis-title", order=5),
-                 dmc.Group([_race_controls(), _expand_button()],
-                           gap="xs", align="center", wrap="nowrap")],
-                justify="space-between", align="center",
-                className="analysis-header"),
+                [
+                    dmc.Text("Analysis", fw=700, size="sm"),
+                    dmc.Group(
+                        [dmc.Text(id="analysis-title", size="sm", c="dimmed"),
+                         _race_controls(), _expand_button()],
+                        gap="xs", align="center", wrap="nowrap"),
+                ],
+                justify="space-between", align="center", wrap="nowrap",
+                className="bento-card__header analysis-header"),
             dmc.Text(id="analysis-caption", size="xs", c="dimmed",
                      className="analysis-caption"),
             html.Div(
