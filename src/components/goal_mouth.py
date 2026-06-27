@@ -140,6 +140,55 @@ def build_goal_mouth_figure(agg: dict, mode: str = "volume",
     return fig
 
 
+_GRAPH_CONFIG = {"displayModeBar": False, "responsive": True}
+
+
+def build_goal_mouth_panel() -> dmc.Box:
+    """Goal-mouth map card: header (title + subtitle + fill-mode control) over a
+    Plotly graph, with a caption and the honest-limitation note."""
+    header = dmc.Group(
+        [
+            dmc.Stack([
+                dmc.Text("Goal-mouth map", fw=700, size="sm"),
+                dmc.Text("where each team's shots finished", size="xs", c="dimmed"),
+            ], gap=0),
+            dmc.SegmentedControl(id="goal-mouth-mode", value="Volume",
+                                 data=["Volume", "Dominant"], size="xs"),
+        ],
+        justify="space-between", align="center", wrap="nowrap",
+        className="bento-card__header",
+    )
+    graph = dcc.Graph(id="goal-mouth-graph", figure=build_goal_mouth_figure(
+        {"zones": {z: {"count": 0, "outcomes": {}, "shooters": []}
+                   for z in ON_TARGET},
+         "off_target": {"count": 0, "outcomes": {}},
+         "other": {"count": 0, "outcomes": {}},
+         "totals": {"on_target": 0, "near_miss": 0, "woodwork": 0,
+                    "off_target": 0, "other": 0, "total": 0}}),
+        config=_GRAPH_CONFIG, style={"width": "100%", "flex": "1 1 auto",
+                                     "minHeight": 0})
+    caption = dmc.Stack([
+        dmc.Text("inside the posts = on target · outer band = near miss",
+                 size="xs", c="dimmed"),
+        dmc.Text("placement map (where shots finished), not pitch coordinates — "
+                 "the API gives goal-target zones, not x/y.",
+                 size="xs", c="dimmed"),
+    ], gap=0)
+    body = dmc.Box([graph, caption], className="goal-mouth-panel__body")
+    return dmc.Box([header, body], className="goal-mouth-panel")
+
+
+def build_goal_mouth_drawer() -> dmc.Drawer:
+    """App-level LEFT drawer holding the clicked zone's full shot list."""
+    return dmc.Drawer(
+        id="goal-mouth-drawer",
+        position="left", size="md", padding="md", opened=False,
+        withCloseButton=True, zIndex=2500,
+        classNames={"content": "filter-drawer-frosted",
+                    "header": "filter-drawer-frosted-header"},
+    )
+
+
 def drawer_body(zone_id: str, agg: dict) -> list:
     """Self-contained left-drawer contents for one zone: summary header + a
     scrollable, time-sorted shot list (minute · shooter · outcome)."""

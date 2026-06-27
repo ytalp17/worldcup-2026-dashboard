@@ -79,3 +79,44 @@ def test_drawer_body_lists_shots_sorted_with_color():
     blob = str([c.to_plotly_json() for c in body])
     assert blob.index("Early") < blob.index("Late")
     assert "Low Centre" in blob
+
+
+# ---------------------------------------------------------------------------
+# Task 7: panel + drawer constructors
+# ---------------------------------------------------------------------------
+from dash import dcc
+from src.components.goal_mouth import (
+    build_goal_mouth_panel, build_goal_mouth_drawer,
+)
+
+
+def _walk(node):
+    yield node
+    children = getattr(node, "children", None)
+    if isinstance(children, (list, tuple)):
+        for c in children:
+            yield from _walk(c)
+    elif children is not None:
+        yield from _walk(children)
+
+
+def test_panel_has_header_title_mode_control_and_graph():
+    panel = build_goal_mouth_panel()
+    ids = {getattr(n, "id", None) for n in _walk(panel)}
+    assert "goal-mouth-graph" in ids
+    assert "goal-mouth-mode" in ids
+    texts = [n.children for n in _walk(panel) if isinstance(n, dmc.Text)]
+    assert any("Goal-mouth map" == t for t in texts)
+    # never call it a "shot map"
+    assert not any(isinstance(t, str) and "shot map" in t.lower() for t in texts)
+    # honest-limitation note present
+    assert any(isinstance(t, str) and "placement" in t.lower() for t in texts)
+    graph = next(n for n in _walk(panel) if isinstance(n, dcc.Graph))
+    assert graph.config.get("displayModeBar") is False
+
+
+def test_drawer_is_left_positioned():
+    drawer = build_goal_mouth_drawer()
+    assert isinstance(drawer, dmc.Drawer)
+    assert drawer.id == "goal-mouth-drawer"
+    assert drawer.position == "left"
