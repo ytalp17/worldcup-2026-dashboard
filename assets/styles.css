@@ -264,12 +264,12 @@ body,
          Row 3: Leaders in track 1 (narrow) · Map spans tracks 2-3 (widest)
        Row 2 (Table + Formation) is equal-height; row 3 (Leaders + Map) taller.
        Squad is the full-height right column. */
-    grid-template-columns: 1.3fr 0.85fr 0.85fr 1.25fr;
+    grid-template-columns: 1.0fr 1.0fr 0.85fr 1.2fr;
     grid-template-rows: auto 1fr 1.3fr;
     grid-template-areas:
-        "kpi      kpi   kpi        kpi"
-        "table    table formation  squad"
-        "leaders  map   map        squad";
+        "kpi      kpi        kpi        kpi"
+        "table    goalmouth  formation  squad"
+        "leaders  map        map        squad";
     gap: 12px;
     padding: 12px;
 }
@@ -283,6 +283,7 @@ body,
 .main-split--team .kpi-strip { grid-area: kpi; }
 .main-split--team .bento-card--leaders { grid-area: leaders; }
 .main-split--team .bento-card--table { grid-area: table; }
+.main-split--team .bento-card--goalmouth { grid-area: goalmouth; }
 .main-split--team .bento-card--formation { grid-area: formation; }
 .main-split--team .bento-card--map { grid-area: map; }
 .main-split--team .bento-card--squad { grid-area: squad; }
@@ -440,6 +441,22 @@ body,
     flex-direction: column;
     gap: 10px;
     padding: 12px 14px;
+    overflow: hidden;
+}
+
+.goal-mouth-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+.goal-mouth-panel__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 14px;
     overflow: hidden;
 }
 
@@ -786,11 +803,15 @@ body,
         grid-template-areas:
             "kpi"
             "table"
+            "goalmouth"
             "formation"
             "map"
             "leaders"
             "squad";
         overflow-y: auto;
+    }
+    .main-split--team .bento-card--goalmouth {
+        height: 44vh;
     }
     /* KPI cards wrap onto multiple rows instead of squeezing across one line. */
     .main-split--team .kpi-strip {

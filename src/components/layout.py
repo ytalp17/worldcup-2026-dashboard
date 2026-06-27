@@ -12,6 +12,7 @@ from src.components.knockout import build_knockout_drawer
 from src.components.map_view import build_map, build_map_controls
 from src.components.mode_switch import mode_switch
 from src.components.third_place import build_third_place_drawer
+from src.components.goal_mouth import build_goal_mouth_drawer
 from src.components.tournament_stats import build_tournament_drawer
 from src.data.venues import Venue
 
@@ -60,6 +61,7 @@ def build_layout(
     formation_panel=None,
     kpi_strip=None,
     leaders_panel=None,
+    goal_mouth_panel=None,
     asset_url=None,
 ) -> dmc.MantineProvider:
     # Three equal-flex zones so the centre widget sits at the true centre of the
@@ -111,9 +113,12 @@ def build_layout(
     squad_card = dmc.Box(squad_panel, className="bento-card bento-card--squad")
     formation_card = dmc.Box(formation_panel, className="bento-card bento-card--formation")
     leaders_card = dmc.Box(leaders_panel, className="bento-card bento-card--leaders")
+    goalmouth_card = dmc.Box(goal_mouth_panel,
+                             className="bento-card bento-card--goalmouth")
     main = dmc.AppShellMain(
         dmc.Box(
-            [kpi_strip, leaders_card, table_card, formation_card, map_card, squad_card],
+            [kpi_strip, leaders_card, table_card, formation_card, map_card,
+             squad_card, goalmouth_card],
             id="main-split",
             className="main-split",
         )
@@ -144,12 +149,14 @@ def build_layout(
             drawer,
             filter_drawer,
             build_tournament_drawer(),
+            build_goal_mouth_drawer(),
             build_third_place_drawer(),
             build_knockout_drawer(),
             build_map_controls(),
             build_live_strip(),
             build_modal(),
             dcc.Store(id="carousel-index", data=0, storage_type="local"),
+            dcc.Store(id="goal-mouth-zone", data=None),
             dcc.Store(id="user-tz"),
             dcc.Store(id="unit-store"),  # journey-grid distance unit (km/mi)
             dcc.Store(id="journey-redraw"),  # ping target for the selection redraw
