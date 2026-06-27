@@ -75,6 +75,23 @@ class LiveDataService:
                 return {**self._last_good, "ok": False}
             return {"ok": False, "any_live": False, "matches": [], "standings": {}}
 
+    def standings(self, now: float, force: bool = False) -> dict:
+        """Standings as ``{group: [row dicts]}`` (same shape as the snapshot's
+        ``standings``). ``force=True`` drops the cached value first so a fresh API
+        call is made — used for an explicit user refresh (e.g. once group games
+        finish), bypassing the long standings TTL. ``{}`` on any failure."""
+        try:
+            if force:
+                self._cache.pop("standings", None)
+            raw = self._cached(
+                "standings", _STANDINGS_TTL, now,
+                lambda: self._client.standings(league_id=self._league_id, season=self._season))
+            return {name: [vars(s) for s in table]
+                    for name, table in models.parse_standings(raw).items()}
+        except Exception:
+            logger.exception("Live standings fetch failed")
+            return {}
+
     def match_events(self, match_id: int, now: float) -> list[dict]:
         """On-demand events for one match (parsed dicts), cached like matches.
         Empty list on any failure so the modal still renders."""

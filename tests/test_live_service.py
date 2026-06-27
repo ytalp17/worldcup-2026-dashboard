@@ -80,6 +80,40 @@ def test_matches_cached_within_ttl():
     assert client.match_calls == 2
 
 
+class _CountingStandingsClient(_FakeClient):
+    def __init__(self):
+        super().__init__()
+        self.standings_calls = 0
+
+    def standings(self, league_id, season):
+        self.standings_calls += 1
+        return super().standings(league_id, season)
+
+
+def test_standings_shapes_and_caches_within_ttl():
+    client = _CountingStandingsClient()
+    svc = LiveDataService(client, _index())
+    table = svc.standings(now=0.0)
+    assert table["Group A"][0]["team"] == "Mexico"
+    assert "Group Stage" not in table
+    svc.standings(now=100.0)                 # within the 3600s TTL -> cached
+    assert client.standings_calls == 1
+
+
+def test_standings_force_bypasses_cache():
+    client = _CountingStandingsClient()
+    svc = LiveDataService(client, _index())
+    svc.standings(now=0.0)
+    assert client.standings_calls == 1
+    svc.standings(now=5.0, force=True)       # force -> fresh API call despite TTL
+    assert client.standings_calls == 2
+
+
+def test_standings_empty_on_error():
+    svc = LiveDataService(_BoomClient(), _index())
+    assert svc.standings(now=0.0) == {}
+
+
 def test_snapshot_falls_back_on_error():
     svc = LiveDataService(_BoomClient(), _index())
     snap = svc.snapshot(date="2026-06-13", now=0.0)

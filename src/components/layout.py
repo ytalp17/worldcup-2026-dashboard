@@ -11,6 +11,7 @@ from src.components.live_strip import build_live_strip
 from src.components.knockout import build_knockout_drawer
 from src.components.map_view import build_map, build_map_controls
 from src.components.mode_switch import mode_switch
+from src.components.third_place import build_third_place_drawer
 from src.components.tournament_stats import build_tournament_drawer
 from src.data.venues import Venue
 
@@ -143,6 +144,7 @@ def build_layout(
             drawer,
             filter_drawer,
             build_tournament_drawer(),
+            build_third_place_drawer(),
             build_knockout_drawer(),
             build_map_controls(),
             build_live_strip(),

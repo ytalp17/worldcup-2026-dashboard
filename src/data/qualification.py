@@ -19,9 +19,13 @@ ELIMINATED = "eliminated"
 _THIRD_PLACE_SLOTS = 8
 
 
-def _rank_key(row: dict) -> tuple:
+def rank_key(row: dict) -> tuple:
     """Descending sort key: points, then goal difference, then goals for."""
     return (row.get("points", 0), row.get("goal_diff", 0), row.get("goals_for", 0))
+
+
+# Backwards-compatible private alias (historical callers).
+_rank_key = rank_key
 
 
 def qualification_status(standings: dict | None) -> dict[str, dict[str, str]]:

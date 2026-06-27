@@ -13,13 +13,15 @@ from dash import ALL, Dash, Input, Output, State, callback, clientside_callback,
 from src.components.detail_panel import stadium_detail
 from src.components.flow_layer import flows_for
 from src.components.group_table import build_group_panel, group_rows, live_group_rows
-from src.components.header_calendar import build_match_calendar
+from src.components.header_calendar import build_match_calendar, format_selected_day
+from src.components.third_place import third_place_rows
 from src.components.layout import build_layout
 from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, live_score_markers, map_controls_style, pulse_markers
 from src.data.distances import DistanceRepository
 from src.data.flows import build_team_flows, team_cities
 from src.data.groups import build_groups, group_for_team
 from src.data.qualification import qualification_status
+from src.data.third_place import groups_to_standings
 from src.data.match_calendar import MatchCalendar
 from src.data.matches import MatchRepository, is_placeholder, matches_by_stadium
 from src.data.bracket import STAGE_PAGES, build_bracket
@@ -199,6 +201,14 @@ def group_panel_payload(index, live_standings=None):
                                 resolve_team=official_team, status_map=status_map)
                 or group_rows(group, app.get_asset_url))
     return name, rows
+
+
+def third_place_payload(live_standings=None):
+    """rowData for the third-place ranking grid. Uses LIVE standings when present
+    (so the top-8 Round-of-32 marks reflect real results); otherwise seeds the
+    static groups so the grid isn't empty pre-tournament (no green marks then)."""
+    standings = live_standings or groups_to_standings(GROUPS)
+    return third_place_rows(standings, app.get_asset_url, resolve_team=official_team)
 
 
 def squad_panel_payload(index):
@@ -447,6 +457,7 @@ def drawer_for_city(city: str | None, user_tz: str | None = None, live: dict | N
     Output("filter-drawer", "opened", allow_duplicate=True),
     Output("tournament-drawer", "opened", allow_duplicate=True),
     Output("knockout-drawer", "opened", allow_duplicate=True),
+    Output("third-place-drawer", "opened", allow_duplicate=True),
     Input({"type": MARKER_TYPE, "index": ALL}, "n_clicks"),
     State("user-tz", "data"),
     State("live-store", "data"),
@@ -456,12 +467,13 @@ def open_stadium_drawer(n_clicks, user_tz, live):
     # user_tz is a State snapshot: if the tz probe hasn't resolved yet, the drawer falls back to venue-local time (window is brief, acceptable per design).
     # Ignore the callback firing when markers mount with n_clicks=None.
     if not any(n_clicks):
-        return no_update, no_update, no_update, no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update
     triggered = ctx.triggered_id
     city = triggered.get("index") if isinstance(triggered, dict) else None
     opened, title, children = drawer_for_city(city, user_tz, live)
-    # Opening the stadium drawer closes the filter, tournament and knockout drawers.
-    return opened, title, children, (False if opened else no_update), False, False
+    # Opening the stadium drawer closes the filter, tournament, knockout and
+    # third-place drawers.
+    return opened, title, children, (False if opened else no_update), False, False, False
 
 
 @callback(
@@ -469,13 +481,14 @@ def open_stadium_drawer(n_clicks, user_tz, live):
     Output("stadium-drawer", "opened", allow_duplicate=True),
     Output("tournament-drawer", "opened", allow_duplicate=True),
     Output("knockout-drawer", "opened", allow_duplicate=True),
+    Output("third-place-drawer", "opened", allow_duplicate=True),
     Input("filter-control", "n_clicks"),
     prevent_initial_call=True,
 )
 def open_filter_drawer(n_clicks):
     if not n_clicks:
-        return no_update, no_update, no_update, no_update
-    return True, False, False, False  # open filter; close stadium + tournament + knockout
+        return no_update, no_update, no_update, no_update, no_update
+    return True, False, False, False, False  # open filter; close the others
 
 
 @callback(
@@ -483,13 +496,29 @@ def open_filter_drawer(n_clicks):
     Output("filter-drawer", "opened", allow_duplicate=True),
     Output("stadium-drawer", "opened", allow_duplicate=True),
     Output("knockout-drawer", "opened", allow_duplicate=True),
+    Output("third-place-drawer", "opened", allow_duplicate=True),
     Input("tournament-control", "n_clicks"),
     prevent_initial_call=True,
 )
 def open_tournament_drawer(n_clicks):
     if not n_clicks:
-        return no_update, no_update, no_update, no_update
-    return True, False, False, False
+        return no_update, no_update, no_update, no_update, no_update
+    return True, False, False, False, False
+
+
+@callback(
+    Output("third-place-drawer", "opened"),
+    Output("filter-drawer", "opened", allow_duplicate=True),
+    Output("stadium-drawer", "opened", allow_duplicate=True),
+    Output("tournament-drawer", "opened", allow_duplicate=True),
+    Output("knockout-drawer", "opened", allow_duplicate=True),
+    Input("third-place-control", "n_clicks"),
+    prevent_initial_call=True,
+)
+def open_third_place_drawer(n_clicks):
+    if not n_clicks:
+        return no_update, no_update, no_update, no_update, no_update
+    return True, False, False, False, False  # open third-place; close the others
 
 
 @callback(
@@ -497,13 +526,14 @@ def open_tournament_drawer(n_clicks):
     Output("filter-drawer", "opened", allow_duplicate=True),
     Output("tournament-drawer", "opened", allow_duplicate=True),
     Output("stadium-drawer", "opened", allow_duplicate=True),
+    Output("third-place-drawer", "opened", allow_duplicate=True),
     Input("knockout-control", "n_clicks"),
     prevent_initial_call=True,
 )
 def open_knockout_drawer(n_clicks):
     if not n_clicks:
-        return no_update, no_update, no_update, no_update
-    return True, False, False, False  # open knockout; close the other three
+        return no_update, no_update, no_update, no_update, no_update
+    return True, False, False, False, False  # open knockout; close the other four
 
 
 @callback(
@@ -527,6 +557,22 @@ def move_knockout_page(_prev, _next, page):
 )
 def render_knockout(page, live, user_tz):
     return knockout_payload(page, live, user_tz)
+
+
+@callback(
+    Output("third-place-grid", "rowData"),
+    Input("live-store", "data"),
+    Input("third-place-control", "n_clicks"),
+)
+def render_third_place(live, n_clicks):
+    # An explicit click hits the API for fresh standings (teams may have just
+    # finished their three group games), bypassing the long standings cache;
+    # otherwise use the latest snapshot the store already holds.
+    if ctx.triggered_id == "third-place-control" and n_clicks and LIVE is not None:
+        fresh = LIVE.standings(time.monotonic(), force=True)
+        if fresh:
+            return third_place_payload(fresh)
+    return third_place_payload((live or {}).get("standings") or None)
 
 
 @callback(
@@ -595,6 +641,14 @@ def update_pulse_layer(team_mode, selected_date, index, user_tz):
 )
 def update_live_layer(live):
     return live_score_markers(VENUES, live)
+
+
+@callback(
+    Output("calendar-selected-date", "children"),
+    Input("match-calendar", "value"),
+)
+def render_selected_date(selected_date):
+    return format_selected_day(selected_date)
 
 
 @callback(
@@ -974,6 +1028,17 @@ _LEADERS_GRID_THEME_JS = """
 clientside_callback(
     _LEADERS_GRID_THEME_JS,
     Output("leaders-grid", "className"),
+    Input("color-scheme-toggle", "checked"),
+)
+
+_TP_GRID_THEME_JS = """
+(checked) => (checked ? 'ag-theme-quartz-dark tp-grid'
+                      : 'ag-theme-quartz tp-grid')
+"""
+
+clientside_callback(
+    _TP_GRID_THEME_JS,
+    Output("third-place-grid", "className"),
     Input("color-scheme-toggle", "checked"),
 )
 

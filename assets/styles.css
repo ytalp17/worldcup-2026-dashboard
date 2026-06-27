@@ -546,6 +546,34 @@ body,
     box-shadow: inset 3px 0 0 0 #1D9E75;
 }
 
+/* Third-place ranking: the best 8 of 12 advance to the Round of 32 — the same
+   green left-edge accent as the group table, plus a green "R32" status tag. */
+
+/* Transparent so the frosted drawer shows through and the text uses the theme's
+   own colour, like the other drawer grids (without this the quartz-dark theme
+   keeps an opaque dark panel that clashes with the frosted backdrop). */
+.tp-grid {
+    --ag-background-color: transparent;
+    --ag-odd-row-background-color: transparent;
+    --ag-header-background-color: transparent;
+    --ag-borders: none;
+    --ag-row-border-width: 0;
+    --ag-font-size: 13px;
+}
+.tp-grid .ag-row.tp-row--advance {
+    box-shadow: inset 3px 0 0 0 #1D9E75;
+}
+.tp-grid .ag-cell.tp-cell--advance {
+    color: #1D9E75;
+    font-weight: 700;
+}
+/* Match the group grid's tightened cell padding so the compact columns read. */
+.tp-grid .ag-cell,
+.tp-grid .ag-header-cell {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
 /* The quartz theme hardcodes ~15px cell padding, which clips the compact numeric
    columns to an ellipsis ("0…"). Override it directly (higher specificity than
    the theme's variable-driven padding). */
