@@ -109,6 +109,34 @@ def test_no_abroad_card():
     assert "Abroad" not in all_text
 
 
+def _header_label(card):
+    # the header label is the first Text in the card (inside _head, possibly
+    # wrapped in a Tooltip)
+    return _texts(card)[0]
+
+
+def test_kpi_cards_are_in_spec_order():
+    cards = kpi_cards(REAL)
+    assert [_header_label(c) for c in cards] == [
+        "Value", "Avg age", "Avg height", "Foot Preference",
+        "FIFA rank", "Federation", "Manager"]
+
+
+def test_foot_card_header_renamed_to_foot_preference():
+    cards = kpi_cards(REAL)
+    headers = [_header_label(c) for c in cards]
+    assert "Foot Preference" in headers
+    assert "Foot" not in headers   # old standalone label is gone
+
+
+def test_every_card_header_has_a_nonempty_tooltip():
+    cards = kpi_cards(REAL)
+    for c in cards:
+        tips = [n for n in _walk(c) if isinstance(n, dmc.Tooltip)]
+        assert tips, f"{_header_label(c)} card has no tooltip"
+        assert all(isinstance(t.label, str) and t.label.strip() for t in tips)
+
+
 def test_federation_card_shows_continent_on_third_line():
     stats = TeamStats(
         avg_age=29.8, avg_height=1.84, squad_value=1, value_display="€1M",

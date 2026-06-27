@@ -8,8 +8,10 @@ from src.data.team_stats import TeamStats
 PLACEHOLDER = "—"
 
 
-def _head(icon, label) -> dmc.Group:
-    return dmc.Group(
+def _head(icon, label, tip=None):
+    """Card header: icon + label. When ``tip`` is given, the header is wrapped in
+    a multiline tooltip explaining the stat (matching the app's tooltip style)."""
+    head = dmc.Group(
         [
             DashIconify(icon=icon, width=14, className="stat-card__icon"),
             dmc.Text(label, size="xs", c="dimmed"),
@@ -18,21 +20,25 @@ def _head(icon, label) -> dmc.Group:
         wrap="nowrap",
         align="center",
     )
+    if tip:
+        return dmc.Tooltip(head, label=tip, position="top", withArrow=True,
+                           multiline=True, w=220)
+    return head
 
 
 def stat_card(icon, label, value=None, sub=None, ring=None, sub_node=None,
-              body_node=None) -> dmc.Box:
+              body_node=None, tip=None) -> dmc.Box:
     """A small KPI card: icon + label on top, a big value (or a ring/custom body)
     below, and an optional dimmed sub-label. ``body_node``/``ring`` replace the
     text value; ``sub_node`` takes precedence over plain-text ``sub`` for richer
-    footers."""
+    footers. ``tip`` adds a header tooltip explaining the stat."""
     if body_node is not None:
         body = body_node
     elif ring is not None:
         body = ring
     else:
         body = dmc.Text(value, className="stat-card__value", fw=700)
-    children = [_head(icon, label), body]
+    children = [_head(icon, label, tip), body]
     if sub_node is not None:
         children.append(sub_node)
     elif sub:
@@ -45,7 +51,9 @@ def _federation_card(stats: TeamStats) -> dmc.Box:
     """Federation card: label + confederation code on the left, the
     confederation logo anchored to the right end of the card."""
     code = stats.confederation or PLACEHOLDER
-    left_children = [_head("tabler:shield", "Federation"),
+    left_children = [_head("tabler:shield", "Federation",
+                          tip="The continental football federation the team "
+                              "belongs to."),
                      dmc.Text(code, fw=700, className="stat-card__fedcode")]
     if stats.confederation_region:
         left_children.append(dmc.Text(stats.confederation_region, size="xs",
@@ -121,15 +129,21 @@ def kpi_cards(stats: TeamStats) -> list[dmc.Box]:
               if stats.avg_height is not None else PLACEHOLDER)
     rank = f"#{stats.fifa_rank}" if stats.fifa_rank is not None else PLACEHOLDER
     return [
-        stat_card("tabler:calendar", "Avg age", age, sub="years"),
-        stat_card("tabler:ruler-2", "Avg height", height, sub="metres"),
-        stat_card("tabler:trophy", "FIFA rank", rank, sub="world"),
-        stat_card("tabler:coin", "Value", stats.value_display, sub="total"),
+        stat_card("tabler:coin", "Value", stats.value_display, sub="total",
+                  tip="Estimated total market value of the squad."),
+        stat_card("tabler:calendar", "Avg age", age, sub="years",
+                  tip="Average age of the squad."),
+        stat_card("tabler:ruler-2", "Avg height", height, sub="metres",
+                  tip="Average height of the squad."),
+        stat_card("tabler:shoe", "Foot Preference", body_node=_foot_bar(stats),
+                  sub_node=_foot_sub(stats),
+                  tip="Share of the squad that is left- vs right-footed."),
+        stat_card("tabler:trophy", "FIFA rank", rank, sub="world",
+                  tip="The team's current FIFA world ranking."),
         _federation_card(stats),
-        stat_card("tabler:shoe", "Foot", body_node=_foot_bar(stats),
-                  sub_node=_foot_sub(stats)),
         stat_card("tabler:user-star", "Manager", stats.manager or PLACEHOLDER,
-                  sub="head coach", sub_node=_manager_sub(stats)),
+                  sub="head coach", sub_node=_manager_sub(stats),
+                  tip="The team's current head coach."),
     ]
 
 
