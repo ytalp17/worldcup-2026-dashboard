@@ -34,6 +34,15 @@ def test_panel_exposes_required_ids():
         assert needed in ids, f"missing {needed}"
 
 
+def test_header_label_is_group_analysis():
+    import dash_mantine_components as dmc
+    root = panel.build_analysis_panel()
+    texts = [n.children for n in _walk(root)
+             if isinstance(n, dmc.Text) and isinstance(n.children, str)]
+    assert "Group Analysis" in texts
+    assert "Analysis" not in texts   # old bare label is gone
+
+
 def test_graph_modebar_is_hidden():
     root = panel.build_analysis_panel()
     graph = next((n for n in _walk(root) if isinstance(n, dcc.Graph)), None)

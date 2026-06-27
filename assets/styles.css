@@ -513,6 +513,12 @@ body,
     box-shadow: inset 3px 0 0 0 #e03131;
 }
 
+/* Top-3 scorers / assisters: the same green left-edge accent as the group
+   table's advancing rows, for visual coherence. */
+.leaders-grid .ag-row.leaders-row--top3 {
+    box-shadow: inset 3px 0 0 0 #1D9E75;
+}
+
 /* The quartz theme hardcodes ~15px cell padding, which clips the compact numeric
    columns to an ellipsis ("0…"). Override it directly (higher specificity than
    the theme's variable-driven padding). */
