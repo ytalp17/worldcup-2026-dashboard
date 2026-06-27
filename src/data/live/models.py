@@ -153,12 +153,17 @@ def parse_lineups(raw: dict) -> dict:
     """Parse homeTeam/awayTeam lineup data into {home/away: {formation, starters, subs}}."""
     def _team(data: dict) -> dict:
         if not data:
-            return {"formation": "", "starters": [], "subs": []}
-        starters = [
-            {"name": p["name"], "number": p["number"], "position": p["position"]}
+            return {"formation": "", "starters": [], "subs": [], "rows": []}
+        # initialLineup is grouped by formation line (GK -> forwards); keep that
+        # grouping in `rows` for the pitch, and flatten it into `starters`.
+        rows = [
+            [
+                {"name": p["name"], "number": p["number"], "position": p["position"]}
+                for p in row
+            ]
             for row in data.get("initialLineup", [])
-            for p in row
         ]
+        starters = [p for row in rows for p in row]
         subs = [
             {"name": p["name"], "number": p["number"], "position": p["position"]}
             for p in data.get("substitutes", [])
@@ -167,6 +172,7 @@ def parse_lineups(raw: dict) -> dict:
             "formation": data.get("formation", ""),
             "starters": starters,
             "subs": subs,
+            "rows": rows,
         }
 
     return {

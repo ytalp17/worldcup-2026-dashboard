@@ -3,6 +3,8 @@ from __future__ import annotations
 import dash_mantine_components as dmc
 from dash import html
 
+from src.components.lineup_pitch import build_lineup_pitch
+
 
 # ---------------------------------------------------------------------------
 # Curated stat set definition
@@ -253,34 +255,37 @@ def _lineups_tab(lineups: dict, home_name: str, away_name: str):
     if not lineups:
         return dmc.Text("Lineups not available.", c="dimmed", size="sm")
 
+    pitch = build_lineup_pitch(lineups)
+    if pitch is None:
+        return dmc.Text("Lineups not available.", c="dimmed", size="sm")
+
     home = lineups.get("home", {})
     away = lineups.get("away", {})
 
-    if not home.get("starters") and not away.get("starters"):
-        return dmc.Text("Lineups not available.", c="dimmed", size="sm")
-
-    def _team_col(data: dict, team_name: str):
+    # A compact team · formation caption flanking the centre, blue (home) left
+    # and orange (away) right, so the colour coding on the pitch is legible.
+    def _caption(data: dict, team_name: str, color: str, justify: str):
         formation = data.get("formation", "")
-        starters = data.get("starters", [])
-        header = dmc.Text(
-            f"{team_name} · {formation}" if formation else team_name,
-            fw=700,
-            size="sm",
+        label = f"{team_name} · {formation}" if formation else team_name
+        return dmc.Group(
+            [dmc.Box(className="lu-key__dot",
+                     style={"backgroundColor": f"var(--mantine-color-{color}-6)"}),
+             dmc.Text(label, size="sm", fw=600)],
+            gap=6, align="center", justify=justify, wrap="nowrap",
         )
-        player_rows = [
-            dmc.Text(f"{p['number']}  {p['name']}", size="sm")
-            for p in starters
-        ]
-        return dmc.Stack([header] + player_rows, gap=4)
 
-    return dmc.SimpleGrid(
+    legend = dmc.Group(
         [
-            _team_col(home, home_name),
-            _team_col(away, away_name),
+            _caption(home, home_name, "blue", "flex-start"),
+            _caption(away, away_name, "orange", "flex-end"),
         ],
-        cols=2,
-        spacing="md",
+        justify="space-between",
+        align="center",
+        wrap="nowrap",
+        className="lu-legend",
     )
+
+    return dmc.Stack([legend, pitch], gap="xs")
 
 
 # ---------------------------------------------------------------------------

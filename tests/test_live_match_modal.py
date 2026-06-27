@@ -161,9 +161,16 @@ class TestModalBodyTabbed:
         # D. Bobadilla is in the fixture events
         assert "D. Bobadilla" in blob or "Bobadilla" in blob
 
-    def test_contains_matthew_freese_from_lineups(self):
+    def test_contains_freese_from_lineups(self):
+        # The Lineups tab is now a head-to-head pitch showing surnames.
         blob = str(self.body.to_plotly_json())
-        assert "Matthew Freese" in blob
+        assert "Freese" in blob
+
+    def test_lineups_tab_renders_head_to_head_pitch(self):
+        blob = str(self.body.to_plotly_json())
+        assert "lu-pitch" in blob
+        # Both teams placed: a home (blue) and an away (orange) node badge.
+        assert "blue" in blob and "orange" in blob
 
     def test_contains_score(self):
         blob = str(self.body.to_plotly_json())

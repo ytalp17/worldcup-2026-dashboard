@@ -323,10 +323,28 @@ class TestParseLineupsFromFixture:
     def test_home_has_subs(self):
         assert len(self.lineups["home"]["subs"]) > 0
 
+    def test_rows_preserve_formation_lines(self):
+        # The API groups initialLineup by formation line; we keep that grouping
+        # so the head-to-head pitch can place each line.
+        home_rows = self.lineups["home"]["rows"]
+        away_rows = self.lineups["away"]["rows"]
+        assert [len(r) for r in home_rows] == [1, 4, 2, 3, 1]  # 4-2-3-1
+        assert [len(r) for r in away_rows] == [1, 4, 4, 2]      # 4-4-2
+
+    def test_rows_players_have_required_fields(self):
+        gk = self.lineups["home"]["rows"][0][0]
+        assert gk["name"] == "Matthew Freese"
+        assert "number" in gk and "position" in gk
+
+    def test_rows_flatten_to_starters(self):
+        rows = self.lineups["home"]["rows"]
+        flat = [p for row in rows for p in row]
+        assert flat == self.lineups["home"]["starters"]
+
     def test_missing_data_returns_defaults(self):
         result = parse_lineups({})
-        assert result["home"] == {"formation": "", "starters": [], "subs": []}
-        assert result["away"] == {"formation": "", "starters": [], "subs": []}
+        assert result["home"] == {"formation": "", "starters": [], "subs": [], "rows": []}
+        assert result["away"] == {"formation": "", "starters": [], "subs": [], "rows": []}
 
 
 def test_parse_match_reads_kickoff_utc():
