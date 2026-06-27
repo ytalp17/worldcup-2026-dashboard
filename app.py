@@ -32,6 +32,9 @@ from src.components.live_match_modal import build_modal, modal_body
 from src.components.live_strip import overlay_style, strip_items
 from src.components.team_kpis import build_kpi_strip, kpi_cards
 from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, display_name, team_order
+from src.components.analysis.panel import build_analysis_panel
+from src.components.analysis import views as analysis_views
+from src.data.analysis import accessors as analysis_accessors
 from src.data.lineups import LineupRepository, lineup_for_team
 from src.data.squads import Squad, SquadRepository, squad_for_team
 from src.data.team_stats import compute_team_stats
@@ -101,9 +104,68 @@ LIVE = (
     if _API_KEY else None
 )
 
+# Wire the Deep Analysis accessor seam now that the stats paths, groups, matches,
+# and the official-name resolver all exist.
+analysis_accessors.configure(
+    team_stats_path=TEAM_STATS_PATH, player_store_path=PLAYER_STORE_PATH,
+    groups=GROUPS, matches=MATCHES, official_resolver=official_team)
+
 
 def flow_children(selected):
     return flows_for(selected, TEAM_FLOWS)
+
+
+def analysis_group_for_index(index):
+    """Group name of the carousel-selected team (or None)."""
+    team = center_team(TEAM_NAMES, index or 0)
+    group = group_for_team(GROUPS, team)
+    return group.name if group else None
+
+
+def analysis_render(view_index, race_metric, carousel_index, dark, frame):
+    """(figure, title, caption, caveat, dots_children, race_controls_style)."""
+    from src.components.analysis import panel as analysis_panel
+    theme = "dark" if dark else "light"
+    n = len(analysis_views.VIEWS)
+    vi = (view_index or 0) % n
+    view = analysis_views.VIEWS[vi]
+    group_name = analysis_group_for_index(carousel_index)
+    dots_children = analysis_panel.dots(vi, n)
+
+    records = analysis_accessors.get_group_aggregates(group_name) if group_name else []
+    is_race = view["type"] == "race"
+    race_style = {"display": "flex"} if is_race else {"display": "none"}
+
+    if not records:
+        import plotly.graph_objects as go
+        empty = go.Figure()
+        empty.update_layout(**{k: v for k, v in
+                               analysis_views.theme_layout(theme).items()
+                               if k in ("paper_bgcolor", "plot_bgcolor", "font")})
+        empty.add_annotation(text=f"No completed matches yet for {group_name or '—'}",
+                             showarrow=False)
+        return empty, view["title"], view["caption"], "", dots_children, race_style
+
+    history = (analysis_accessors.get_matchday_history(group_name, race_metric)
+               if is_race else None)
+    fig = analysis_views.build_figure(view, records=records, history=history,
+                                      race_metric=race_metric, frame=frame or 0,
+                                      theme=theme)
+    caveat = view.get("caveat", "")
+    if is_race and race_metric == "conceded":
+        caveat = "Goals conceded — lower is better; the shortest bar leads."
+    return fig, view["title"], view["caption"], caveat, dots_children, race_style
+
+
+def analysis_next_frame(frame, history_len):
+    """Step the race; clamp at the last frame and disable the interval there."""
+    if history_len <= 0:
+        return 0, True
+    nxt = (frame or 0) + 1
+    if nxt >= history_len - 1:
+        return history_len - 1, True
+    return nxt, False
+
 
 app = Dash(
     __name__,
@@ -791,6 +853,90 @@ async def live_feed():
         await asyncio.to_thread(LIVE.update_player_stats, snap["matches"], now)
         await asyncio.to_thread(LIVE.update_team_stats, snap["matches"], now)
         await asyncio.sleep(next_delay(snap))
+
+
+@callback(
+    Output("analysis-view-index", "data"),
+    Input("analysis-prev", "n_clicks"),
+    Input("analysis-next", "n_clicks"),
+    Input("analysis-modal-prev", "n_clicks"),
+    Input("analysis-modal-next", "n_clicks"),
+    State("analysis-view-index", "data"),
+    prevent_initial_call=True,
+)
+def move_analysis_view(_prev, _next, _mprev, _mnext, index):
+    delta = -1 if ctx.triggered_id in ("analysis-prev", "analysis-modal-prev") else 1
+    return advance(index or 0, delta, len(analysis_views.VIEWS))
+
+
+@callback(
+    Output("analysis-graph", "figure"),
+    Output("analysis-title", "children"),
+    Output("analysis-caption", "children"),
+    Output("analysis-caveat", "children"),
+    Output("analysis-dots", "children"),
+    Output("analysis-race-controls", "style"),
+    Output("analysis-modal-graph", "figure"),
+    Output("analysis-modal", "title"),
+    Output("analysis-modal-dots", "children"),
+    Input("analysis-view-index", "data"),
+    Input("analysis-race-metric", "value"),
+    Input("analysis-race-frame", "data"),
+    Input("carousel-index", "data"),
+    Input("live-store", "data"),
+    Input("color-scheme-toggle", "checked"),
+)
+def render_analysis(view_index, race_metric, frame, carousel_index, _live, dark):
+    fig, title, caption, caveat, dots_children, race_style = analysis_render(
+        view_index, race_metric, carousel_index,
+        dark if dark is not None else True, frame)
+    # The expanded modal mirrors the current chart (same figure), title, and
+    # position dots so the in-modal carousel stays in sync with the tile.
+    return (fig, title, caption, caveat, dots_children, race_style,
+            fig, title, dots_children)
+
+
+@callback(
+    Output("analysis-modal", "opened"),
+    Input("analysis-expand", "n_clicks"),
+    State("analysis-modal", "opened"),
+    prevent_initial_call=True,
+)
+def toggle_analysis_modal(_n, opened):
+    return not opened
+
+
+@callback(
+    Output("analysis-race-frame", "data"),
+    Output("analysis-race-interval", "disabled"),
+    Input("analysis-race-interval", "n_intervals"),
+    State("analysis-race-frame", "data"),
+    State("analysis-view-index", "data"),
+    State("analysis-race-metric", "value"),
+    State("carousel-index", "data"),
+    prevent_initial_call=True,
+)
+def step_race(_n, frame, view_index, race_metric, carousel_index):
+    group_name = analysis_group_for_index(carousel_index)
+    hist = (analysis_accessors.get_matchday_history(group_name, race_metric)
+            if group_name else {})
+    return analysis_next_frame(frame, analysis_views.race_frame_count(hist))
+
+
+@callback(
+    Output("analysis-race-frame", "data", allow_duplicate=True),
+    Output("analysis-race-interval", "disabled", allow_duplicate=True),
+    Input("analysis-race-replay", "n_clicks"),
+    Input("analysis-view-index", "data"),
+    Input("analysis-race-metric", "value"),
+    prevent_initial_call=True,
+)
+def start_race(_clicks, view_index, _metric):
+    # restart whenever RACE becomes active, the metric changes, or Replay is hit
+    view = analysis_views.VIEWS[(view_index or 0) % len(analysis_views.VIEWS)]
+    if view["type"] != "race":
+        return 0, True
+    return 0, False
 
 
 if __name__ == "__main__":

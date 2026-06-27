@@ -4,6 +4,7 @@ import dash_mantine_components as dmc
 from dash import dcc, html
 from dash_iconify import DashIconify
 
+from src.components.analysis.panel import build_analysis_panel
 from src.components.filter_panel import build_filter_drawer
 from src.components.live_match_modal import build_modal
 from src.components.live_strip import build_live_strip
@@ -98,7 +99,10 @@ def build_layout(
     # swaps the grid template); the map keeps `bento-card--map` so the Time-mode
     # hide rule leaves it visible.
     map_card = dmc.Box(
-        html.Div(build_map(venues), id="map-container"),
+        [
+            html.Div(build_map(venues), id="map-container"),
+            build_analysis_panel(),
+        ],
         className="bento-card bento-card--map",
     )
     table_card = dmc.Box(group_panel, className="bento-card bento-card--table")
