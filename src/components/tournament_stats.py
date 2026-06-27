@@ -74,11 +74,6 @@ def tab_options(scope: str) -> list[str]:
     return PLAYER_TABS if scope == "Players" else TEAM_TABS
 
 
-def group_only(stage_value: str) -> bool:
-    """True when the stage toggle is narrowing to the group stage."""
-    return stage_value == "Group Stage"
-
-
 def tourn_columns(scope: str, tab: str) -> list[dict]:
     return _columns_for(scope, _resolve_tab(scope, tab))
 
@@ -97,8 +92,6 @@ def build_tournament_drawer() -> dmc.Drawer:
     AG grid. The grid's columnDefs/rowData are driven by app callbacks."""
     scope = dmc.SegmentedControl(id="tourn-scope", value="Team",
                                  data=["Team", "Players"], size="xs", fullWidth=True)
-    stage = dmc.SegmentedControl(id="tourn-stage", value="All",
-                                 data=["All", "Group Stage"], size="xs", fullWidth=True)
     tabs = dmc.SegmentedControl(id="tourn-tabs", value="Attack & xG",
                                 data=TEAM_TABS, size="xs", fullWidth=True)
     grid = dag.AgGrid(
@@ -109,10 +102,23 @@ def build_tournament_drawer() -> dmc.Drawer:
         dashGridOptions=_GRID_OPTIONS,
         style={"height": "70vh", "width": "100%"},
     )
-    body = dmc.Stack([scope, stage, tabs, grid], gap="xs")
+    body = dmc.Stack([scope, tabs, grid], gap="xs")
+    # Stage filter lives in the header next to the close button: off = All,
+    # on = group stage only. The tourn-grid callback reads its `checked` state.
+    title = dmc.Group(
+        [
+            dmc.Text("Tournament Stats", fw=700, size="lg"),
+            dmc.Switch(id="tourn-stage", label="Group Stage", checked=False,
+                       size="sm", color="gray"),
+        ],
+        justify="space-between",
+        align="center",
+        wrap="nowrap",
+        style={"flex": 1, "minWidth": 0},
+    )
     return dmc.Drawer(
         id="tournament-drawer",
-        title="Tournament Stats",
+        title=title,
         position="right",
         size="lg",
         padding="md",

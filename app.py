@@ -34,7 +34,7 @@ from src.components.leaders_card import (
 )
 from src.components.squad_table import build_squad_panel, squad_rows
 from src.components.tournament_stats import (
-    group_only, tab_options, tourn_columns, tourn_row_data)
+    tab_options, tourn_columns, tourn_row_data)
 from src.components.live_match_modal import build_modal, loading_body, modal_body
 from src.components.live_strip import overlay_style, strip_items
 from src.components.team_kpis import build_kpi_strip, kpi_cards
@@ -896,11 +896,11 @@ def set_tournament_tabs(scope):
     Output("tourn-grid", "columnDefs"),
     Input("tourn-scope", "value"),
     Input("tourn-tabs", "value"),
-    Input("tourn-stage", "value"),
+    Input("tourn-stage", "checked"),
     Input("live-store", "data"),
 )
-def update_tournament_grid(scope, tab, stage_value, live):
-    return tournament_grid_payload(scope, tab, live, group_only(stage_value))
+def update_tournament_grid(scope, tab, group_stage_on, live):
+    return tournament_grid_payload(scope, tab, live, bool(group_stage_on))
 
 
 @callback(
