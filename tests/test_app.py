@@ -390,3 +390,20 @@ def test_tournament_grid_payload_defaults_group_only_false(monkeypatch):
     monkeypatch.setattr(app, "LIVE", fake)
     app.tournament_grid_payload("Team", "Attack & xG", {"standings": {}})
     assert ("team", False) in fake.calls
+
+
+def test_update_tournament_grid_callback_wires_switch_to_grid(monkeypatch):
+    # The stage Switch's `checked` state must drive the grid: on -> group_only,
+    # off -> all. Calls the real callback and asserts the flag reaches LIVE.
+    import app
+    fake = _FakeLive()
+    monkeypatch.setattr(app, "LIVE", fake)
+
+    rows, cols = app.update_tournament_grid("Team", "Attack & xG", True,
+                                            {"standings": {}})
+    assert ("team", True) in fake.calls and ("player", True) in fake.calls
+    assert cols  # columnDefs returned for the grid
+
+    fake.calls.clear()
+    app.update_tournament_grid("Team", "Attack & xG", False, {"standings": {}})
+    assert ("team", False) in fake.calls and ("player", False) in fake.calls

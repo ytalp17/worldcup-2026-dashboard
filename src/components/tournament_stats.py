@@ -109,7 +109,7 @@ def build_tournament_drawer() -> dmc.Drawer:
         [
             dmc.Text("Tournament Stats", fw=700, size="lg"),
             dmc.Switch(id="tourn-stage", label="Group Stage", checked=False,
-                       size="sm", color="gray"),
+                       size="sm", color="blue"),
         ],
         justify="space-between",
         align="center",
@@ -129,5 +129,8 @@ def build_tournament_drawer() -> dmc.Drawer:
         zIndex=2500,
         classNames={"content": "filter-drawer-frosted",
                     "header": "filter-drawer-frosted-header"},
+        # Let the title element fill the header so the in-title Group's
+        # space-between pushes the stage switch to the right, beside the X.
+        styles={"title": {"flexGrow": 1, "marginRight": 0}},
         children=[body],
     )
