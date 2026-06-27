@@ -46,9 +46,11 @@ def _race_controls():
 
 
 def _expand_button():
+    # size "xs" keeps the icon no taller than the sm header text, so the header
+    # height matches the other bento cards exactly (md/sm inflated it).
     return dmc.ActionIcon(
-        DashIconify(icon="mdi:arrow-expand-all", width=18),
-        id="analysis-expand", variant="subtle", size="md", radius="xl",
+        DashIconify(icon="mdi:arrow-expand-all", width=14),
+        id="analysis-expand", variant="subtle", size="xs", radius="xl",
         **{"aria-label": "Expand chart"})
 
 
