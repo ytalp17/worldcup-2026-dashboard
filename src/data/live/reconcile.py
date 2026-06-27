@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 # Map a normalized LIVE (Highlightly) team name to a normalized STATIC
 # (our schedule) name, for the FIFA spelling differences. Seeded with the
 # likely diffs; extend as live names are observed. Exact-matching names
@@ -55,3 +57,29 @@ def find_stadium(home: str, away: str, index: dict[tuple[str, str], str],
     """
     key = (canonical_team(home, aliases), canonical_team(away, aliases))
     return index.get(key)
+
+
+def _as_dt(value):
+    """Coerce a datetime / ISO-8601 string / None to a datetime, or None."""
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def classify_stage(kickoff, knockout_start) -> str:
+    """'knockout' if kickoff is at/after the knockout cutoff, else 'group'.
+
+    Missing kickoff, unparseable kickoff, or missing cutoff all fall back to
+    'group' — the safe default that never hides a match from Group-Stage view.
+    """
+    if knockout_start is None:
+        return "group"
+    ko = _as_dt(kickoff)
+    if ko is None:
+        return "group"
+    return "knockout" if ko >= knockout_start else "group"

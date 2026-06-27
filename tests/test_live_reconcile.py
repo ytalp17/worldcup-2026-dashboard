@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from src.data.matches import Match
 from src.data.live.reconcile import (
-    normalize, canonical_team, build_stadium_index, find_stadium,
+    normalize, canonical_team, build_stadium_index, find_stadium, classify_stage,
 )
-from datetime import date, time, datetime
+from datetime import date, time, datetime, timezone
 
 
 def _m(home, away, stadium):
@@ -67,3 +67,29 @@ def test_index_matches_by_pair_skips_incomplete():
     from src.data.live.reconcile import index_matches_by_pair
     idx = index_matches_by_pair([{"home": "USA", "away": "Paraguay"}])  # no match_id
     assert idx == {}
+
+
+_KO = datetime(2026, 6, 28, 19, 0, tzinfo=timezone.utc)
+
+
+def test_classify_stage_before_cutoff_is_group():
+    assert classify_stage("2026-06-27T19:00:00+00:00", _KO) == "group"
+
+
+def test_classify_stage_at_or_after_cutoff_is_knockout():
+    assert classify_stage("2026-06-28T19:00:00+00:00", _KO) == "knockout"
+    assert classify_stage("2026-07-01T19:00:00+00:00", _KO) == "knockout"
+
+
+def test_classify_stage_accepts_datetime():
+    dt = datetime(2026, 6, 28, 20, 0, tzinfo=timezone.utc)
+    assert classify_stage(dt, _KO) == "knockout"
+
+
+def test_classify_stage_missing_kickoff_defaults_group():
+    assert classify_stage(None, _KO) == "group"
+    assert classify_stage("not-a-date", _KO) == "group"
+
+
+def test_classify_stage_no_cutoff_defaults_group():
+    assert classify_stage("2026-08-01T19:00:00+00:00", None) == "group"
