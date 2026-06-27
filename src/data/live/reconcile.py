@@ -82,4 +82,6 @@ def classify_stage(kickoff, knockout_start) -> str:
     ko = _as_dt(kickoff)
     if ko is None:
         return "group"
+    if ko.tzinfo is None:
+        return "group"
     return "knockout" if ko >= knockout_start else "group"

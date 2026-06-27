@@ -93,3 +93,10 @@ def test_classify_stage_missing_kickoff_defaults_group():
 
 def test_classify_stage_no_cutoff_defaults_group():
     assert classify_stage("2026-08-01T19:00:00+00:00", None) == "group"
+
+
+def test_classify_stage_naive_datetime_defaults_group():
+    # A naive datetime (no tzinfo) should not raise TypeError when compared
+    # to a tz-aware cutoff; instead, it should fall back to the safe default.
+    naive_dt = datetime(2026, 7, 1, 19, 0)
+    assert classify_stage(naive_dt, _KO) == "group"
