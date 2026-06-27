@@ -155,23 +155,97 @@ def _stats_tab(statistics: dict, home_name: str, away_name: str):
     return dmc.Stack(items, gap=6)
 
 
+# ---------------------------------------------------------------------------
+# Timeline event styling: emoji glyph + accent colour per event type.
+# Keyed on the exact API ``type`` strings, with a fuzzy fallback for the
+# variant spellings the live feed sometimes sends ("substitution",
+# "VAR Goal Cancelled - ...", etc.).
+# ---------------------------------------------------------------------------
+
+_EVENT_VISUALS: dict[str, tuple[str, str]] = {
+    "Goal": ("⚽", "green"),
+    "Penalty": ("🎯", "green"),
+    "Own Goal": ("🥅", "red"),
+    "Yellow Card": ("🟨", "yellow"),
+    "Red Card": ("🟥", "red"),
+    "Substitution": ("🔄", "blue"),
+    "VAR": ("📺", "grape"),
+}
+_DEFAULT_VISUAL: tuple[str, str] = ("🔹", "gray")
+
+
+def event_visual(event_type: str) -> tuple[str, str]:
+    """Return ``(emoji, mantine_color)`` for a timeline event type.
+
+    Exact matches win; otherwise a fuzzy pass maps the feed's variant
+    spellings onto the canonical set. Unknown types get a neutral default.
+    """
+    key = (event_type or "").strip()
+    if key in _EVENT_VISUALS:
+        return _EVENT_VISUALS[key]
+
+    low = key.lower()
+    if "substitut" in low:
+        return _EVENT_VISUALS["Substitution"]
+    if low.startswith("var") or " var" in low:
+        return _EVENT_VISUALS["VAR"]
+    if "yellow" in low:
+        return _EVENT_VISUALS["Yellow Card"]
+    if "red" in low:
+        return _EVENT_VISUALS["Red Card"]
+    if "own goal" in low:
+        return _EVENT_VISUALS["Own Goal"]
+    if "penalty" in low:
+        return _EVENT_VISUALS["Penalty"]
+    if "goal" in low:
+        return _EVENT_VISUALS["Goal"]
+    return _DEFAULT_VISUAL
+
+
+def _event_card(e: dict):
+    emoji, color = event_visual(e.get("type", ""))
+    etype = e.get("type", "")
+    player = e.get("player", "")
+    team = e.get("team", "")
+    is_highlight = color in ("green", "red")  # goals & dismissals stand out
+    subline = " · ".join(part for part in (etype, team) if part)
+    return dmc.Paper(
+        dmc.Group(
+            [
+                dmc.Badge(f"{e.get('minute', 0)}'", variant="light",
+                          color=color, miw=42, radius="sm"),
+                dmc.Text(emoji, className="tl-event__emoji"),
+                dmc.Stack(
+                    [
+                        dmc.Text(player or etype or "—",
+                                 fw=700 if is_highlight else 600,
+                                 size="sm", lineClamp=1),
+                        dmc.Text(subline, size="xs", c="dimmed", lineClamp=1),
+                    ],
+                    gap=0,
+                    style={"flexGrow": 1, "minWidth": 0},
+                ),
+            ],
+            gap="sm",
+            wrap="nowrap",
+            align="center",
+        ),
+        withBorder=True,
+        radius="md",
+        p="xs",
+        className="tl-event-card",
+        style={"borderLeft": f"3px solid var(--mantine-color-{color}-6)"},
+    )
+
+
 def _timeline_tab(events: list[dict]):
     if not events:
         return dmc.Text("No events yet.", c="dimmed", size="sm")
-    items = [
-        dmc.Group(
-            [
-                dmc.Badge(f"{e['minute']}'", variant="light", color="blue", miw=40),
-                dmc.Text(
-                    f"{e['type']} — {e['player']} ({e['team']})",
-                    size="sm",
-                ),
-            ],
-            gap="xs",
-        )
-        for e in events
-    ]
-    return dmc.Stack(items, gap=6)
+    return dmc.Stack(
+        [_event_card(e) for e in events],
+        gap="xs",
+        className="tl-stack",
+    )
 
 
 def _lineups_tab(lineups: dict, home_name: str, away_name: str):

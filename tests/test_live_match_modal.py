@@ -3,7 +3,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from src.components.live_match_modal import build_modal, modal_body, stat_rows
+from src.components.live_match_modal import (
+    build_modal,
+    event_visual,
+    modal_body,
+    stat_rows,
+)
 from src.data.live.models import parse_statistics
 
 FIXTURES = Path(__file__).parent / "fixtures" / "live"
@@ -49,6 +54,74 @@ class TestStatRows:
 
     def test_empty_stats_returns_empty_list(self):
         assert stat_rows({}, "A", "B") == []
+
+
+# ---------------------------------------------------------------------------
+# event_visual — emoji + accent colour per event type
+# ---------------------------------------------------------------------------
+
+class TestEventVisual:
+    def test_goal(self):
+        assert event_visual("Goal") == ("⚽", "green")
+
+    def test_penalty_is_green(self):
+        assert event_visual("Penalty")[1] == "green"
+
+    def test_own_goal_is_red(self):
+        emoji, color = event_visual("Own Goal")
+        assert color == "red"
+
+    def test_yellow_card(self):
+        assert event_visual("Yellow Card") == ("🟨", "yellow")
+
+    def test_red_card_is_red(self):
+        assert event_visual("Red Card")[1] == "red"
+
+    def test_substitution_variant_is_blue(self):
+        # real API may send lowercase / variant spellings
+        assert event_visual("substitution")[1] == "blue"
+
+    def test_var_variant_is_grape(self):
+        assert event_visual("VAR Goal Cancelled - Offside")[1] == "grape"
+
+    def test_unknown_type_falls_back_to_default(self):
+        assert event_visual("Kickoff") == ("🔹", "gray")
+
+    def test_empty_type_falls_back_to_default(self):
+        assert event_visual("") == ("🔹", "gray")
+
+
+# ---------------------------------------------------------------------------
+# Timeline tab — one card per event
+# ---------------------------------------------------------------------------
+
+class TestTimelineCards:
+    def setup_method(self):
+        self.events = [
+            {"minute": 23, "type": "Goal", "player": "Messi", "team": "Argentina"},
+            {"minute": 45, "type": "Yellow Card", "player": "Casemiro", "team": "Brazil"},
+        ]
+        self.match = {
+            "home": "Argentina", "away": "Brazil",
+            "home_score": 1, "away_score": 0,
+            "state": "live", "is_live": True, "clock": 60,
+        }
+        self.body = modal_body(self.match, self.events, {}, {})
+        self.blob = str(self.body.to_plotly_json())
+
+    def test_renders_one_card_per_event(self):
+        assert self.blob.count("tl-event-card") == 2
+
+    def test_shows_event_emojis(self):
+        assert "⚽" in self.blob
+        assert "🟨" in self.blob
+
+    def test_shows_player_and_team(self):
+        assert "Messi" in self.blob and "Argentina" in self.blob
+        assert "Casemiro" in self.blob and "Brazil" in self.blob
+
+    def test_shows_minute(self):
+        assert "23'" in self.blob and "45'" in self.blob
 
 
 # ---------------------------------------------------------------------------

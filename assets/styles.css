@@ -902,3 +902,20 @@ body,
     .ko-page--finals { flex-direction: column; align-items: center; }
     .ko-final { max-width: 100%; width: 100%; }
 }
+
+/* ---- Match-detail Timeline: one charming little card per event ---- */
+.tl-stack { max-height: 52vh; overflow-y: auto; padding-right: 4px; }
+.tl-event-card {
+    transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.tl-event-card:hover {
+    transform: translateX(2px);
+    box-shadow: var(--mantine-shadow-sm);
+}
+.tl-event__emoji {
+    font-size: 1.25rem;
+    line-height: 1;
+    width: 1.75rem;
+    text-align: center;
+    flex: 0 0 auto;
+}
