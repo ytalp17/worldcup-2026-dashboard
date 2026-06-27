@@ -4,8 +4,10 @@ import logging
 
 from pathlib import Path
 
-from src.data.live import models, player_store
+from src.data.live import models, player_store, shots_store
 from src.data.live import team_stats_store
+from src.data.live.shots import parse_shots
+from src.data.live.goal_mouth import aggregate_goal_mouth
 from src.data.live.player_stats import parse_player_stats
 from src.data.live.team_match_stats import STAT_KEYS, parse_team_match_stats
 from src.data.live.reconcile import (
@@ -32,13 +34,15 @@ class LiveDataService:
     """
 
     def __init__(self, client, stadium_index, league_id=LEAGUE_ID, season=SEASON,
-                 player_store=None, team_store=None, knockout_start=None):
+                 player_store=None, team_store=None, knockout_start=None,
+                 shots_store=None):
         self._client = client
         self._stadium_index = stadium_index
         self._league_id = league_id
         self._season = season
         self._player_store = Path(player_store) if player_store else None
         self._team_store = Path(team_store) if team_store else None
+        self._shots_store = Path(shots_store) if shots_store else None
         self._knockout_start = knockout_start
         self._cache: dict[str, tuple[float, object]] = {}
         self._last_good: dict | None = None
@@ -213,6 +217,43 @@ class LiveDataService:
                 team_stats_store.upsert(self._team_store, mid, state, rows, stage)
             except Exception:
                 logger.exception("team stats update failed for match %s", mid)
+
+    def update_shot_stats(self, matches, now: float) -> None:
+        """Refresh the shot cache from today's matches (mirrors
+        update_team_stats). Finished & already stored -> skip; finished-new or
+        live -> fetch /matches/{id} detail once and overwrite that match's rows.
+        Each match is independent: a failure is logged and skipped."""
+        if self._shots_store is None:
+            return
+        stored = shots_store.stored_match_states(self._shots_store)
+        live_states = {models.MatchState.LIVE.value, models.MatchState.HALF_TIME.value}
+        for m in matches:
+            mid = m.get("match_id")
+            state = m.get("state")
+            if mid is None:
+                continue
+            finished = state == models.MatchState.FINISHED.value
+            if finished and stored.get(mid) == models.MatchState.FINISHED.value:
+                continue
+            if not (finished or state in live_states):
+                continue
+            try:
+                rows = parse_shots(mid, self._client.match(mid))
+                stage = classify_stage(m.get("kickoff"), self._knockout_start)
+                shots_store.upsert(self._shots_store, mid, state, rows, stage)
+            except Exception:
+                logger.exception("shot stats update failed for match %s", mid)
+
+    def team_goal_mouth(self, team: str, group_only: bool = False) -> dict:
+        """Aggregate goal-mouth structure for `team` across stored matches.
+        No store / no shots -> a valid empty structure."""
+        if self._shots_store is None:
+            return aggregate_goal_mouth([])
+        by_match = shots_store.load(self._shots_store)
+        target = canonical_team(team)
+        records = [r for rows in by_match.values() for r in rows
+                   if canonical_team(r.team) == target]
+        return aggregate_goal_mouth(records, group_only=group_only)
 
     def team_leaders(self, team: str) -> dict:
         """Per-stat ranked leader rows for `team` aggregated across its matches.
