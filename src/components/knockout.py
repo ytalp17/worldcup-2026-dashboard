@@ -45,8 +45,8 @@ def _slot_row(slot, asset_url):
     """One team line: flag + name + score when resolved, else a shield + TBD."""
     if slot.team:
         ident = dmc.Group(
-            [dmc.Image(src=asset_url(f"country_logos/{slot.team}.svg"),
-                       w=22, h=15, fit="contain", className="ko-flag"),
+            [dmc.Image(src=asset_url(f"flags/{slot.team}.png"),
+                       w=22, h=15, fit="cover", className="ko-flag"),
              dmc.Text(display_name(slot.team), size="sm",
                       fw=700 if slot.winner else 500, className="ko-team")],
             gap=8, wrap="nowrap", align="center", className="ko-slot__ident")

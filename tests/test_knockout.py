@@ -84,7 +84,7 @@ def test_match_card_shows_team_score_and_flag_when_resolved():
     assert "Mexico" in texts and "Serbia" in texts
     assert "2" in texts and "1" in texts
     imgs = [n for n in _walk(card) if isinstance(n, dmc.Image)]
-    assert any(getattr(i, "src", "").endswith("country_logos/Mexico.svg")
+    assert any(getattr(i, "src", "").endswith("flags/Mexico.png")
                for i in imgs)
 
 
