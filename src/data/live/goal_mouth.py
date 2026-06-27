@@ -24,7 +24,7 @@ def aggregate_goal_mouth(records, group_only: bool = False) -> dict:
 
     for r in recs:
         if r.outcome == "Post":
-            woodwork += 1
+            woodwork += 1  # Woodwork is an overlay tally; Post shots are also counted in their zone.
         region = classify_target(r.goal_target)
         if region == "off_target":
             _bump(off, r.outcome)

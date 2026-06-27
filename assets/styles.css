@@ -260,9 +260,9 @@ body,
 .main-split--team {
     /* Four fluid tracks (+ squad) let each row split independently via spanning,
        so the columns are NOT uniform:
-         Row 2: Table spans tracks 1-2 (wide) · Formation in track 3 (narrow)
+         Row 2: Table in track 1 · Goal-mouth in track 2 · Formation in track 3 (narrow)
          Row 3: Leaders in track 1 (narrow) · Map spans tracks 2-3 (widest)
-       Row 2 (Table + Formation) is equal-height; row 3 (Leaders + Map) taller.
+       Row 2 (Table + Goal-mouth + Formation) is equal-height; row 3 (Leaders + Map) taller.
        Squad is the full-height right column. */
     grid-template-columns: 1.0fr 1.0fr 0.85fr 1.2fr;
     grid-template-rows: auto 1fr 1.3fr;
