@@ -16,10 +16,11 @@ import dash_mantine_components as dmc
 # Pitch coordinate band (0-100). Players sit between these vertical bounds; the
 # x-bands keep each half's keeper at the touchline and the forwards near centre.
 _PITCH_TOP, _PITCH_BOT = 12.0, 88.0
-# GK -> forwards. Forwards stop short of the halfway line so the two attacking
-# lines' name labels don't collide at the centre seam (matters on phone width).
-_HOME_X = (4.0, 43.0)
-_AWAY_X = (96.0, 57.0)
+# GK -> forwards. Keepers sit a little off the goal line (not at x=0/100) so
+# their name label clears the pitch edge; forwards stop short of the halfway
+# line so the two attacking lines' labels don't collide at the centre seam.
+_HOME_X = (8.0, 43.0)
+_AWAY_X = (92.0, 57.0)
 
 
 def surname(name: str | None) -> str:
@@ -60,20 +61,14 @@ def pitch_nodes(rows: list, side: str) -> list[tuple[dict, float, float]]:
     return out
 
 
-def _is_keeper(player: dict) -> bool:
-    return "goal" in (player.get("position") or "").lower()
-
-
 def _player_node(player: dict, x: float, y: float, side: str) -> dmc.Box:
-    # Keepers get their own accent (gold) regardless of team; outfielders take
-    # the team colour. Colours live in CSS so they can use gradients and react
-    # to the dark/light theme.
-    role = "gk" if _is_keeper(player) else side
+    # Every player (keepers included) takes their team colour. Colours live in
+    # CSS so they can use gradients and react to the dark/light theme.
     return dmc.Box(
         [
             dmc.Box(
                 str(player.get("number", "")),
-                className=f"lu-node__badge lu-node__badge--{role}",
+                className=f"lu-node__badge lu-node__badge--{side}",
             ),
             dmc.Text(surname(player.get("name")), className="lu-node__name"),
         ],

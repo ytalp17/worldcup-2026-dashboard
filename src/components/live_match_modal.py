@@ -126,7 +126,7 @@ def stat_rows(statistics: dict, home: str, away: str) -> list[tuple]:
 def _score_line(m: dict) -> str:
     h, a = m.get("home_score"), m.get("away_score")
     score = f"{h} - {a}" if h is not None else "vs"
-    return f"{m['home']}  {score}  {m['away']}"
+    return f"{m['home']} {score} {m['away']}"
 
 
 # ---------------------------------------------------------------------------
@@ -313,7 +313,7 @@ def modal_body(
 
     header = dmc.Stack(
         [
-            dmc.Title(_score_line(match), order=3),
+            dmc.Title(_score_line(match), order=3, ta="center"),
             dmc.Group(
                 [
                     dmc.Badge(
@@ -324,9 +324,11 @@ def modal_body(
                     dmc.Text(match.get("venue") or "", size="sm", c="dimmed"),
                 ],
                 gap="sm",
+                justify="center",
             ),
         ],
         gap="xs",
+        align="center",
     )
 
     tabs = dmc.Tabs(
@@ -370,8 +372,14 @@ def loading_body():
     """
     return dmc.Stack(
         [
-            dmc.Skeleton(height=26, width="58%", radius="sm"),          # title
-            dmc.Skeleton(height=18, width=120, radius="xl"),           # status badge
+            dmc.Stack(
+                [
+                    dmc.Skeleton(height=26, width=220, radius="sm"),   # centred title
+                    dmc.Skeleton(height=18, width=120, radius="xl"),  # status badge
+                ],
+                gap="xs",
+                align="center",
+            ),
             dmc.Divider(my="sm"),
             dmc.Group(
                 [dmc.Skeleton(height=20, width=70, radius="sm") for _ in range(3)],

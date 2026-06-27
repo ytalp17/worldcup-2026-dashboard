@@ -977,14 +977,9 @@ body,
     border: 1.5px solid rgba(255, 255, 255, 0.55);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
-/* Elegant, slightly muted team colours; keepers get a distinct gold. */
+/* Elegant, slightly muted team colours (keepers included). */
 .lu-node__badge--home { background: linear-gradient(150deg, #7da0e0, #4761b6); }
 .lu-node__badge--away { background: linear-gradient(150deg, #e7a184, #cc6646); }
-.lu-node__badge--gk {
-    background: linear-gradient(150deg, #f0d488, #d6ab4c);
-    color: #3a2c08;
-    text-shadow: none;
-}
 .lu-node__name {
     font-size: clamp(0.55rem, 1.2vw, 0.72rem);
     font-weight: 600;

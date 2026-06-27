@@ -172,7 +172,6 @@ class TestModalBodyTabbed:
         # Both teams placed, plus distinctly-coloured keepers.
         assert "lu-node__badge--home" in blob
         assert "lu-node__badge--away" in blob
-        assert "lu-node__badge--gk" in blob
 
     def test_contains_score(self):
         blob = str(self.body.to_plotly_json())

@@ -131,16 +131,15 @@ class TestBuildLineupPitch:
                   if "lu-node__badge" in getattr(n, "className", "")]
         assert len(badges) == 22
 
-    def test_team_and_keeper_colors(self):
+    def test_team_colors(self):
         pitch = build_lineup_pitch(LINEUPS)
         badges = [n for n in _walk(pitch)
                   if "lu-node__badge" in getattr(n, "className", "")]
-        gk = [b for b in badges if "lu-node__badge--gk" in b.className]
         home = [b for b in badges if "lu-node__badge--home" in b.className]
         away = [b for b in badges if "lu-node__badge--away" in b.className]
-        assert len(gk) == 2       # one keeper per team, distinct colour
-        assert len(home) == 10    # home outfielders
-        assert len(away) == 10    # away outfielders
+        # Every player (keepers included) takes their team colour.
+        assert len(home) == 11
+        assert len(away) == 11
 
     def test_empty_lineups_returns_none(self):
         assert build_lineup_pitch({"home": {"rows": []}, "away": {"rows": []}}) is None
