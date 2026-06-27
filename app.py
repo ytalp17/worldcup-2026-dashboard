@@ -33,7 +33,8 @@ from src.components.leaders_card import (
     leaders_row_data,
 )
 from src.components.squad_table import build_squad_panel, squad_rows
-from src.components.tournament_stats import tab_options, tourn_columns, tourn_row_data
+from src.components.tournament_stats import (
+    group_only, tab_options, tourn_columns, tourn_row_data)
 from src.components.live_match_modal import build_modal, loading_body, modal_body
 from src.components.live_strip import overlay_style, strip_items
 from src.components.team_kpis import build_kpi_strip, kpi_cards
@@ -108,9 +109,11 @@ PLAYER_STORE_PATH = DATA_DIR / "live_player_stats.csv"
 TEAM_STATS_PATH = DATA_DIR / "live_team_stats.csv"
 # No-key mode: when the env var is unset the app runs purely on static data,
 # so dev and the whole test suite work offline.
+KNOCKOUT_START = min((m.kickoff_utc for m in KO_MATCHES), default=None)
 LIVE = (
     LiveDataService(HighlightlyClient(api_key=_API_KEY), STADIUM_INDEX,
-                    player_store=PLAYER_STORE_PATH, team_store=TEAM_STATS_PATH)
+                    player_store=PLAYER_STORE_PATH, team_store=TEAM_STATS_PATH,
+                    knockout_start=KNOCKOUT_START)
     if _API_KEY else None
 )
 
@@ -241,11 +244,13 @@ def attach_team_flags(rows):
     return out
 
 
-def tournament_grid_payload(scope, tab, live):
+def tournament_grid_payload(scope, tab, live, group_only=False):
     """(rowData, columnDefs) for the tournament grid. Empty rows when offline."""
     standings = (live or {}).get("standings") or {}
-    tl = LIVE.tournament_team_leaders(standings) if LIVE is not None else {}
-    pl = LIVE.tournament_player_leaders() if LIVE is not None else {}
+    tl = (LIVE.tournament_team_leaders(standings, group_only=group_only)
+          if LIVE is not None else {})
+    pl = (LIVE.tournament_player_leaders(group_only=group_only)
+          if LIVE is not None else {})
     rows = attach_team_flags(tourn_row_data(scope, tab, tl, pl))
     return rows, tourn_columns(scope, tab)
 
@@ -891,10 +896,11 @@ def set_tournament_tabs(scope):
     Output("tourn-grid", "columnDefs"),
     Input("tourn-scope", "value"),
     Input("tourn-tabs", "value"),
+    Input("tourn-stage", "value"),
     Input("live-store", "data"),
 )
-def update_tournament_grid(scope, tab, live):
-    return tournament_grid_payload(scope, tab, live)
+def update_tournament_grid(scope, tab, stage_value, live):
+    return tournament_grid_payload(scope, tab, live, group_only(stage_value))
 
 
 @callback(

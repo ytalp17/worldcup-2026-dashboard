@@ -355,3 +355,38 @@ def test_modal_target_id_extracts_match_id():
     assert app._modal_target_id({"id": 7, "t": 1.0}) == 7
     assert app._modal_target_id(None) is None
     assert app._modal_target_id({}) is None
+
+
+# ---------------------------------------------------------------------------
+# Task 7: stage filter wiring — group_only reaches both leader calls
+# ---------------------------------------------------------------------------
+
+class _FakeLive:
+    def __init__(self):
+        self.calls = []
+
+    def tournament_team_leaders(self, standings=None, group_only=False):
+        self.calls.append(("team", group_only))
+        return {}
+
+    def tournament_player_leaders(self, group_only=False):
+        self.calls.append(("player", group_only))
+        return {}
+
+
+def test_tournament_grid_payload_passes_group_only(monkeypatch):
+    import app
+    fake = _FakeLive()
+    monkeypatch.setattr(app, "LIVE", fake)
+    app.tournament_grid_payload("Team", "Attack & xG", {"standings": {}},
+                                group_only=True)
+    assert ("team", True) in fake.calls
+    assert ("player", True) in fake.calls
+
+
+def test_tournament_grid_payload_defaults_group_only_false(monkeypatch):
+    import app
+    fake = _FakeLive()
+    monkeypatch.setattr(app, "LIVE", fake)
+    app.tournament_grid_payload("Team", "Attack & xG", {"standings": {}})
+    assert ("team", False) in fake.calls
