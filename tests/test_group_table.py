@@ -1,6 +1,10 @@
 import dash_ag_grid as dag
 
-from src.components.group_table import build_group_panel, group_rows
+from src.components.group_table import (
+    build_group_panel,
+    group_rows,
+    live_group_rows,
+)
 from src.data.groups import Group, GroupStanding
 
 
@@ -51,12 +55,49 @@ def test_group_rows_stats_all_zero():
 def test_build_group_panel_has_expected_ids_and_team_renderer():
     panel = build_group_panel(_group(), _asset)
     ids = {getattr(n, "id", None) for n in _walk(panel)}
-    assert {"group-grid", "group-table-title", "group-extra"} <= ids
+    assert {"group-grid", "group-table-title"} <= ids
 
     grid = next(n for n in _walk(panel) if isinstance(n, dag.AgGrid))
     team_col = next(c for c in grid.columnDefs if c.get("field") == "team")
     assert team_col["cellRenderer"] == "TeamCell"
     assert len(grid.rowData) == 4
+
+
+def test_group_rows_have_empty_status_when_static():
+    rows = group_rows(_group(), _asset)
+    assert all(r["status"] == "" for r in rows)
+
+
+def test_live_group_rows_attach_qualification_status():
+    live = {"Group A": [
+        {"team": "Mexico", "played": 3, "won": 3, "drawn": 0, "lost": 0,
+         "goal_diff": 6, "points": 9},
+        {"team": "South Korea", "played": 3, "won": 2, "drawn": 0, "lost": 1,
+         "goal_diff": 2, "points": 6},
+        {"team": "Bosnia", "played": 3, "won": 1, "drawn": 0, "lost": 2,
+         "goal_diff": -1, "points": 3},
+        {"team": "South Africa", "played": 3, "won": 0, "drawn": 0, "lost": 3,
+         "goal_diff": -7, "points": 0},
+    ]}
+    status_map = {"Mexico": "qualified", "South Korea": "qualified",
+                  "Bosnia": "eliminated", "South Africa": "eliminated"}
+    rows = live_group_rows("Group A", live, _asset, status_map=status_map)
+    by_raw = {r["flag"].split("/")[-1].removesuffix(".svg"): r["status"]
+              for r in rows}
+    # status keyed by the raw live name; flag filename uses the (resolved) name
+    statuses = [r["status"] for r in rows]
+    assert statuses == ["qualified", "qualified", "eliminated", "eliminated"]
+
+
+def test_grid_fits_card_and_has_marker_rules():
+    panel = build_group_panel(_group(), _asset)
+    grid = next(n for n in _walk(panel) if isinstance(n, dag.AgGrid))
+    opts = grid.dashGridOptions
+    assert opts["domLayout"] == "normal"   # grid fills the card (no autoHeight)
+    rules = opts["rowClassRules"]
+    assert "group-row--q" in rules and "group-row--e" in rules
+    assert "qualified" in rules["group-row--q"]
+    assert "eliminated" in rules["group-row--e"]
 
 
 def test_build_group_panel_shows_group_name():

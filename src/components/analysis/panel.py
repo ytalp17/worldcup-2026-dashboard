@@ -83,7 +83,7 @@ def build_analysis_panel() -> dmc.Box:
             # dimmed context (the view title) right, under the shared divider.
             dmc.Group(
                 [
-                    dmc.Text("Analysis", fw=700, size="sm"),
+                    dmc.Text("Group Analysis", fw=700, size="sm"),
                     dmc.Group(
                         [dmc.Text(id="analysis-title", size="sm", c="dimmed"),
                          _race_controls(), _expand_button()],

@@ -11,6 +11,9 @@ _GRID_OPTIONS = {
     "rowHeight": 34,
     "headerHeight": 34,
     "overlayNoRowsTemplate": "No player data yet",
+    # Green left-edge accent on the top-3 rows (Goals/Assists only — see
+    # leaders_row_data), matching the group table's qualification markers.
+    "rowClassRules": {"leaders-row--top3": "params.data.top3 === true"},
 }
 
 _RANK_COL = {"headerName": "#", "field": "rank", "width": 52, "sortable": False,
@@ -48,14 +51,16 @@ def leaders_columns(tab: str) -> list[dict]:
 
 def leaders_row_data(leaders: dict | None, tab: str) -> list[dict]:
     """Rows for the active tab, with a 1-based rank. Empty list when no data.
-    Cards rows carry the yellow/red breakdown; other tabs carry a single `value`."""
+    Cards rows carry the yellow/red breakdown; other tabs carry a single `value`.
+    `top3` marks the top three rows for the Goals and Assists tabs (a positive
+    achievement worth a green accent); Cards never gets a top-3 mark."""
     rows = (leaders or {}).get(_stat_key(tab), [])
     if tab == "Cards":
         return [{"rank": i + 1, "player": r["player"],
                  "yellow": r.get("yellow", 0), "red": r.get("red", 0),
-                 "apps": r["apps"]} for i, r in enumerate(rows)]
+                 "apps": r["apps"], "top3": False} for i, r in enumerate(rows)]
     return [{"rank": i + 1, "player": r["player"], "value": r["value"],
-             "apps": r["apps"]} for i, r in enumerate(rows)]
+             "apps": r["apps"], "top3": i < 3} for i, r in enumerate(rows)]
 
 
 def build_leaders_card() -> dmc.Box:
@@ -63,7 +68,7 @@ def build_leaders_card() -> dmc.Box:
     selected team's players, ranked by the active stat."""
     header = dmc.Group(
         [
-            dmc.Text("Leaders", fw=700, size="sm"),
+            dmc.Text("Team Leaders", fw=700, size="sm"),
             dmc.Text("", id="leaders-table-title", size="sm", c="dimmed"),
         ],
         justify="space-between",

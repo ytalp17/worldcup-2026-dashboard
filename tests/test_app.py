@@ -69,9 +69,19 @@ def test_team_stats_payload_for_centered_team():
     assert isinstance(stats, TeamStats)
     assert stats.squad_size > 0
     assert stats.value_display.startswith("€")
-    # KPI strip rebuilds to 7 cards for any team index.
-    cards = app.kpi_cards(app.team_stats_payload(5))
-    assert len(cards) == 7
+    # KPI strip rebuilds to 8 cards (incl. Form) for any team index.
+    cards = app.kpi_cards(app.team_stats_payload(5), app.team_form_payload(5))
+    assert len(cards) == 8
+
+
+def test_team_form_payload_returns_wdl_tuple():
+    import app
+
+    form = app.team_form_payload(0)
+    assert isinstance(form, tuple)
+    # Without a live service (no API key in tests) there is no form yet, but the
+    # shape is stable and every entry, when present, is a W/D/L token.
+    assert all(r in ("W", "D", "L") for r in form)
 
 
 def test_formation_panel_payload_is_theme_aware():
