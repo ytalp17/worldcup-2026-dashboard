@@ -17,8 +17,9 @@ from dash_iconify import DashIconify
 from src.components.team_carousel import display_name
 from src.data.bracket import STAGE_PAGES, BracketMatch, stage_ties
 
-_FROSTED = {"content": "filter-drawer-frosted",
-            "header": "filter-drawer-frosted-header"}
+_FROSTED = {"content": "filter-drawer-frosted ko-drawer-content",
+            "header": "filter-drawer-frosted-header",
+            "body": "ko-drawer-body"}
 
 
 def format_ko_datetime(bm: BracketMatch, user_tz: str | None,
@@ -64,12 +65,13 @@ def _slot_row(slot, asset_url):
 
 def match_card(bm: BracketMatch, asset_url, user_tz, today) -> dmc.Box:
     """A single bracket match card: date/time header over the two team rows."""
+    cls = "ko-card ko-card--done" if bm.finished else "ko-card"
     return dmc.Box(
         [dmc.Text(format_ko_datetime(bm, user_tz, today), size="xs", c="dimmed",
                   className="ko-card__time"),
          _slot_row(bm.home, asset_url),
          _slot_row(bm.away, asset_url)],
-        className="ko-card")
+        className=cls)
 
 
 def _tie_row(winner_match, feeders, asset_url, user_tz, today) -> dmc.Box:

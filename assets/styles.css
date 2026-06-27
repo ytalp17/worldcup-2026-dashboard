@@ -811,3 +811,81 @@ body,
 }
 .analysis-dot.is-active { background: var(--mantine-color-blue-5); }
 .analysis-empty { height: 100%; }
+
+/* ============================================================
+   Tournament Knockout drawer — Google-style paged bracket
+   ============================================================ */
+:root { --ko-line: var(--mantine-color-gray-4); }
+[data-mantine-color-scheme="dark"] { --ko-line: rgba(255, 255, 255, 0.18); }
+
+/* The drawer body is a flex column; only the bracket scrolls. */
+.ko-drawer-body { display: flex; flex-direction: column; height: 100%;
+    min-height: 0; overflow: hidden; }
+.ko-stack { flex: 1 1 auto; min-height: 0; }
+.ko-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden;
+    padding-right: 2px; }
+
+/* Carousel controls (prev · dots · next) */
+.ko-controls { width: 100%; flex: 0 0 auto; }
+.ko-dot { width: 7px; height: 7px; border-radius: 50%;
+    background: var(--mantine-color-default-border); transition: all .15s ease; }
+.ko-dot--active { width: 18px; border-radius: 4px;
+    background: var(--mantine-color-blue-5); }
+
+/* Stage headers, each centred over its column */
+.ko-stage-headers { position: sticky; top: 0; z-index: 3; padding: 2px 0 8px;
+    margin-bottom: 2px;
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.ko-stage-headers__left, .ko-stage-headers__right { flex: 1 1 0;
+    text-align: center; }
+
+/* Ties: each is [two feeder cards | connector | one winner card] */
+.ko-ties { display: flex; flex-direction: column; gap: 24px; padding: 2px 2px 10px; }
+.ko-tie { display: flex; align-items: center; }
+.ko-feeders { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column;
+    gap: 14px; }
+.ko-winner { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column;
+    justify-content: center; }
+.ko-connector { flex: 0 0 28px; align-self: stretch; position: relative; }
+/* vertical line joining the two feeders' mid-points */
+.ko-connector::before { content: ""; position: absolute; left: 0;
+    top: 22%; bottom: 22%; border-left: 2px solid var(--ko-line); }
+/* horizontal line from the join into the winner card */
+.ko-connector::after { content: ""; position: absolute; left: 0; right: 0;
+    top: 50%; border-top: 2px solid var(--ko-line); }
+
+/* Match card */
+.ko-card { background: var(--mantine-color-default);
+    border: 1px solid var(--mantine-color-default-border); border-radius: 12px;
+    padding: 7px 10px; display: flex; flex-direction: column; gap: 5px; }
+.ko-card__time { line-height: 1.1; }
+.ko-slot { gap: 8px; }
+.ko-slot__ident { flex: 1 1 auto; min-width: 0; }
+.ko-flag { flex: 0 0 auto; border-radius: 2px;
+    box-shadow: 0 0 0 1px var(--mantine-color-default-border); }
+.ko-team { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ko-score { flex: 0 0 auto; min-width: 12px; text-align: right;
+    font-variant-numeric: tabular-nums; }
+.ko-shield { color: var(--mantine-color-dimmed); opacity: .55; }
+/* in a finished match the losing side dims so the winner stands out */
+.ko-card--done .ko-slot:not(.ko-slot--win) .ko-team {
+    color: var(--mantine-color-dimmed); }
+
+/* Finals page: Final + 3rd-Place side by side */
+.ko-page--finals { display: flex; gap: 22px; justify-content: center;
+    align-items: flex-start; padding-top: 18px; }
+.ko-final { flex: 1 1 0; max-width: 300px; display: flex; flex-direction: column;
+    gap: 8px; align-items: stretch; }
+.ko-final-label { text-align: center; }
+.ko-final--bronze { opacity: .92; }
+
+/* Narrow screens: tighten the bracket so two columns still fit */
+@media (max-width: 600px) {
+    .ko-ties { gap: 18px; }
+    .ko-feeders { gap: 10px; }
+    .ko-connector { flex-basis: 16px; }
+    .ko-card { padding: 6px 8px; border-radius: 10px; }
+    .ko-flag { width: 18px !important; height: 12px !important; }
+    .ko-page--finals { flex-direction: column; align-items: center; }
+    .ko-final { max-width: 100%; width: 100%; }
+}
