@@ -74,6 +74,7 @@ def build_map_controls() -> html.Div:
             [
                 _control_button("tournament-control", "tabler:trophy", "Tournament Stats"),
                 _control_button("filter-control", "tabler:plane-tilt", "Team Travel Map"),
+                _control_button("knockout-control", "tabler:tournament", "Tournament Knockout"),
             ],
             gap="sm",
         ),

@@ -20,7 +20,9 @@ from src.data.flows import build_team_flows, team_cities
 from src.data.groups import build_groups, group_for_team
 from src.data.qualification import qualification_status
 from src.data.match_calendar import MatchCalendar
-from src.data.matches import MatchRepository, matches_by_stadium
+from src.data.matches import MatchRepository, is_placeholder, matches_by_stadium
+from src.data.bracket import STAGE_PAGES, build_bracket
+from src.components.knockout import page_dots, render_page
 from src.components.formation_pitch import build_formation_panel, formation_title, pitch_src
 from src.components.leaders_card import (
     build_leaders_card,
@@ -66,6 +68,7 @@ DISTANCES = DistanceRepository(DATA_DIR / "teams.csv").load()
 
 MATCHES = MatchRepository(DATA_DIR / "matches.csv").load()
 MATCHES_BY_STADIUM = matches_by_stadium(MATCHES)
+KO_MATCHES = [m for m in MATCHES if m.stage != "Group Stage"]
 
 TEAM_FLOWS = build_team_flows(MATCHES, VENUES, distances=DISTANCES)
 TEAM_OPTIONS = grouped_team_options(sorted(TEAM_FLOWS))
@@ -281,6 +284,58 @@ def team_form_payload(index, now=None):
     return tuple(recent_form(team, matches, canonical_team, limit=5))
 
 
+def _bracket_standings(live):
+    """({group: [official team names ordered by position]}, {complete groups}).
+    A group is 'complete' once all four teams have played their three games, so
+    we only resolve its winner/runner-up into the bracket then."""
+    raw = (live or {}).get("standings") or {}
+    standings, complete = {}, set()
+    for group, rows in raw.items():
+        standings[group] = [official_team(r["team"]) for r in rows]
+        if len(rows) >= 4 and all(r.get("played", 0) >= 3 for r in rows):
+            complete.add(group)
+    return standings, complete
+
+
+def _knockout_results(now):
+    """{match_number: (home, away, home_score, away_score)} for knockout matches
+    that the live feed has resolved (real teams). Matched to the schedule by
+    kickoff instant; reads the cache-warmed per-date snapshots, so cheap."""
+    if LIVE is None:
+        return {}
+    today = date.today()
+    by_date = {}
+    for m in KO_MATCHES:
+        if m.date <= today:
+            by_date.setdefault(m.date.isoformat(), []).append(m)
+    results = {}
+    for date_iso, day_matches in by_date.items():
+        live_day = LIVE.matches_on(date_iso, now)
+        by_kickoff = {lm.get("kickoff"): lm for lm in live_day if lm.get("kickoff")}
+        for m in day_matches:
+            lm = by_kickoff.get(m.kickoff_utc.isoformat())
+            if not lm:
+                continue
+            home, away = lm.get("home", ""), lm.get("away", "")
+            if is_placeholder(home) or is_placeholder(away):
+                continue
+            results[m.number] = (official_team(home), official_team(away),
+                                 lm.get("home_score"), lm.get("away_score"))
+    return results
+
+
+def knockout_payload(page, live, user_tz):
+    """(bracket body, page dots) for the knockout drawer at the given carousel
+    page, resolved as far as the live data allows."""
+    standings, complete = _bracket_standings(live)
+    results = _knockout_results(time.monotonic())
+    bracket = build_bracket(KO_MATCHES, standings=standings,
+                            complete_groups=complete, results=results)
+    page = max(0, min(page or 0, len(STAGE_PAGES) - 1))
+    body = render_page(bracket, page, app.get_asset_url, user_tz, date.today())
+    return body, page_dots(page)
+
+
 def formation_panel_payload(index, dark):
     """(header_title, team, image_src) for the centred team's estimated XI.
     `dark` (the color-scheme-toggle state) picks the dark/light pitch image."""
@@ -379,6 +434,7 @@ def drawer_for_city(city: str | None, user_tz: str | None = None, live: dict | N
     Output("stadium-drawer", "children"),
     Output("filter-drawer", "opened", allow_duplicate=True),
     Output("tournament-drawer", "opened", allow_duplicate=True),
+    Output("knockout-drawer", "opened", allow_duplicate=True),
     Input({"type": MARKER_TYPE, "index": ALL}, "n_clicks"),
     State("user-tz", "data"),
     State("live-store", "data"),
@@ -388,38 +444,77 @@ def open_stadium_drawer(n_clicks, user_tz, live):
     # user_tz is a State snapshot: if the tz probe hasn't resolved yet, the drawer falls back to venue-local time (window is brief, acceptable per design).
     # Ignore the callback firing when markers mount with n_clicks=None.
     if not any(n_clicks):
-        return no_update, no_update, no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update, no_update, no_update
     triggered = ctx.triggered_id
     city = triggered.get("index") if isinstance(triggered, dict) else None
     opened, title, children = drawer_for_city(city, user_tz, live)
-    # Opening the stadium drawer closes the filter and tournament drawers.
-    return opened, title, children, (False if opened else no_update), False
+    # Opening the stadium drawer closes the filter, tournament and knockout drawers.
+    return opened, title, children, (False if opened else no_update), False, False
 
 
 @callback(
     Output("filter-drawer", "opened"),
     Output("stadium-drawer", "opened", allow_duplicate=True),
     Output("tournament-drawer", "opened", allow_duplicate=True),
+    Output("knockout-drawer", "opened", allow_duplicate=True),
     Input("filter-control", "n_clicks"),
     prevent_initial_call=True,
 )
 def open_filter_drawer(n_clicks):
     if not n_clicks:
-        return no_update, no_update, no_update
-    return True, False, False  # open the filter drawer, close the stadium + tournament drawers
+        return no_update, no_update, no_update, no_update
+    return True, False, False, False  # open filter; close stadium + tournament + knockout
 
 
 @callback(
     Output("tournament-drawer", "opened"),
     Output("filter-drawer", "opened", allow_duplicate=True),
     Output("stadium-drawer", "opened", allow_duplicate=True),
+    Output("knockout-drawer", "opened", allow_duplicate=True),
     Input("tournament-control", "n_clicks"),
     prevent_initial_call=True,
 )
 def open_tournament_drawer(n_clicks):
     if not n_clicks:
-        return no_update, no_update, no_update
-    return True, False, False
+        return no_update, no_update, no_update, no_update
+    return True, False, False, False
+
+
+@callback(
+    Output("knockout-drawer", "opened"),
+    Output("filter-drawer", "opened", allow_duplicate=True),
+    Output("tournament-drawer", "opened", allow_duplicate=True),
+    Output("stadium-drawer", "opened", allow_duplicate=True),
+    Input("knockout-control", "n_clicks"),
+    prevent_initial_call=True,
+)
+def open_knockout_drawer(n_clicks):
+    if not n_clicks:
+        return no_update, no_update, no_update, no_update
+    return True, False, False, False  # open knockout; close the other three
+
+
+@callback(
+    Output("knockout-page", "data"),
+    Input("knockout-prev", "n_clicks"),
+    Input("knockout-next", "n_clicks"),
+    State("knockout-page", "data"),
+    prevent_initial_call=True,
+)
+def move_knockout_page(_prev, _next, page):
+    delta = -1 if ctx.triggered_id == "knockout-prev" else 1
+    return max(0, min((page or 0) + delta, len(STAGE_PAGES) - 1))
+
+
+@callback(
+    Output("knockout-body", "children"),
+    Output("knockout-dots", "children"),
+    Input("knockout-page", "data"),
+    Input("live-store", "data"),
+    State("user-tz", "data"),
+)
+def render_knockout(page, live, user_tz):
+    return knockout_payload(page, live, user_tz)
 
 
 @callback(
@@ -577,6 +672,16 @@ def close_filter_drawer_in_team_mode(team_mode):
 )
 def close_tournament_drawer_in_team_mode(team_mode):
     # Team mode hides the tournament pin, so also close its (right-side) drawer.
+    return False if team_mode else no_update
+
+
+@callback(
+    Output("knockout-drawer", "opened", allow_duplicate=True),
+    Input("mode-toggle", "checked"),
+    prevent_initial_call=True,
+)
+def close_knockout_drawer_in_team_mode(team_mode):
+    # Team mode hides the map controls, so also close the knockout drawer.
     return False if team_mode else no_update
 
 

@@ -229,27 +229,29 @@ def test_live_score_markers_empty_when_no_live():
     assert live_score_markers([], {"matches": []}) == []
 
 
-def test_map_controls_overlay_has_both_buttons():
+def test_map_controls_overlay_has_three_buttons():
     from src.components.map_view import build_map_controls
 
     overlay = build_map_controls()
     assert overlay.id == "map-controls-overlay"
     ids = {getattr(n, "id", None) for n in _walk(overlay)}
-    # Tournament Stats and Team Travel Map are now fixed-overlay icon buttons.
+    # Tournament Stats, Team Travel Map and Tournament Knockout fixed buttons.
     assert "tournament-control" in ids
     assert "filter-control" in ids
+    assert "knockout-control" in ids
 
 
-def test_map_controls_tournament_button_is_above_filter_button():
+def test_map_controls_button_order_top_to_bottom():
     from src.components.map_view import build_map_controls
 
     overlay = build_map_controls()
     button_ids = [
         nid for n in _walk(overlay)
-        if (nid := getattr(n, "id", None)) in ("tournament-control", "filter-control")
+        if (nid := getattr(n, "id", None))
+        in ("tournament-control", "filter-control", "knockout-control")
     ]
-    # Stacked top-to-bottom: Tournament Stats first, Team Travel Map below it.
-    assert button_ids == ["tournament-control", "filter-control"]
+    # Stacked top-to-bottom: Tournament Stats, Team Travel Map, Tournament Knockout.
+    assert button_ids == ["tournament-control", "filter-control", "knockout-control"]
 
 
 def test_map_controls_buttons_have_tooltip_labels():
@@ -259,7 +261,7 @@ def test_map_controls_buttons_have_tooltip_labels():
     labels = {
         t.label for t in _walk(build_map_controls()) if isinstance(t, dmc.Tooltip)
     }
-    assert {"Tournament Stats", "Team Travel Map"} <= labels
+    assert {"Tournament Stats", "Team Travel Map", "Tournament Knockout"} <= labels
 
 
 def test_map_controls_buttons_are_theme_aware():
@@ -267,7 +269,7 @@ def test_map_controls_buttons_are_theme_aware():
     from src.components.map_view import build_map_controls
 
     icons = [n for n in _walk(build_map_controls()) if isinstance(n, dmc.ActionIcon)]
-    assert len(icons) == 2
+    assert len(icons) == 3
     # "default" variant renders the icon in the theme text color (black in light,
     # white in dark), matching the live match-score items.
     assert all(b.variant == "default" for b in icons)
