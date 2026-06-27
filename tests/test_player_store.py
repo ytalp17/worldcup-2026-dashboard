@@ -44,3 +44,32 @@ def test_null_id_roundtrips_as_none(tmp_path):
     player_store.upsert(path, 1, "finished", [_row(1, "Top Player", None)])
     row = player_store.load(path)[1][0]
     assert row.player_id is None
+
+
+def _pstat(mid, team, player, pid, goals=0, assists=0, yellow=0, red=0):
+    return PlayerMatchStat(match_id=mid, team=team, player=player, player_id=pid,
+                           goals=goals, assists=assists, yellow=yellow, red=red)
+
+
+def test_upsert_stores_stage_and_load_roundtrips(tmp_path):
+    path = tmp_path / "ps.csv"
+    player_store.upsert(path, 1, "finished",
+                        [_pstat(1, "USA", "F. Balogun", 100, goals=1)],
+                        stage="knockout")
+    assert player_store.load(path)[1][0].stage == "knockout"
+
+
+def test_upsert_stage_defaults_to_group(tmp_path):
+    path = tmp_path / "ps.csv"
+    player_store.upsert(path, 1, "finished",
+                        [_pstat(1, "USA", "F. Balogun", 100, goals=1)])
+    assert player_store.load(path)[1][0].stage == "group"
+
+
+def test_load_legacy_row_without_stage_defaults_group(tmp_path):
+    path = tmp_path / "ps.csv"
+    path.write_text(
+        "match_id,team,player,player_id,goals,assists,yellow,red,state\n"
+        "1,USA,F. Balogun,100,1,0,0,0,finished\n"
+    )
+    assert player_store.load(path)[1][0].stage == "group"

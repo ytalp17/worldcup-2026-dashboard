@@ -20,6 +20,7 @@ class PlayerMatchStat:
     assists: int
     yellow: int
     red: int
+    stage: str = "group"
 
 
 def _team_name(raw) -> str:

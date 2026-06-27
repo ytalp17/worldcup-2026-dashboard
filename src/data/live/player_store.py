@@ -9,7 +9,7 @@ from src.data.live.player_stats import PlayerMatchStat
 # A gitignored cache of per-match player stats. `state` records the match state
 # at write time so the updater can skip finished matches already on disk.
 FIELDS = ["match_id", "team", "player", "player_id",
-          "goals", "assists", "yellow", "red", "state"]
+          "goals", "assists", "yellow", "red", "state", "stage"]
 
 
 def load(path) -> dict[int, list[PlayerMatchStat]]:
@@ -30,6 +30,7 @@ def load(path) -> dict[int, list[PlayerMatchStat]]:
                 assists=int(row["assists"]),
                 yellow=int(row["yellow"]),
                 red=int(row["red"]),
+                stage=row.get("stage") or "group",
             ))
     return out
 
@@ -46,8 +47,9 @@ def stored_match_states(path) -> dict[int, str]:
     return out
 
 
-def upsert(path, match_id: int, state: str, rows) -> None:
-    """Atomically replace all rows for `match_id` with `rows` (tagged `state`)."""
+def upsert(path, match_id: int, state: str, rows, stage: str = "group") -> None:
+    """Atomically replace all rows for `match_id` with `rows` (tagged `state`
+    and `stage`)."""
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)
     kept = []
@@ -59,13 +61,15 @@ def upsert(path, match_id: int, state: str, rows) -> None:
         w = csv.DictWriter(f, fieldnames=FIELDS)
         w.writeheader()
         for r in kept:
-            w.writerow({k: r.get(k, "") for k in FIELDS})
+            out_row = {k: r.get(k, "") for k in FIELDS}
+            out_row["stage"] = r.get("stage") or "group"
+            w.writerow(out_row)
         for s in rows:
             w.writerow({
                 "match_id": s.match_id, "team": s.team, "player": s.player,
                 "player_id": s.player_id if s.player_id is not None else "",
                 "goals": s.goals, "assists": s.assists,
                 "yellow": s.yellow, "red": s.red,
-                "state": state,
+                "state": state, "stage": stage,
             })
     os.replace(tmp, p)
