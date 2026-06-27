@@ -144,7 +144,7 @@ def build_knockout_drawer() -> dmc.Drawer:
         id="knockout-drawer",
         title="Tournament Knockout",
         position="right",
-        size="xl",
+        size=540,  # narrower than the other drawers; cards are compact
         padding="md",
         opened=False,
         withCloseButton=True,

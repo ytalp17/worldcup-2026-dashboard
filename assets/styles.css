@@ -818,6 +818,9 @@ body,
 :root { --ko-line: var(--mantine-color-gray-4); }
 [data-mantine-color-scheme="dark"] { --ko-line: rgba(255, 255, 255, 0.18); }
 
+/* Drawer width is set via the `size` prop; cap to the viewport on phones. */
+.ko-drawer-content { max-width: 100vw; }
+
 /* The drawer body is a flex column; only the bracket scrolls. */
 .ko-drawer-body { display: flex; flex-direction: column; height: 100%;
     min-height: 0; overflow: hidden; }
