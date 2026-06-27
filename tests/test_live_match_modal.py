@@ -58,22 +58,22 @@ class TestStatRows:
 
 
 # ---------------------------------------------------------------------------
-# event_visual — emoji + accent colour per event type
+# event_visual — minimalist (Tabler) icon + accent colour per event type
 # ---------------------------------------------------------------------------
 
 class TestEventVisual:
     def test_goal(self):
-        assert event_visual("Goal") == ("⚽", "green")
+        assert event_visual("Goal") == ("tabler:ball-football", "green")
 
     def test_penalty_is_green(self):
         assert event_visual("Penalty")[1] == "green"
 
     def test_own_goal_is_red(self):
-        emoji, color = event_visual("Own Goal")
+        icon, color = event_visual("Own Goal")
         assert color == "red"
 
     def test_yellow_card(self):
-        assert event_visual("Yellow Card") == ("🟨", "yellow")
+        assert event_visual("Yellow Card") == ("tabler:rectangle-vertical-filled", "yellow")
 
     def test_red_card_is_red(self):
         assert event_visual("Red Card")[1] == "red"
@@ -85,11 +85,17 @@ class TestEventVisual:
     def test_var_variant_is_grape(self):
         assert event_visual("VAR Goal Cancelled - Offside")[1] == "grape"
 
+    def test_icons_are_tabler_names(self):
+        # Every visual is a minimalist icon name, not an emoji glyph.
+        for t in ("Goal", "Penalty", "Own Goal", "Yellow Card", "Red Card",
+                  "Substitution", "VAR", "Kickoff", ""):
+            assert event_visual(t)[0].startswith("tabler:")
+
     def test_unknown_type_falls_back_to_default(self):
-        assert event_visual("Kickoff") == ("🔹", "gray")
+        assert event_visual("Kickoff") == ("tabler:point-filled", "gray")
 
     def test_empty_type_falls_back_to_default(self):
-        assert event_visual("") == ("🔹", "gray")
+        assert event_visual("") == ("tabler:point-filled", "gray")
 
 
 # ---------------------------------------------------------------------------
@@ -113,9 +119,9 @@ class TestTimelineCards:
     def test_renders_one_card_per_event(self):
         assert self.blob.count("tl-event-card") == 2
 
-    def test_shows_event_emojis(self):
-        assert "⚽" in self.blob
-        assert "🟨" in self.blob
+    def test_shows_event_icons(self):
+        assert "tabler:ball-football" in self.blob
+        assert "tabler:rectangle-vertical-filled" in self.blob
 
     def test_shows_player_and_team(self):
         assert "Messi" in self.blob and "Argentina" in self.blob

@@ -109,6 +109,18 @@ def _final_col(bm, label, asset_url, user_tz, today, extra="") -> dmc.Box:
         className=f"ko-final {extra}".strip())
 
 
+def _finals_brand(asset_url) -> dmc.Box:
+    """FIFA logo crowning the finals page; contrast-aware (black in light mode,
+    white in dark mode) via DMC's darkHidden/lightHidden, since the bracket body
+    is rendered by a callback that can't see the colour scheme."""
+    return dmc.Box(
+        [dmc.Image(src=asset_url("logos/fifa_logo_black.cc.svg"), h=40, w="auto",
+                   alt="FIFA", darkHidden=True, className="ko-finals-brand__img"),
+         dmc.Image(src=asset_url("logos/fifa_logo_white.cc.svg"), h=40, w="auto",
+                   alt="FIFA", lightHidden=True, className="ko-finals-brand__img")],
+        className="ko-finals-brand")
+
+
 def render_page(bracket, page: int, asset_url, user_tz, today) -> dmc.Box:
     """The bracket body for one carousel page (a pair of stages)."""
     left, right = STAGE_PAGES[page]
@@ -121,7 +133,10 @@ def render_page(bracket, page: int, asset_url, user_tz, today) -> dmc.Box:
         if bracket.get("Bronze Final"):
             cols.append(_final_col(bracket["Bronze Final"][0], "3rd Place",
                                    asset_url, user_tz, today, "ko-final--bronze"))
-        return dmc.Box(cols, className="ko-page ko-page--finals")
+        return dmc.Box(
+            [_finals_brand(asset_url),
+             dmc.Box(cols, className="ko-page--finals")],
+            className="ko-page ko-finals")
 
     rows = [_tie_row(wm, feeders, asset_url, user_tz, today)
             for wm, feeders in stage_ties(bracket, left, right)]

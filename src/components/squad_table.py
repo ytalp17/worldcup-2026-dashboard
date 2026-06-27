@@ -30,12 +30,10 @@ def position_code(position: str) -> str:
     return "".join(p[0] for p in parts).upper() or "?"
 
 
-# `#` and `Player` are pinned left so identity stays visible while the stat
-# columns scroll horizontally. No columnSize: fixed widths + a narrower card
-# give native horizontal scroll for the 12 columns.
+# `Player` is pinned left so identity stays visible while the stat columns
+# scroll horizontally. No columnSize: fixed widths + a narrower card give
+# native horizontal scroll for the columns.
 COL_DEFS = [
-    {"headerName": "#", "field": "number", "width": 48, "pinned": "left",
-     "sortable": True, "cellClass": "squad-grid__num"},
     {"headerName": "Player", "field": "name", "width": 150, "pinned": "left",
      "sortable": True},
     {"headerName": "Pos", "field": "pos", "width": 56, "sortable": True},
@@ -83,10 +81,10 @@ def build_squad_panel(squad: Squad | None) -> dmc.Box:
     name = squad.name if squad else "—"
     rows = squad_rows(squad) if squad else []
 
-    # Card header bar: bold "Squad" label left, live team name right, divider below.
+    # Card header bar: bold "Team Squad" label left, live team name right.
     header = dmc.Group(
         [
-            dmc.Text("Squad", fw=700, size="sm"),
+            dmc.Text("Team Squad", fw=700, size="sm"),
             dmc.Text(name, id="squad-table-title", size="sm", c="dimmed"),
         ],
         justify="space-between",

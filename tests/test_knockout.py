@@ -148,3 +148,25 @@ def test_render_finals_page_shows_final_and_third_place():
     texts = _texts(page)
     assert "Final" in texts
     assert any("3rd" in t or "Third" in t for t in texts)
+
+
+def test_render_finals_page_shows_fifa_logo():
+    br = build_bracket(_full_ko())
+    page = render_page(br, 2, _asset, user_tz=None, today=date(2026, 6, 27))
+    logos = [n for n in _walk(page) if isinstance(n, dmc.Image)
+             and "fifa_logo" in str(getattr(n, "src", ""))]
+    # Both contrast variants present (black for light, white for dark mode).
+    srcs = {n.src for n in logos}
+    assert any("black" in s for s in srcs)
+    assert any("white" in s for s in srcs)
+    assert any(getattr(n, "darkHidden", False) for n in logos)
+    assert any(getattr(n, "lightHidden", False) for n in logos)
+
+
+def test_finals_page_only_shows_logo():
+    # The logo is a finals flourish; ordinary stage pages don't carry it.
+    br = build_bracket(_full_ko())
+    page0 = render_page(br, 0, _asset, user_tz=None, today=date(2026, 6, 27))
+    logos = [n for n in _walk(page0) if isinstance(n, dmc.Image)
+             and "fifa_logo" in str(getattr(n, "src", ""))]
+    assert logos == []

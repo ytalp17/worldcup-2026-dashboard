@@ -38,6 +38,17 @@ def test_strip_items_one_per_match_with_match_id():
     assert "LIVE" in blob.upper()                # live badge for match 1
 
 
+def test_strip_items_do_not_shrink():
+    # Each card carries the class CSS uses to keep its width (no squeeze when >3).
+    live = {"matches": [
+        {"match_id": i, "home": "USA", "away": "Canada", "home_score": None,
+         "away_score": None, "state": "scheduled", "is_live": False}
+        for i in range(5)
+    ]}
+    items = strip_items(live)
+    assert all(it.className == "live-strip-item" for it in items)
+
+
 def test_strip_items_empty_when_no_matches():
     assert strip_items({"matches": []}) == []
     assert strip_items(None) == []

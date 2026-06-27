@@ -67,17 +67,25 @@ def test_squad_rows_blank_caps_and_blank_height():
     assert rows[0]["foot"] == ""
 
 
-def test_col_defs_exclude_country_and_team_id():
+def test_col_defs_exclude_country_team_id_and_number():
     fields = {c.get("field") for c in COL_DEFS}
     assert "country" not in fields
     assert "team_id" not in fields
-    assert {"number", "name", "pos", "value"} <= fields
+    assert "number" not in fields          # leading "#" column dropped
+    assert {"name", "pos", "value"} <= fields
 
 
-def test_col_defs_pin_number_and_player_left():
+def test_col_defs_pin_player_left_and_lead_with_player():
     by_field = {c["field"]: c for c in COL_DEFS}
-    assert by_field["number"].get("pinned") == "left"
     assert by_field["name"].get("pinned") == "left"
+    assert COL_DEFS[0]["field"] == "name"  # Player is now the first column
+
+
+def test_build_squad_panel_header_says_team_squad():
+    panel = build_squad_panel(_squad())
+    labels = [n.children for n in _walk(panel)
+              if isinstance(n, dmc.Text) and n.children == "Team Squad"]
+    assert labels == ["Team Squad"]
 
 
 def test_build_squad_panel_has_grid_and_title():

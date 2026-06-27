@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dash_mantine_components as dmc
 from dash import html
+from dash_iconify import DashIconify
 
 from src.components.lineup_pitch import build_lineup_pitch
 
@@ -159,26 +160,26 @@ def _stats_tab(statistics: dict, home_name: str, away_name: str):
 
 
 # ---------------------------------------------------------------------------
-# Timeline event styling: emoji glyph + accent colour per event type.
+# Timeline event styling: minimalist (Tabler) icon + accent colour per type.
 # Keyed on the exact API ``type`` strings, with a fuzzy fallback for the
 # variant spellings the live feed sometimes sends ("substitution",
 # "VAR Goal Cancelled - ...", etc.).
 # ---------------------------------------------------------------------------
 
 _EVENT_VISUALS: dict[str, tuple[str, str]] = {
-    "Goal": ("⚽", "green"),
-    "Penalty": ("🎯", "green"),
-    "Own Goal": ("🥅", "red"),
-    "Yellow Card": ("🟨", "yellow"),
-    "Red Card": ("🟥", "red"),
-    "Substitution": ("🔄", "blue"),
-    "VAR": ("📺", "grape"),
+    "Goal": ("tabler:ball-football", "green"),
+    "Penalty": ("tabler:target-arrow", "green"),
+    "Own Goal": ("tabler:ball-football", "red"),
+    "Yellow Card": ("tabler:rectangle-vertical-filled", "yellow"),
+    "Red Card": ("tabler:rectangle-vertical-filled", "red"),
+    "Substitution": ("tabler:arrows-exchange", "blue"),
+    "VAR": ("tabler:device-tv", "grape"),
 }
-_DEFAULT_VISUAL: tuple[str, str] = ("🔹", "gray")
+_DEFAULT_VISUAL: tuple[str, str] = ("tabler:point-filled", "gray")
 
 
 def event_visual(event_type: str) -> tuple[str, str]:
-    """Return ``(emoji, mantine_color)`` for a timeline event type.
+    """Return ``(icon_name, mantine_color)`` for a timeline event type.
 
     Exact matches win; otherwise a fuzzy pass maps the feed's variant
     spellings onto the canonical set. Unknown types get a neutral default.
@@ -206,7 +207,7 @@ def event_visual(event_type: str) -> tuple[str, str]:
 
 
 def _event_card(e: dict):
-    emoji, color = event_visual(e.get("type", ""))
+    icon, color = event_visual(e.get("type", ""))
     etype = e.get("type", "")
     player = e.get("player", "")
     team = e.get("team", "")
@@ -217,7 +218,9 @@ def _event_card(e: dict):
             [
                 dmc.Badge(f"{e.get('minute', 0)}'", variant="light",
                           color=color, miw=42, radius="sm"),
-                dmc.Text(emoji, className="tl-event__emoji"),
+                DashIconify(icon=icon, width=20,
+                            color=f"var(--mantine-color-{color}-6)",
+                            className="tl-event__icon"),
                 dmc.Stack(
                     [
                         dmc.Text(player or etype or "—",

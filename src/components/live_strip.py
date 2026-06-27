@@ -57,6 +57,7 @@ def strip_items(live: dict | None, user_tz: str | None = None) -> list:
             html.Div(
                 id={"type": "live-strip-item", "index": m["match_id"]},
                 n_clicks=0,
+                className="live-strip-item",
                 style={"cursor": "pointer"},
                 children=dmc.Paper(
                     dmc.Group(
