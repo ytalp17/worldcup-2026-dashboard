@@ -10,3 +10,4 @@ logs/
 *.env
 assets/data/live_player_stats.csv
 assets/data/live_team_stats.csv
+assets/data/live_shots.csv
