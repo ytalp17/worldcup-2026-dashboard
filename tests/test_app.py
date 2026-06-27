@@ -407,3 +407,47 @@ def test_update_tournament_grid_callback_wires_switch_to_grid(monkeypatch):
     fake.calls.clear()
     app.update_tournament_grid("Team", "Attack & xG", False, {"standings": {}})
     assert ("team", False) in fake.calls and ("player", False) in fake.calls
+
+
+# ---------------------------------------------------------------------------
+# Task 9: goal-mouth payload helpers
+# ---------------------------------------------------------------------------
+import plotly.graph_objects as go
+
+
+class _FakeGMLive:
+    """Stand-in LIVE exposing team_goal_mouth with a fixed aggregate."""
+    def __init__(self):
+        from src.data.live.shots import ShotRecord
+        from src.data.live.goal_mouth import aggregate_goal_mouth
+        self._agg = aggregate_goal_mouth([
+            ShotRecord(1, "England", "A", "10'", "Goal", "Low Centre"),
+            ShotRecord(1, "England", "B", "20'", "Saved", "Low Centre")])
+        self.calls = []
+
+    def team_goal_mouth(self, team, group_only=False):
+        self.calls.append((team, group_only))
+        return self._agg
+
+
+def test_goal_mouth_figure_payload_builds_figure(monkeypatch):
+    import app
+    monkeypatch.setattr(app, "LIVE", _FakeGMLive())
+    fig = app.goal_mouth_figure_payload(0, {"ok": True}, dark=True, mode="Volume")
+    assert isinstance(fig, go.Figure)
+    assert app.LIVE.calls and isinstance(app.LIVE.calls[0][0], str)
+
+
+def test_goal_mouth_figure_payload_no_live_is_empty(monkeypatch):
+    import app
+    monkeypatch.setattr(app, "LIVE", None)
+    fig = app.goal_mouth_figure_payload(0, None, dark=True, mode="Volume")
+    assert isinstance(fig, go.Figure)          # empty-but-valid frame
+
+
+def test_goal_mouth_drawer_payload_lists_zone(monkeypatch):
+    import app
+    monkeypatch.setattr(app, "LIVE", _FakeGMLive())
+    title, children = app.goal_mouth_drawer_payload("low_centre", 0, {"ok": True})
+    assert "Low Centre" in title
+    assert isinstance(children, list) and children

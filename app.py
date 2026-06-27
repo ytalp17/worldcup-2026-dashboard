@@ -55,6 +55,9 @@ from src.data.team_continents import (
     manager_for,
     manager_nationality_for,
 )
+from src.components.goal_mouth import (
+    build_goal_mouth_figure, build_goal_mouth_panel, drawer_body, ZONE_LABEL,
+)
 from src.data.live.client import HighlightlyClient
 from src.data.live.reconcile import build_stadium_index, canonical_team
 from src.data.env_config import load_env_file
@@ -107,13 +110,14 @@ _API_KEY = os.environ.get("HIGHLIGHTLY_API_KEY")
 # team_leaders reads it for the leaders card.
 PLAYER_STORE_PATH = DATA_DIR / "live_player_stats.csv"
 TEAM_STATS_PATH = DATA_DIR / "live_team_stats.csv"
+SHOTS_STORE_PATH = DATA_DIR / "live_shots.csv"
 # No-key mode: when the env var is unset the app runs purely on static data,
 # so dev and the whole test suite work offline.
 KNOCKOUT_START = min((m.kickoff_utc for m in KO_MATCHES), default=None)
 LIVE = (
     LiveDataService(HighlightlyClient(api_key=_API_KEY), STADIUM_INDEX,
                     player_store=PLAYER_STORE_PATH, team_store=TEAM_STATS_PATH,
-                    knockout_start=KNOCKOUT_START)
+                    knockout_start=KNOCKOUT_START, shots_store=SHOTS_STORE_PATH)
     if _API_KEY else None
 )
 
@@ -253,6 +257,38 @@ def tournament_grid_payload(scope, tab, live, group_only=False):
           if LIVE is not None else {})
     rows = attach_team_flags(tourn_row_data(scope, tab, tl, pl))
     return rows, tourn_columns(scope, tab)
+
+
+_EMPTY_GM = {
+    "zones": {z: {"count": 0, "outcomes": {}, "shooters": []}
+              for z in ["high_left", "high_centre", "high_right",
+                        "low_left", "low_centre", "low_right"]},
+    "off_target": {"count": 0, "outcomes": {}},
+    "other": {"count": 0, "outcomes": {}},
+    "totals": {"on_target": 0, "near_miss": 0, "woodwork": 0,
+               "off_target": 0, "other": 0, "total": 0},
+}
+
+
+def goal_mouth_figure_payload(index, live, dark, mode):
+    """Figure for the carousel-selected team. `live` is the trigger only; data
+    comes from the shot store via LIVE."""
+    if LIVE is None:
+        agg = _EMPTY_GM
+    else:
+        team = center_team(TEAM_NAMES, index or 0)
+        agg = LIVE.team_goal_mouth(team)
+    theme = "dark" if (dark is None or dark) else "light"
+    fig_mode = "dominant" if mode == "Dominant" else "volume"
+    return build_goal_mouth_figure(agg, mode=fig_mode, theme=theme)
+
+
+def goal_mouth_drawer_payload(zone_id, index, live):
+    """(title, children) for the zone drawer. Title doubles the zone name."""
+    agg = _EMPTY_GM if LIVE is None else LIVE.team_goal_mouth(
+        center_team(TEAM_NAMES, index or 0))
+    title = ZONE_LABEL.get(zone_id, zone_id)
+    return title, drawer_body(zone_id, agg)
 
 
 def team_stats_payload(index):
@@ -403,6 +439,7 @@ app.layout = build_layout(
     ),
     kpi_strip=build_kpi_strip(team_stats_payload(0), team_form_payload(0)),
     leaders_panel=build_leaders_card(),
+    goal_mouth_panel=build_goal_mouth_panel(),
     asset_url=app.get_asset_url,
 )
 
@@ -927,6 +964,53 @@ def update_kpi_strip(index, _live):
     return kpi_cards(team_stats_payload(index), team_form_payload(index))
 
 
+@callback(
+    Output("goal-mouth-graph", "figure"),
+    Input("carousel-index", "data"),
+    Input("goal-mouth-mode", "value"),
+    Input("color-scheme-toggle", "checked"),
+    Input("live-store", "data"),
+)
+def update_goal_mouth(index, mode, dark, live):
+    return goal_mouth_figure_payload(index, live, dark, mode)
+
+
+@callback(
+    Output("goal-mouth-zone", "data"),
+    Output("goal-mouth-drawer", "opened"),
+    Output("goal-mouth-drawer", "title"),
+    Output("goal-mouth-drawer", "children"),
+    Input("goal-mouth-graph", "clickData"),
+    Input("carousel-index", "data"),
+    State("goal-mouth-zone", "data"),
+    State("live-store", "data"),
+    prevent_initial_call=True,
+)
+def open_goal_mouth_zone(click, index, current_zone, live):
+    # Team change closes any open zone drawer.
+    if ctx.triggered_id == "carousel-index":
+        return None, False, no_update, no_update
+    if not click or not click.get("points"):
+        return no_update, no_update, no_update, no_update
+    zid = click["points"][0].get("customdata")
+    if isinstance(zid, list):           # customdata may arrive as a list
+        zid = zid[0]
+    if zid is None or zid == current_zone:   # re-click same zone -> close
+        return None, False, no_update, no_update
+    title, children = goal_mouth_drawer_payload(zid, index, live)
+    return zid, True, title, children
+
+
+@callback(
+    Output("goal-mouth-zone", "data", allow_duplicate=True),
+    Input("goal-mouth-drawer", "opened"),
+    prevent_initial_call=True,
+)
+def clear_goal_mouth_zone(opened):
+    # Closing via the X / overlay clears the stored zone so a re-click reopens.
+    return None if not opened else no_update
+
+
 # Toggling the switch flips both the Mantine color scheme and the base map
 # tiles in one clientside callback (checked => dark). The tile URLs contain
 # Leaflet's {s}/{z}/{x}/{y} placeholders, so inject them via json.dumps rather
@@ -1096,6 +1180,7 @@ def _backfill_live_stats():
         day = LIVE.matches_on(d.isoformat(), now)
         LIVE.update_player_stats(day, now)
         LIVE.update_team_stats(day, now)
+        LIVE.update_shot_stats(day, now)
     # Warm the matches_on cache for upcoming knockout dates too, so the
     # knockout bracket renders (and its cards become clickable) without each
     # render paying for ~17 future-date fetches.
@@ -1119,6 +1204,7 @@ async def live_feed():
         set_props("live-store", {"data": snap})
         await asyncio.to_thread(LIVE.update_player_stats, snap["matches"], now)
         await asyncio.to_thread(LIVE.update_team_stats, snap["matches"], now)
+        await asyncio.to_thread(LIVE.update_shot_stats, snap["matches"], now)
         await asyncio.sleep(next_delay(snap))
 
 
