@@ -345,28 +345,29 @@ body,
 }
 
 /* Width balance: keep total flex-grow at 7 so Federation & Manager (grow 1)
-   stay the same width. The Form card takes 1.5 and the five computed/rank
-   cards drop to 0.7 each (5×0.7 + 1.5 = 5), so Form's extra room comes out of
-   them, not out of Federation/Manager. flex-basis stays 0 (from .stat-card). */
-.stat-card--narrow { flex-grow: 0.7; }
-.stat-card--form { flex-grow: 1.5; }
+   stay the same width. The Form card only holds five small dots, so it stays
+   narrow (grow 0.7); the five computed/rank cards take the rest at 0.86 each
+   (5×0.86 + 0.7 = 5). flex-basis stays 0 (from .stat-card). */
+.stat-card--narrow { flex-grow: 0.86; }
+.stat-card--form { flex-grow: 0.7; }
 
 /* Recent-form dots: one circle per match, oldest → newest. Win/loss reuse the
    exact qualification green / elimination red from the group table. */
 .stat-card__form {
     flex-wrap: nowrap;
     min-width: 0;
+    gap: 4px;
 }
 
 .form-dot {
     flex: 0 0 auto;
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     line-height: 1;
     color: #fff;

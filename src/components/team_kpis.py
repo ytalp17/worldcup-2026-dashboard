@@ -67,7 +67,7 @@ def _form_dots(form, slots=FORM_SLOTS) -> dmc.Group:
         result = form[i] if i < len(form) else None
         cls, glyph = _FORM_DOT.get(result, ("form-dot--empty", ""))
         dots.append(dmc.Box(glyph, className=f"form-dot {cls}"))
-    return dmc.Group(dots, gap=5, wrap="nowrap", align="center",
+    return dmc.Group(dots, gap=4, wrap="nowrap", align="center",
                      className="stat-card__form")
 
 
