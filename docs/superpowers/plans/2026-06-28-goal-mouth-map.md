@@ -1138,7 +1138,6 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 
 ```python
 # tests/test_goal_mouth_component.py  (append)
-import dash_ag_grid as dag  # noqa: F401  (not used; keep imports tidy if linted)
 from dash import dcc
 from src.components.goal_mouth import (
     build_goal_mouth_panel, build_goal_mouth_drawer,
