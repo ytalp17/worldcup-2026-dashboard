@@ -8,7 +8,7 @@ from src.data.live.team_match_stats import STAT_KEYS, TeamMatchStat
 
 # A gitignored cache of per-match team statistics. `state` records the match
 # state at write time so the updater can skip finished matches already on disk.
-FIELDS = ["match_id", "team", "state"] + STAT_KEYS
+FIELDS = ["match_id", "team", "state", "stage"] + STAT_KEYS
 
 
 def load(path) -> dict[int, list[TeamMatchStat]]:
@@ -22,7 +22,8 @@ def load(path) -> dict[int, list[TeamMatchStat]]:
             mid = int(row["match_id"])
             stats = {k: float(row[k]) if row.get(k) else 0.0 for k in STAT_KEYS}
             out.setdefault(mid, []).append(
-                TeamMatchStat(match_id=mid, team=row["team"], stats=stats))
+                TeamMatchStat(match_id=mid, team=row["team"], stats=stats,
+                              stage=row.get("stage") or "group"))
     return out
 
 
@@ -38,8 +39,9 @@ def stored_match_states(path) -> dict[int, str]:
     return out
 
 
-def upsert(path, match_id: int, state: str, rows) -> None:
-    """Atomically replace all rows for `match_id` with `rows` (tagged `state`)."""
+def upsert(path, match_id: int, state: str, rows, stage: str = "group") -> None:
+    """Atomically replace all rows for `match_id` with `rows` (tagged `state`
+    and `stage`)."""
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)
     kept = []
@@ -51,9 +53,12 @@ def upsert(path, match_id: int, state: str, rows) -> None:
         w = csv.DictWriter(f, fieldnames=FIELDS)
         w.writeheader()
         for r in kept:
-            w.writerow({k: r.get(k, "") for k in FIELDS})
+            out_row = {k: r.get(k, "") for k in FIELDS}
+            out_row["stage"] = r.get("stage") or "group"
+            w.writerow(out_row)
         for s in rows:
-            base = {"match_id": s.match_id, "team": s.team, "state": state}
+            base = {"match_id": s.match_id, "team": s.team, "state": state,
+                    "stage": stage}
             base.update({k: s.stats.get(k, 0.0) for k in STAT_KEYS})
             w.writerow(base)
     os.replace(tmp, p)

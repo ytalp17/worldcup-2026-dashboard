@@ -39,3 +39,38 @@ def test_upsert_replaces_only_target_match(tmp_path):
     assert loaded[1][0].stats["xg"] == 5.0
     assert loaded[2][0].stats["xg"] == 3.0
     assert team_stats_store.stored_match_states(path) == {1: "finished", 2: "live"}
+
+
+def test_upsert_stores_stage_and_load_roundtrips(tmp_path):
+    path = tmp_path / "ts.csv"
+    team_stats_store.upsert(path, 1, "finished", [_row(1, "USA", xg=1.0)],
+                            stage="knockout")
+    loaded = team_stats_store.load(path)
+    assert loaded[1][0].stage == "knockout"
+
+
+def test_upsert_stage_defaults_to_group(tmp_path):
+    path = tmp_path / "ts.csv"
+    team_stats_store.upsert(path, 1, "finished", [_row(1, "USA", xg=1.0)])
+    assert team_stats_store.load(path)[1][0].stage == "group"
+
+
+def test_load_legacy_row_without_stage_defaults_group(tmp_path):
+    path = tmp_path / "ts.csv"
+    # A legacy file written before the stage column existed.
+    path.write_text(
+        "match_id,team,state," + ",".join(STAT_KEYS) + "\n"
+        + "1,USA,finished," + ",".join(["0.0"] * len(STAT_KEYS)) + "\n"
+    )
+    assert team_stats_store.load(path)[1][0].stage == "group"
+
+
+def test_upsert_preserves_other_matches_stage(tmp_path):
+    path = tmp_path / "ts.csv"
+    team_stats_store.upsert(path, 1, "finished", [_row(1, "USA", xg=1.0)],
+                            stage="knockout")
+    team_stats_store.upsert(path, 2, "finished", [_row(2, "Brazil", xg=2.0)],
+                            stage="group")
+    loaded = team_stats_store.load(path)
+    assert loaded[1][0].stage == "knockout"
+    assert loaded[2][0].stage == "group"

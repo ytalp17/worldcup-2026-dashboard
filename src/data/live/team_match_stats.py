@@ -44,6 +44,7 @@ class TeamMatchStat:
     match_id: int
     team: str
     stats: dict   # every key in STAT_KEYS -> float (missing -> 0.0)
+    stage: str = "group"
 
 
 def parse_team_match_stats(match_id: int, statistics) -> list[TeamMatchStat]:
