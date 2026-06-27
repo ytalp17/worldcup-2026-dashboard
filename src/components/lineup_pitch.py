@@ -60,14 +60,20 @@ def pitch_nodes(rows: list, side: str) -> list[tuple[dict, float, float]]:
     return out
 
 
+def _is_keeper(player: dict) -> bool:
+    return "goal" in (player.get("position") or "").lower()
+
+
 def _player_node(player: dict, x: float, y: float, side: str) -> dmc.Box:
-    color = "blue" if side == "home" else "orange"
+    # Keepers get their own accent (gold) regardless of team; outfielders take
+    # the team colour. Colours live in CSS so they can use gradients and react
+    # to the dark/light theme.
+    role = "gk" if _is_keeper(player) else side
     return dmc.Box(
         [
             dmc.Box(
                 str(player.get("number", "")),
-                className="lu-node__badge",
-                style={"backgroundColor": f"var(--mantine-color-{color}-6)"},
+                className=f"lu-node__badge lu-node__badge--{role}",
             ),
             dmc.Text(surname(player.get("name")), className="lu-node__name"),
         ],

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 62.5" preserveAspectRatio="none">
+  <g fill="none" stroke="#ffffff" stroke-opacity="0.4" stroke-width="0.35" stroke-linejoin="round">
+    <!-- boundary -->
+    <rect x="0.7" y="0.7" width="98.6" height="61.1" rx="0.6"/>
+    <!-- halfway line + centre circle -->
+    <line x1="50" y1="0.7" x2="50" y2="61.8"/>
+    <circle cx="50" cy="31.25" r="9"/>
+    <!-- left penalty + goal areas -->
+    <rect x="0.7" y="12.25" width="16" height="38"/>
+    <rect x="0.7" y="22.75" width="5.5" height="17"/>
+    <path d="M16.7,24.63 A9,9 0 0 1 16.7,37.87"/>
+    <!-- right penalty + goal areas -->
+    <rect x="83.3" y="12.25" width="16" height="38"/>
+    <rect x="93.8" y="22.75" width="5.5" height="17"/>
+    <path d="M83.3,24.63 A9,9 0 0 0 83.3,37.87"/>
+    <!-- corner arcs -->
+    <path d="M0.7,3.1 A2.4,2.4 0 0 1 3.1,0.7"/>
+    <path d="M96.9,0.7 A2.4,2.4 0 0 1 99.3,3.1"/>
+    <path d="M3.1,61.8 A2.4,2.4 0 0 1 0.7,59.4"/>
+    <path d="M99.3,59.4 A2.4,2.4 0 0 1 96.9,61.8"/>
+  </g>
+  <!-- centre + penalty spots -->
+  <g fill="#ffffff" fill-opacity="0.4">
+    <circle cx="50" cy="31.25" r="0.5"/>
+    <circle cx="10.5" cy="31.25" r="0.5"/>
+    <circle cx="89.5" cy="31.25" r="0.5"/>
+  </g>
+</svg>

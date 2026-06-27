@@ -169,8 +169,10 @@ class TestModalBodyTabbed:
     def test_lineups_tab_renders_head_to_head_pitch(self):
         blob = str(self.body.to_plotly_json())
         assert "lu-pitch" in blob
-        # Both teams placed: a home (blue) and an away (orange) node badge.
-        assert "blue" in blob and "orange" in blob
+        # Both teams placed, plus distinctly-coloured keepers.
+        assert "lu-node__badge--home" in blob
+        assert "lu-node__badge--away" in blob
+        assert "lu-node__badge--gk" in blob
 
     def test_contains_score(self):
         blob = str(self.body.to_plotly_json())

@@ -264,20 +264,19 @@ def _lineups_tab(lineups: dict, home_name: str, away_name: str):
 
     # A compact team · formation caption flanking the centre, blue (home) left
     # and orange (away) right, so the colour coding on the pitch is legible.
-    def _caption(data: dict, team_name: str, color: str, justify: str):
+    def _caption(data: dict, team_name: str, side: str, justify: str):
         formation = data.get("formation", "")
         label = f"{team_name} · {formation}" if formation else team_name
         return dmc.Group(
-            [dmc.Box(className="lu-key__dot",
-                     style={"backgroundColor": f"var(--mantine-color-{color}-6)"}),
+            [dmc.Box(className=f"lu-key__dot lu-key__dot--{side}"),
              dmc.Text(label, size="sm", fw=600)],
             gap=6, align="center", justify=justify, wrap="nowrap",
         )
 
     legend = dmc.Group(
         [
-            _caption(home, home_name, "blue", "flex-start"),
-            _caption(away, away_name, "orange", "flex-end"),
+            _caption(home, home_name, "home", "flex-start"),
+            _caption(away, away_name, "away", "flex-end"),
         ],
         justify="space-between",
         align="center",
