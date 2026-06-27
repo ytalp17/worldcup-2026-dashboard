@@ -60,6 +60,7 @@ class BracketMatch:
     finished: bool
     feeder_numbers: tuple[int, ...]  # earlier matches feeding this one
     venue: str = ""                  # where the match is played
+    match_id: int | None = None      # live API id, when the feed has this match
 
 
 def _feeders(home_label: str, away_label: str) -> tuple[int, ...]:
@@ -97,7 +98,8 @@ def _resolve_label(label: str, standings: dict, complete_groups: set,
 def build_bracket(ko_matches, standings: dict | None = None,
                   complete_groups: set | None = None,
                   results: dict | None = None,
-                  venues: dict | None = None) -> dict[str, list[BracketMatch]]:
+                  venues: dict | None = None,
+                  match_ids: dict | None = None) -> dict[str, list[BracketMatch]]:
     """Resolve the knockout schedule into ``{stage: [BracketMatch]}``.
 
     ``standings``: ``{group_name: [team, ...]}`` ordered best-first.
@@ -110,6 +112,7 @@ def build_bracket(ko_matches, standings: dict | None = None,
     complete_groups = complete_groups or set()
     results = results or {}
     venues = venues or {}
+    match_ids = match_ids or {}
 
     winners: dict[int, str] = {}
     losers: dict[int, str] = {}
@@ -144,6 +147,7 @@ def build_bracket(ko_matches, standings: dict | None = None,
             finished=finished,
             feeder_numbers=_feeders(m.home, m.away),
             venue=venues.get(m.stadium, m.stadium),
+            match_id=match_ids.get(m.number),
         ))
     return out
 

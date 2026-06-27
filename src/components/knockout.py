@@ -11,7 +11,7 @@ from datetime import date, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import dash_mantine_components as dmc
-from dash import dcc
+from dash import dcc, html
 from dash_iconify import DashIconify
 
 from src.components.team_carousel import display_name
@@ -75,7 +75,14 @@ def match_card(bm: BracketMatch, asset_url, user_tz, today) -> dmc.Box:
             [DashIconify(icon="tabler:map-pin", width=12, className="ko-pin"),
              dmc.Text(bm.venue, size="xs", c="dimmed", className="ko-venue__text")],
             gap=4, wrap="nowrap", align="center", className="ko-venue"))
-    return dmc.Box(children, className=cls)
+    card = dmc.Box(children, className=cls)
+    if bm.match_id is None:
+        return card
+    # Resolved to a live fixture → make it open the shared match-detail modal,
+    # reusing the same pattern-matching id the footer live strip uses.
+    return html.Div(
+        card, id={"type": "open-live-modal", "index": bm.match_id},
+        n_clicks=0, className="ko-card-link")
 
 
 def _tie_row(winner_match, feeders, asset_url, user_tz, today) -> dmc.Box:

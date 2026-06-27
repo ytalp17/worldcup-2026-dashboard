@@ -862,6 +862,11 @@ body,
     border: 1px solid var(--mantine-color-default-border); border-radius: 12px;
     padding: 7px 10px; display: flex; flex-direction: column; gap: 5px; }
 .ko-card__time { line-height: 1.1; }
+/* Clickable card (resolved to a live fixture): opens the match-detail modal */
+.ko-card-link { cursor: pointer; }
+.ko-card-link .ko-card { transition: border-color .12s ease, transform .12s ease; }
+.ko-card-link:hover .ko-card { border-color: var(--mantine-color-blue-5);
+    transform: translateY(-1px); }
 .ko-slot { gap: 8px; }
 .ko-slot__ident { flex: 1 1 auto; min-width: 0; }
 .ko-flag { flex: 0 0 auto; border-radius: 2px;

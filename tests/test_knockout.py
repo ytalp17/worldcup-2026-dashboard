@@ -98,6 +98,25 @@ def test_match_card_shows_venue():
     assert "AT&T Stadium, Dallas" in _texts(card)
 
 
+def test_match_card_is_clickable_when_live_match_id_known():
+    from dash import html
+    br = build_bracket(_full_ko(), results={73: ("Mexico", "Serbia", 2, 1)},
+                       match_ids={73: 555})
+    node = match_card(br["Round of 32"][0], _asset, None, date(2026, 6, 27))
+    # wrapped in a clickable element carrying the open-live-modal id + match_id
+    assert isinstance(node, html.Div)
+    assert node.id == {"type": "open-live-modal", "index": 555}
+    # the card itself is still inside
+    assert any(str(getattr(n, "className", "")).split()[:1] == ["ko-card"]
+               for n in _walk(node))
+
+
+def test_match_card_not_clickable_without_match_id():
+    br = build_bracket(_full_ko())
+    node = match_card(br["Round of 16"][0], _asset, None, date(2026, 6, 27))
+    assert getattr(node, "id", None) is None   # plain card, no click wrapper
+
+
 def test_format_ko_datetime_relative_and_absolute():
     today = date(2026, 6, 27)
     bm_today = build_bracket([_m(73, "a", "b", "Round of 32", d="2026-06-27",

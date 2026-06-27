@@ -299,18 +299,20 @@ def _bracket_standings(live):
     return standings, complete
 
 
-def _knockout_results(now):
-    """{match_number: (home, away, home_score, away_score)} for knockout matches
-    that the live feed has resolved (real teams). Matched to the schedule by
-    kickoff instant; reads the cache-warmed per-date snapshots, so cheap."""
+def _knockout_live(now):
+    """({number: (home, away, home_score, away_score)}, {number: live match_id})
+    for knockout matches the live feed carries. Matched to the schedule by
+    kickoff instant; reads the cache-warmed per-date snapshots, so cheap. A
+    match_id is recorded whenever the feed has the fixture (so the card is
+    clickable); results only when both teams are resolved (not placeholders)."""
     if LIVE is None:
-        return {}
+        return {}, {}
     today = date.today()
     by_date = {}
     for m in KO_MATCHES:
         if m.date <= today:
             by_date.setdefault(m.date.isoformat(), []).append(m)
-    results = {}
+    results, match_ids = {}, {}
     for date_iso, day_matches in by_date.items():
         live_day = LIVE.matches_on(date_iso, now)
         by_kickoff = {lm.get("kickoff"): lm for lm in live_day if lm.get("kickoff")}
@@ -318,21 +320,24 @@ def _knockout_results(now):
             lm = by_kickoff.get(m.kickoff_utc.isoformat())
             if not lm:
                 continue
+            if lm.get("match_id") is not None:
+                match_ids[m.number] = lm["match_id"]
             home, away = lm.get("home", ""), lm.get("away", "")
             if is_placeholder(home) or is_placeholder(away):
                 continue
             results[m.number] = (official_team(home), official_team(away),
                                  lm.get("home_score"), lm.get("away_score"))
-    return results
+    return results, match_ids
 
 
 def knockout_payload(page, live, user_tz):
     """(bracket body, page dots) for the knockout drawer at the given carousel
     page, resolved as far as the live data allows."""
     standings, complete = _bracket_standings(live)
-    results = _knockout_results(time.monotonic())
+    results, match_ids = _knockout_live(time.monotonic())
     bracket = build_bracket(KO_MATCHES, standings=standings,
                             complete_groups=complete, results=results,
+                            match_ids=match_ids,
                             venues=VENUE_LABELS)
     page = max(0, min(page or 0, len(STAGE_PAGES) - 1))
     body = render_page(bracket, page, app.get_asset_url, user_tz, date.today())

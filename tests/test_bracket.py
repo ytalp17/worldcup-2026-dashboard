@@ -87,6 +87,13 @@ def test_bracket_carries_venue_label():
     assert br["Round of 32"][0].venue == "AT&T Stadium, Dallas"
 
 
+def test_bracket_carries_live_match_id_when_known():
+    matches = [_m(73, "Group A winners", "Group B runners-up", "Round of 32")]
+    assert build_bracket(matches)["Round of 32"][0].match_id is None
+    br = build_bracket(matches, match_ids={73: 999})
+    assert br["Round of 32"][0].match_id == 999
+
+
 def test_stage_ties_link_winner_to_its_two_feeders():
     br = build_bracket(_mini_ko())
     ties = stage_ties(br, "Round of 32", "Round of 16")
