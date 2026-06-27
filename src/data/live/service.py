@@ -8,7 +8,8 @@ from src.data.live import models, player_store
 from src.data.live import team_stats_store
 from src.data.live.player_stats import parse_player_stats
 from src.data.live.team_match_stats import STAT_KEYS, parse_team_match_stats
-from src.data.live.reconcile import canonical_team, find_stadium, normalize
+from src.data.live.reconcile import (
+    canonical_team, classify_stage, find_stadium, normalize)
 
 logger = logging.getLogger(__name__)
 
@@ -31,13 +32,14 @@ class LiveDataService:
     """
 
     def __init__(self, client, stadium_index, league_id=LEAGUE_ID, season=SEASON,
-                 player_store=None, team_store=None):
+                 player_store=None, team_store=None, knockout_start=None):
         self._client = client
         self._stadium_index = stadium_index
         self._league_id = league_id
         self._season = season
         self._player_store = Path(player_store) if player_store else None
         self._team_store = Path(team_store) if team_store else None
+        self._knockout_start = knockout_start
         self._cache: dict[str, tuple[float, object]] = {}
         self._last_good: dict | None = None
 
@@ -181,7 +183,8 @@ class LiveDataService:
                 continue
             try:
                 rows = parse_player_stats(mid, self._client.events(mid))
-                player_store.upsert(self._player_store, mid, state, rows)
+                stage = classify_stage(m.get("kickoff"), self._knockout_start)
+                player_store.upsert(self._player_store, mid, state, rows, stage)
             except Exception:
                 logger.exception("player stats update failed for match %s", mid)
 
@@ -206,7 +209,8 @@ class LiveDataService:
             try:
                 parsed = models.parse_statistics(self._client.statistics(mid))
                 rows = parse_team_match_stats(mid, parsed)
-                team_stats_store.upsert(self._team_store, mid, state, rows)
+                stage = classify_stage(m.get("kickoff"), self._knockout_start)
+                team_stats_store.upsert(self._team_store, mid, state, rows, stage)
             except Exception:
                 logger.exception("team stats update failed for match %s", mid)
 

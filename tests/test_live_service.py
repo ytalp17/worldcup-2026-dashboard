@@ -563,3 +563,41 @@ def test_tournament_team_leaders_group_only_excludes_knockout(tmp_path):
     assert all_atk["shots"] == 14       # 4 + 10
     assert grp_atk["shots"] == 4        # group stage only
     assert grp_atk["apps"] == 1
+
+
+# ---------------------------------------------------------------------------
+# stage tagging at write time (Task 5)
+# ---------------------------------------------------------------------------
+
+from datetime import timezone  # noqa: E402
+
+_KO_START = datetime(2026, 6, 28, 19, 0, tzinfo=timezone.utc)
+
+
+def _match(mid, kickoff):
+    return {"match_id": mid, "state": MatchState.FINISHED.value, "kickoff": kickoff,
+            "home": "USA", "away": "Brazil"}
+
+
+def test_update_player_stats_tags_stage_from_kickoff(tmp_path):
+    path = tmp_path / "ps.csv"
+    client = _StatsClient()   # returns event rows for any match_id
+    svc = LiveDataService(client, _index(), player_store=path,
+                          knockout_start=_KO_START)
+    svc.update_player_stats([_match(1, "2026-06-20T19:00:00+00:00"),
+                             _match(2, "2026-06-29T19:00:00+00:00")], 0.0)
+    loaded = player_store.load(path)
+    assert loaded[1][0].stage == "group"
+    assert loaded[2][0].stage == "knockout"
+
+
+def test_update_team_stats_tags_stage_from_kickoff(tmp_path):
+    path = tmp_path / "ts.csv"
+    client = _TeamStatsClient()   # returns stat rows for any match_id
+    svc = LiveDataService(client, _index(), team_store=path,
+                          knockout_start=_KO_START)
+    svc.update_team_stats([_match(1, "2026-06-20T19:00:00+00:00"),
+                           _match(2, "2026-06-29T19:00:00+00:00")], 0.0)
+    loaded = team_stats_store.load(path)
+    assert loaded[1][0].stage == "group"
+    assert loaded[2][0].stage == "knockout"
