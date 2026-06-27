@@ -18,6 +18,7 @@ from src.components.map_view import DARK_TILE, LIGHT_TILE, MARKER_TYPE, live_sco
 from src.data.distances import DistanceRepository
 from src.data.flows import build_team_flows, team_cities
 from src.data.groups import build_groups, group_for_team
+from src.data.qualification import qualification_status
 from src.data.match_calendar import MatchCalendar
 from src.data.matches import MatchRepository, matches_by_stadium
 from src.components.formation_pitch import build_formation_panel, formation_title, pitch_src
@@ -185,8 +186,10 @@ def group_panel_payload(index, live_standings=None):
     name = group.name if group else "—"
     rows = []
     if group:
+        status_map = (qualification_status(live_standings).get(name, {})
+                      if live_standings else {})
         rows = (live_group_rows(name, live_standings, app.get_asset_url,
-                                resolve_team=official_team)
+                                resolve_team=official_team, status_map=status_map)
                 or group_rows(group, app.get_asset_url))
     return name, rows
 

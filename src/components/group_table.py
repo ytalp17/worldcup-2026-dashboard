@@ -34,11 +34,19 @@ COL_DEFS = [
 ]
 
 # autoHeight: the grid grows to fit its (4) rows; the panel handles any overflow.
+# domLayout "normal": the grid fills the card body (see .group-grid CSS) so a
+# 4-row table sits cleanly in the card; it scrolls internally only if rows ever
+# exceed the visible area. rowClassRules paint a left-edge accent per row from
+# the derived qualification status (green = advancing, red = eliminated).
 _GRID_OPTIONS = {
     "suppressCellFocus": True,
     "rowHeight": 40,
     "headerHeight": 36,
-    "domLayout": "autoHeight",
+    "domLayout": "normal",
+    "rowClassRules": {
+        "group-row--q": "params.data.status === 'qualified'",
+        "group-row--e": "params.data.status === 'eliminated'",
+    },
 }
 
 
@@ -57,6 +65,7 @@ def group_rows(group: Group, asset_url: Callable[[str], str]) -> list[dict]:
             "l": s.lost,
             "gd": s.goal_diff,
             "pts": s.points,
+            "status": "",   # no qualification markers on static (zeroed) data
         })
     return rows
 
@@ -66,15 +75,19 @@ def live_group_rows(
     live_standings: dict | None,
     asset_url: Callable[[str], str],
     resolve_team: Callable[[str], str] = lambda t: t,
+    status_map: dict | None = None,
 ) -> list[dict] | None:
     """ag-grid rowData built from the LIVE standings snapshot for one group, or
     None if that group is absent/empty (caller then falls back to static rows).
     Row order is the API's (already position-ordered). `resolve_team` maps the
     raw live team name to its official name so the flag filename and display name
-    line up with the static assets (the live feed spells some names differently)."""
+    line up with the static assets (the live feed spells some names differently).
+    `status_map` maps the RAW live team name to "qualified"/"eliminated"/"" so
+    each row carries its qualification marker."""
     table = (live_standings or {}).get(group_name)
     if not table:
         return None
+    status_map = status_map or {}
     rows = []
     for rank, s in enumerate(table, start=1):
         team = resolve_team(s["team"])
@@ -88,13 +101,14 @@ def live_group_rows(
             "l": s["lost"],
             "gd": s["goal_diff"],
             "pts": s["points"],
+            "status": status_map.get(s["team"], ""),   # keyed by raw live name
         })
     return rows
 
 
 def build_group_panel(group: Group | None, asset_url: Callable[[str], str]) -> dmc.Box:
-    """The panel body: header (Table / World Cup / group name + chevron), the
-    ag-grid, and an empty flex spacer reserved for future infographics."""
+    """The panel body: header (Table label + live group name) and the ag-grid,
+    which fills the card."""
     name = group.name if group else "—"
     rows = group_rows(group, asset_url) if group else []
 
@@ -121,11 +135,10 @@ def build_group_panel(group: Group | None, asset_url: Callable[[str], str]) -> d
         # Dark theme by default; a clientside callback swaps quartz <-> quartz-dark to follow the app color scheme.
         className="ag-theme-quartz-dark group-grid",
         dashGridOptions=_GRID_OPTIONS,
-        style={"width": "100%"},
+        style={"width": "100%", "height": "100%"},
     )
 
-    body = dmc.Box(
-        [grid, dmc.Box(id="group-extra", style={"flex": "1 1 auto"})],
-        className="group-panel__body",
-    )
+    # The grid fills the card body (domLayout "normal" + .group-grid flex), so a
+    # 4-row table sits cleanly with no leftover spacer.
+    body = dmc.Box(grid, className="group-panel__body")
     return dmc.Box([header, body], className="group-panel")

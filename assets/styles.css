@@ -453,15 +453,27 @@ body,
     border-radius: 8px;
 }
 
-/* Compact, borderless grid that blends with the card background. */
+/* Compact, borderless grid that fills the card (domLayout "normal"); a 4-row
+   table fits cleanly, scrolling internally only if rows exceed the area. */
 .group-grid {
-    flex: 0 0 auto;
+    flex: 1 1 auto;
+    min-height: 0;
     --ag-background-color: transparent;
     --ag-odd-row-background-color: transparent;
     --ag-header-background-color: transparent;
     --ag-borders: none;
     --ag-row-border-width: 0;
     --ag-font-size: 13px;
+}
+
+/* Qualification / elimination markers: a subtle inset left-edge accent per row
+   (no layout shift). Green = advancing, red = eliminated. Theme-agnostic colors
+   from the app palette. */
+.group-grid .ag-row.group-row--q {
+    box-shadow: inset 3px 0 0 0 #1D9E75;
+}
+.group-grid .ag-row.group-row--e {
+    box-shadow: inset 3px 0 0 0 #e03131;
 }
 
 /* The quartz theme hardcodes ~15px cell padding, which clips the compact numeric
