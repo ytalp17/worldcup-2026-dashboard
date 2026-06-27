@@ -262,7 +262,7 @@ class LiveDataService:
                             lambda g: {"yellow": g["yellow"], "red": g["red"]}),
         }
 
-    def tournament_player_leaders(self) -> dict:
+    def tournament_player_leaders(self, group_only: bool = False) -> dict:
         """Player leaders across the whole tournament (every team). Same grouping
         as team_leaders but unscoped, with a Team column. {} when no store."""
         if self._player_store is None:
@@ -271,6 +271,8 @@ class LiveDataService:
         groups: dict = {}
         for rows in by_match.values():
             for r in rows:
+                if group_only and r.stage != "group":
+                    continue
                 key = r.player_id if r.player_id else (canonical_team(r.team), normalize(r.player))
                 g = groups.get(key)
                 if g is None:
@@ -306,7 +308,7 @@ class LiveDataService:
                             lambda g: {"yellow": g["yellow"], "red": g["red"]}),
         }
 
-    def tournament_team_leaders(self, standings=None) -> dict:
+    def tournament_team_leaders(self, standings=None, group_only: bool = False) -> dict:
         """Team leaders across the tournament: per-team sums of counting stats,
         mean possession, recomputed shot/pass accuracy, and goals from standings.
         Returns {"attack"|"possession"|"defense"|"discipline": [row, ...]}.
@@ -317,6 +319,8 @@ class LiveDataService:
         agg: dict = {}
         for rows in by_match.values():
             for r in rows:
+                if group_only and r.stage != "group":
+                    continue
                 key = canonical_team(r.team)
                 a = agg.get(key)
                 if a is None:

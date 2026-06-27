@@ -530,3 +530,36 @@ def test_tournament_team_leaders_shot_acc_zero_when_no_shots(tmp_path):
     atk = next(r for r in svc.tournament_team_leaders()["attack"] if r["team"] == "USA")
     assert atk["shots"] == 0
     assert atk["shot_acc"] == 0.0             # no division-by-zero
+
+
+def test_tournament_player_leaders_group_only_excludes_knockout(tmp_path):
+    path = tmp_path / "ps.csv"
+    player_store.upsert(path, 1, "finished",
+                        [_pstat(1, "USA", "F. Balogun", 100, goals=2)],
+                        stage="group")
+    player_store.upsert(path, 2, "finished",
+                        [_pstat(2, "USA", "F. Balogun", 100, goals=5)],
+                        stage="knockout")
+    svc = LiveDataService(_FakeClient(), _index(), player_store=path)
+    all_goals = svc.tournament_player_leaders()["goals"][0]
+    grp_goals = svc.tournament_player_leaders(group_only=True)["goals"][0]
+    assert all_goals["value"] == 7      # 2 + 5 across both stages
+    assert grp_goals["value"] == 2      # group stage only
+    assert grp_goals["apps"] == 1
+
+
+def test_tournament_team_leaders_group_only_excludes_knockout(tmp_path):
+    path = tmp_path / "ts.csv"
+    team_stats_store.upsert(path, 1, "finished",
+                            [_tstat(1, "USA", shots_on=4)], stage="group")
+    team_stats_store.upsert(path, 2, "finished",
+                            [_tstat(2, "USA", shots_on=10)], stage="knockout")
+    svc = LiveDataService(_FakeClient(), _index(), team_store=path)
+    all_atk = next(r for r in svc.tournament_team_leaders()["attack"]
+                   if r["team"] == "USA")
+    grp_atk = next(r for r in
+                   svc.tournament_team_leaders(group_only=True)["attack"]
+                   if r["team"] == "USA")
+    assert all_atk["shots"] == 14       # 4 + 10
+    assert grp_atk["shots"] == 4        # group stage only
+    assert grp_atk["apps"] == 1
