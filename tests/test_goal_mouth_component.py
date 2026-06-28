@@ -64,9 +64,27 @@ def test_figure_has_six_grid_traces_plus_present_margins():
 
 def test_empty_figure_still_has_six_grid_cells():
     fig = build_goal_mouth_figure(aggregate_goal_mouth([]))
-    zids = [t.customdata[0] for t in fig.data if t.customdata is not None]
-    assert sum(z in ("high_left", "high_centre", "high_right",
-                     "low_left", "low_centre", "low_right") for z in zids) == 6
+    six = {"high_left", "high_centre", "high_right",
+           "low_left", "low_centre", "low_right"}
+    # Each grid cell is drawn as its own fill trace (customdata=[zid]*5).
+    fill_zids = {t.customdata[0] for t in fig.data
+                 if t.customdata is not None and t.mode == "lines"}
+    assert fill_zids == six
+
+
+def test_figure_has_clickable_hit_markers_for_every_zone():
+    # A transparent markers trace gives every zone a real clickable data point,
+    # so clicks land on a point (customdata) rather than only on fill interiors
+    # (which Plotly can report with customdata=None).
+    agg = _agg()                      # 6 grid cells + close_left margin present
+    fig = build_goal_mouth_figure(agg)
+    marker_traces = [t for t in fig.data if t.mode == "markers"]
+    assert len(marker_traces) == 1
+    hit = marker_traces[0]
+    # one hit point per present zone, each carrying its zone id as customdata
+    assert set(hit.customdata) == set(agg["zones"])
+    # invisible: fully transparent fill, no marker outline
+    assert "rgba" in str(hit.marker.color) and str(hit.marker.color).endswith("0)")
 
 
 def test_drawer_body_lists_shots_sorted_with_color():
@@ -120,3 +138,11 @@ def test_drawer_is_left_positioned():
     assert isinstance(drawer, dmc.Drawer)
     assert drawer.id == "goal-mouth-drawer"
     assert drawer.position == "left"
+
+
+def test_drawer_has_no_overlay_so_zones_stay_clickable():
+    # No overlay: the goal-mouth box stays interactive while the drawer is open,
+    # so clicking another zone replaces the contents in one click and the only
+    # dismissals are re-click / close (per spec).
+    drawer = build_goal_mouth_drawer()
+    assert drawer.withOverlay is False

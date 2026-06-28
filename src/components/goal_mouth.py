@@ -35,6 +35,11 @@ ZONE_BOX = {
     "close_right": (3, 0, 3.6, 2), "close_right_high": (3, 2, 3.6, 2.6),
 }
 
+# Cell centres — used for the invisible hit-marker overlay (see
+# build_goal_mouth_figure) so every zone has a real clickable data point.
+ZONE_CENTER = {z: ((x0 + x1) / 2, (y0 + y1) / 2)
+               for z, (x0, y0, x1, y1) in ZONE_BOX.items()}
+
 
 def _rgba(hex_color: str, alpha: float) -> str:
     h = hex_color.lstrip("#")
@@ -112,6 +117,18 @@ def build_goal_mouth_figure(agg: dict, mode: str = "volume",
             customdata=[zid] * 5, showlegend=False, name=ZONE_LABEL.get(zid, zid),
         ))
 
+    # Invisible hit-marker overlay: one transparent marker at each zone's centre,
+    # carrying the zone id as customdata. Clicking a fill interior can report a
+    # point with customdata=None in Plotly; a real marker point guarantees the
+    # click lands on a zone id, making the click->drawer interaction reliable.
+    fig.add_trace(go.Scatter(
+        x=[ZONE_CENTER[z][0] for z in order],
+        y=[ZONE_CENTER[z][1] for z in order],
+        customdata=list(order), mode="markers",
+        marker=dict(size=42, color="rgba(0,0,0,0)", line=dict(width=0)),
+        hoverinfo="skip", showlegend=False, name="zone-hit",
+    ))
+
     # Posts + crossbar (the on-target / near-miss divider).
     post = dict(type="line", line=dict(color=fg, width=3), layer="above")
     shapes = [
@@ -179,11 +196,16 @@ def build_goal_mouth_panel() -> dmc.Box:
 
 
 def build_goal_mouth_drawer() -> dmc.Drawer:
-    """App-level LEFT drawer holding the clicked zone's full shot list."""
+    """App-level LEFT drawer holding the clicked zone's full shot list.
+
+    No overlay (and no scroll lock): the goal-mouth box stays interactive while
+    the drawer is open, so clicking another zone replaces the contents in a
+    single click (per spec) and the only dismissals are re-clicking the same
+    zone or the close control."""
     return dmc.Drawer(
         id="goal-mouth-drawer",
         position="left", size="md", padding="md", opened=False,
-        withCloseButton=True, zIndex=2500,
+        withCloseButton=True, withOverlay=False, lockScroll=False, zIndex=2500,
         classNames={"content": "filter-drawer-frosted",
                     "header": "filter-drawer-frosted-header"},
     )

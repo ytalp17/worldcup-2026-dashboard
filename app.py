@@ -995,7 +995,9 @@ def open_goal_mouth_zone(click, index, current_zone, live):
     zid = click["points"][0].get("customdata")
     if isinstance(zid, list):           # customdata may arrive as a list
         zid = zid[0]
-    if zid is None or zid == current_zone:   # re-click same zone -> close
+    if zid is None:                     # stray fill-edge click with no zone -> ignore
+        return no_update, no_update, no_update, no_update
+    if zid == current_zone:             # re-click same zone -> close
         return None, False, no_update, no_update
     title, children = goal_mouth_drawer_payload(zid, index, live)
     return zid, True, title, children
