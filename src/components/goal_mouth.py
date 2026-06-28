@@ -41,13 +41,8 @@ def zone_hover_text(zone_id: str, zinfo: dict) -> str:
     parts = ", ".join(f"{c} {o.lower()}"
                       for o, c in sorted(zinfo["outcomes"].items(),
                                          key=lambda kv: -kv[1]))
-    lines = [f"<b>{label}</b> — {n} shots", parts]
-    if zinfo.get("shooters"):
-        top = zinfo["shooters"][0]
-        lines.append(f"top: {top['player']}")
-    if n > 6:
-        lines.append(f"<i>click to see all {n}</i>")
-    return "<br>".join(lines)
+    return "<br>".join([f"<b>{label}</b> — {n} shots", parts,
+                        f"<i>click to see all {n}</i>"])
 
 
 def build_goal_mouth_figure(agg: dict, theme: str = "dark") -> go.Figure:

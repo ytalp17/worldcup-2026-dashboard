@@ -39,12 +39,13 @@ def test_hover_text_has_breakdown_and_click_prompt():
     assert "Low Centre" in txt
     assert "7" in txt
     assert "click to see all 7" in txt
+    assert "top:" not in txt                       # top-shooter line removed
 
 
-def test_hover_text_no_click_prompt_when_few():
+def test_hover_text_click_prompt_shown_for_any_populated_cell():
     agg = _agg()
     txt = zone_hover_text("low_centre", agg["zones"]["low_centre"])  # 2 shots
-    assert "click to see all" not in txt
+    assert "click to see all 2" in txt             # prompt on every cell w/ shots
 
 
 def test_heatmap_covers_six_grid_cells_with_counts():
