@@ -61,6 +61,10 @@ def _control_button(button_id: str, icon: str, label: str) -> dmc.Tooltip:
             variant="default",
             size="xl",
             radius="xl",
+            # `map-control` is the styling hook; a callback adds the
+            # `map-control--active` modifier while this control's panel is open
+            # so the active button is discernable (matches the lit tour bulb).
+            className="map-control",
         ),
     )
 
@@ -72,6 +76,7 @@ def build_map_controls() -> html.Div:
     return html.Div(
         dmc.Stack(
             [
+                _control_button("tour-control", "tabler:bulb", "How to use"),
                 _control_button("tournament-control", "tabler:trophy", "Tournament Stats"),
                 _control_button("filter-control", "tabler:plane-tilt", "Team Travel Map"),
                 _control_button("third-place-control", "fluent-emoji-high-contrast:3rd-place-medal", "Third-Place Ranking"),

@@ -1050,6 +1050,52 @@ clientside_callback(
     Input("color-scheme-toggle", "checked"),
 )
 
+# The spotlight walkthrough is a pure client-side widget (assets/tour.js). Hand
+# it the Python-defined step data once it's available, and start it when the
+# light-bulb control is clicked.
+clientside_callback(
+    """
+    (steps) => {
+        if (window.WCTour && steps) {
+            window.WCTour.setSteps(steps);
+            window.WCTour.nudge();  // pulse the bulb on first load
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output("tour-init-sink", "data"),
+    Input("tour-steps", "data"),
+)
+
+clientside_callback(
+    """
+    (n) => {
+        if (n && window.WCTour) window.WCTour.toggle();
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output("tour-start-sink", "data"),
+    Input("tour-control", "n_clicks"),
+)
+
+# Mark each control button active while its drawer is open, so the currently
+# open panel's button glows (same amber treatment as the lit tour bulb).
+_CONTROL_ACTIVE_JS = """
+(opened) => opened ? 'map-control map-control--active' : 'map-control'
+"""
+
+for _control_id, _drawer_id in (
+    ("tournament-control", "tournament-drawer"),
+    ("filter-control", "filter-drawer"),
+    ("third-place-control", "third-place-drawer"),
+    ("knockout-control", "knockout-drawer"),
+):
+    clientside_callback(
+        _CONTROL_ACTIVE_JS,
+        Output(_control_id, "className"),
+        Input(_drawer_id, "opened"),
+    )
+
 # Read the browser's IANA timezone once at load (e.g. "Europe/Berlin"); null on failure.
 _TZ_JS = """
 function(_) {

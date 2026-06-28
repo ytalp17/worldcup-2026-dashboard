@@ -13,6 +13,7 @@ from src.components.map_view import build_map, build_map_controls
 from src.components.mode_switch import mode_switch
 from src.components.third_place import build_third_place_drawer
 from src.components.goal_mouth import build_goal_mouth_drawer
+from src.components.tour import build_tour
 from src.components.tournament_stats import build_tournament_drawer
 from src.data.venues import Venue
 
@@ -153,6 +154,7 @@ def build_layout(
             build_third_place_drawer(),
             build_knockout_drawer(),
             build_map_controls(),
+            build_tour(),
             build_live_strip(),
             build_modal(),
             dcc.Store(id="carousel-index", data=0, storage_type="local"),
