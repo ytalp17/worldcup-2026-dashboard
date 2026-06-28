@@ -30,6 +30,7 @@ The app runs in two complementary modes that share the same map:
 - Provides a per-team **bento dashboard** (Team mode): squad-value and rank KPIs, the live-or-static group table, a leaders card (goals / assists / cards), the estimated starting XI on an interactive pitch, the team's host cities on the map, and the full squad table.
 - Works **offline / key-less**: without an API key the app runs purely on bundled static data, showing truthful empty states instead of inventing live results. The entire test suite runs in this mode.
 - Ships a **light/dark theme switch** that is always present and re-themes everything at once — Mantine components, the Leaflet base tiles, the ag-grid tables, and the formation pitch image.
+- Onboards new users with a **guided spotlight walkthrough** — a light-bulb control dims the screen and highlights each feature in turn (map, calendar, every control, both switches, then the Team-mode dashboards), switching modes as it goes and restoring yours on exit. The bulb pulses on a first visit to invite a click, and any control whose panel is open glows so the active view is always clear.
 
 ---
 
@@ -47,10 +48,7 @@ The header shows a **tournament calendar**. Choosing a day:
 - repaints the **bottom live-match strip** with that day's fixtures — live and auto-updating for today, fetched on demand for any other day,
 - keeps live matches marked with scores directly on the map.
 
-Two **icon controls** sit at the bottom-left of the map:
-
-- **Tournament Stats** — opens the stats drawer.
-- **Team Travel Map** — opens the team/journey filter drawer.
+A stack of **icon controls** sits at the bottom-left of the map. A light-bulb **How-to-use** button at the top launches the guided walkthrough (see below); below it sit **Tournament Stats** — opens the stats drawer — and **Team Travel Map** — opens the team/journey filter drawer. Whichever control's panel is open glows amber, so the active view is always clear.
 
 Clicking a venue marker opens the **stadium drawer**; clicking any fixture (strip or drawer) opens the **live-match modal** — score and status, plus stats, timeline, and lineups tabs:
 
@@ -78,6 +76,10 @@ The whole app re-themes at once. Here is Team mode and the Tournament Stats draw
 ![Team mode bento dashboard in light theme](assets/in_app_ss/team-mode-light.png)
 
 ![Tournament Stats drawer — Attack & xG table with national team crests](assets/in_app_ss/tournament-stats.png)
+
+### Guided Walkthrough
+
+The light-bulb control at the top of the map's control stack starts a **spotlight tour** of the whole dashboard. It dims the screen and highlights one real element at a time — the map, the matchday calendar, each control, the theme and mode switches — then flips into Team mode to walk through the team carousel and the per-team dashboard, restoring your original mode when it ends. A floating card explains each step with Back / Next / Skip, progress dots, and keyboard support (←/→ to move, Esc to close). The bulb is a toggle (click to open, click again to close) and **pulses on a first visit** to invite a click, remembering once the tour has been taken so returning visitors aren't nudged again. It is a pure client-side widget: the step copy lives in Python (`src/components/tour.py`) while the positioning/mode-switching engine runs in `assets/tour.js`.
 
 ---
 
@@ -139,6 +141,8 @@ Static data is loaded once at startup through repository classes that return imm
 │   ├── styles.css                  # global styling, responsive shell, themed scrollbars
 │   ├── dashAgGridComponentFunctions.js  # TeamCell renderer (crest + name)
 │   ├── dashAgGridFunctions.js      # ag-grid value formatters (e.g. distance km/mi)
+│   ├── tour.js                     # spotlight walkthrough engine
+
 │   ├── country_logos/              # 48 national team crests (SVG)
 │   ├── confederation_logos/        # AFC, CAF, CONCACAF, CONMEBOL, OFC, UEFA
 │   └── data/                       # venues, teams, matches, squads, estimated XIs
