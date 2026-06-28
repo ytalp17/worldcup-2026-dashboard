@@ -54,6 +54,46 @@ def _expand_button():
         **{"aria-label": "Expand chart"})
 
 
+def info_content(view: dict, caveat: str | None = None) -> dmc.Stack:
+    """Rich explanatory block shown inside the header info hover-card: the chart
+    title, its one-line caption, a longer 'how to read it' note, and any caveat
+    (a `caveat` argument overrides the view's default — used for the goals-
+    conceded race, where lower is better)."""
+    cav = view.get("caveat", "") if caveat is None else caveat
+    parts = [
+        dmc.Text(view["title"], fw=700, size="sm"),
+        dmc.Text(view["caption"], size="xs", c="dimmed"),
+    ]
+    if view.get("info"):
+        parts.append(dmc.Text(view["info"], size="xs"))
+    if cav:
+        parts.append(dmc.Group(
+            [DashIconify(icon="mdi:alert-outline", width=15),
+             dmc.Text(cav, size="xs")],
+            gap=6, align="flex-start", wrap="nowrap",
+            className="analysis-info-caveat"))
+    return dmc.Stack(parts, gap=8)
+
+
+def _info_hovercard():
+    # Small "i" in the header; on hover a card explains the current chart. The
+    # dropdown body is filled per-view by the render callback. `bottom-end`
+    # anchors to the icon's right edge so the card never overflows off-screen.
+    return dmc.HoverCard(
+        withArrow=True, shadow="md", position="bottom-end", width=270,
+        openDelay=120, closeDelay=80,
+        children=[
+            dmc.HoverCardTarget(
+                dmc.ActionIcon(
+                    DashIconify(icon="mdi:information-outline", width=14),
+                    id="analysis-info", variant="subtle", size="xs", radius="xl",
+                    **{"aria-label": "About this chart"})),
+            dmc.HoverCardDropdown(
+                html.Div(info_content(views.VIEWS[0]), id="analysis-info-content"),
+                className="analysis-info-dropdown"),
+        ])
+
+
 def _expanded_modal():
     """A large centered modal mirroring the current chart for a roomier view.
     Carries its own carousel arrows + position dots, wired to the same view
@@ -85,14 +125,15 @@ def build_analysis_panel() -> dmc.Box:
                 [
                     dmc.Text("Group Analysis", fw=700, size="sm"),
                     dmc.Group(
-                        [dmc.Text(id="analysis-title", size="sm", c="dimmed"),
-                         _race_controls(), _expand_button()],
+                        # The per-view chart title now lives in the info hover-card
+                        # (and the expanded-modal title), so the header stays clean.
+                        [_race_controls(), _info_hovercard(), _expand_button()],
                         gap="xs", align="center", wrap="nowrap"),
                 ],
                 justify="space-between", align="center", wrap="nowrap",
                 className="bento-card__header analysis-header"),
-            dmc.Text(id="analysis-caption", size="xs", c="dimmed",
-                     className="analysis-caption"),
+            # No caption/caveat text rows: that copy now lives behind the header
+            # info icon, leaving the whole body to the figure.
             html.Div(
                 [_arrow("analysis-prev", "mdi:chevron-left", "Previous chart"),
                  dcc.Graph(id="analysis-graph", config=_GRAPH_CONFIG,
@@ -100,8 +141,6 @@ def build_analysis_panel() -> dmc.Box:
                            style={"height": "100%", "width": "100%"}),
                  _arrow("analysis-next", "mdi:chevron-right", "Next chart")],
                 className="analysis-stage"),
-            dmc.Text(id="analysis-caveat", size="xs", c="dimmed",
-                     className="analysis-caveat"),
             dmc.Group(dots(0, len(views.VIEWS)), id="analysis-dots",
                       justify="center", gap="xs", className="analysis-dots"),
         ],

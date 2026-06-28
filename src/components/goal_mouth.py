@@ -190,14 +190,12 @@ def drawer_body(zone_id: str, agg: dict, dark: bool = True) -> list:
     AG grid of the zone's shots (minute · shooter · opponent "vs <team>" ·
     outcome), time-sorted. `dark` selects the AG theme to match the app."""
     z = agg["zones"].get(zone_id, {"count": 0, "outcomes": {}, "shooters": []})
-    label = ZONE_LABEL.get(zone_id, zone_id)
     breakdown = ", ".join(f"{c} {o}" for o, c in
                           sorted(z["outcomes"].items(), key=lambda kv: -kv[1]))
-    header = dmc.Stack([
-        dmc.Text(label, fw=700, size="lg"),
-        dmc.Text(f"{z['count']} shots — {breakdown}" if z["count"] else "No shots",
-                 size="sm", c="dimmed"),
-    ], gap=2)
+    # The zone name is already in the drawer title ("Shoot at <zone>"), so the
+    # body opens straight with the shot-count breakdown — no duplicate heading.
+    header = dmc.Text(f"{z['count']} shots — {breakdown}" if z["count"] else "No shots",
+                      size="sm", c="dimmed")
 
     def _minute_key(time_str):
         base, extra = parse_shot_minute(time_str)

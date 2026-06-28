@@ -872,8 +872,12 @@ body,
     padding: 4px 3px;
 }
 .analysis-header { flex: 0 0 auto; }
-.analysis-caption { flex: 0 0 auto; }
-.analysis-caveat { flex: 0 0 auto; min-height: 0; }
+/* Header info hover-card: keep it readable but never wider than the phone. */
+.analysis-info-dropdown { max-width: min(270px, calc(100vw - 24px)); }
+.analysis-info-caveat { color: var(--mantine-color-orange-7); }
+[data-mantine-color-scheme="dark"] .analysis-info-caveat {
+    color: var(--mantine-color-orange-4);
+}
 .analysis-stage {
     position: relative;
     flex: 1 1 auto;

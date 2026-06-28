@@ -14,12 +14,20 @@ DEFEND_COLORS = theme.DEFEND_COLORS
 VIEWS = [
     {"id": "ATTACKING_THREAT", "type": "radar", "title": "Attacking threat",
      "caption": "Where each team generates danger (per-90, scaled to the group).",
+     "info": "Each spoke is one attacking metric, normalised so the group's best "
+             "on that axis reaches the rim. A wide, even shape is a rounded attack; "
+             "a single spike marks a team that leans on one route to goal. Values "
+             "are per 90 minutes, so sides with different match counts compare fairly.",
      "metrics": [("xg", "Expected goals", "rate"), ("xa", "Expected assists", "rate"),
                  ("big_chances", "Big chances", "count"),
                  ("shots_in_box", "Shots in box", "count"),
                  ("key_passes", "Key passes", "count")]},
     {"id": "BUILD_UP", "type": "radar", "title": "Build-up",
      "caption": "How teams progress the ball (per-90, scaled to the group).",
+     "info": "Spokes track ball progression — possession, passing volume and "
+             "dribbling. A wide footprint is a possession-heavy side that builds "
+             "patiently; a small one a more direct team. Each axis is scaled to "
+             "the group leader, per 90 minutes.",
      "metrics": [("possession", "Possession", "rate"),
                  ("passes_succ", "Successful passes", "count"),
                  ("passes_final_third", "Passes into final third", "count"),
@@ -27,6 +35,9 @@ VIEWS = [
                  ("dribbles_succ", "Successful dribbles", "count")]},
     {"id": "DEFENSIVE_WORK", "type": "radar", "title": "Defensive work",
      "caption": "Defensive actions (per-90, scaled to the group).",
+     "info": "Spokes are defensive actions per 90, scaled to the group. Read it "
+             "for a team's defensive workload and where it concentrates — aerial "
+             "duels, tackles, interceptions or clearances.",
      "caveat": "High volume often means a team played without the ball — a bigger "
                "shape is not necessarily better defending.",
      "metrics": [("tackles_succ", "Successful tackles", "count"),
@@ -36,6 +47,9 @@ VIEWS = [
                  ("gk_saves", "Goalkeeper saves", "count")]},
     {"id": "STYLE_FINGERPRINT", "type": "radar", "title": "Style fingerprint",
      "caption": "How a team plays — raw attempt volumes (per-90, scaled).",
+     "info": "Raw attempt volumes — what a team tries, not how well it does it. "
+             "Lots of crosses and long passes points to a direct side; high "
+             "possession and dribbling to a patient, ball-keeping one.",
      "metrics": [("possession", "Possession", "rate"),
                  ("crosses", "Crosses", "count"),
                  ("long_passes", "Long passes", "count"),
@@ -43,20 +57,39 @@ VIEWS = [
                  ("aerials", "Aerial duels", "count")]},
     {"id": "FINISHING", "type": "dumbbell", "title": "Finishing: goals vs xG",
      "caption": "Actual goals against expected goals — over- and under-performance.",
+     "info": "Each team's expected goals (xG) and actual goals sit on one line; the "
+             "gap is finishing. A green line running right of xG is clinical — more "
+             "goals than the chances were worth; a red line left of it is wasteful.",
      "caveat": "With few shots or matches, finishing looks extreme and tends to "
                "regress."},
     {"id": "RACE", "type": "race", "title": "Race over matchdays",
-     "caption": "A selected metric accumulating matchday by matchday."},
+     "caption": "A selected metric accumulating matchday by matchday.",
+     "info": "A bar chart that replays the group matchday by matchday for the "
+             "chosen metric — press Replay to watch the standings form. The leader "
+             "sits on top of each frame. Switch the metric with the selector."},
     {"id": "SHOT_FUNNEL", "type": "funnel", "title": "Shot funnel",
-     "caption": "Shots → on target → goals, per team."},
+     "caption": "Shots → on target → goals, per team.",
+     "info": "For each team, total shots narrow to shots on target and then to "
+             "goals. The percentages show how much is lost at each step — shot "
+             "selection and finishing combined."},
     {"id": "QUALITY_VS_CONV", "type": "quadrant", "title": "Chance quality vs conversion",
-     "caption": "xG per shot (quality) against conversion % (goals ÷ shots)."},
+     "caption": "xG per shot (quality) against conversion % (goals ÷ shots).",
+     "info": "Chance quality (xG per shot) runs left-to-right; conversion (goals ÷ "
+             "shots) bottom-to-top. Top-right is clinical, top-left lucky, "
+             "bottom-right wasteful, bottom-left toothless. Dotted lines mark the "
+             "group average on each axis."},
     {"id": "HOW_THEY_DEFEND", "type": "defend", "title": "How they defend",
      "caption": "Defensive volume and its mix, per-90.",
+     "info": "Stacked bars split each team's defensive actions per 90 into tackles, "
+             "interceptions, clearances and aerials — a taller bar means more "
+             "defending, and the segments show how that work is made up.",
      "caveat": "High defensive volume often signals playing without the ball — "
                "more actions is not better defending."},
     {"id": "VOLUME_VS_PENETR", "type": "bubble", "title": "Volume vs penetration",
-     "caption": "Total passes against passes into the final third; bubble = accuracy %."},
+     "caption": "Total passes against passes into the final third; bubble = accuracy %.",
+     "info": "Total passes (x) against passes into the final third (y); the bubble "
+             "size is pass accuracy. Teams to the top-right both pass a lot and "
+             "penetrate, and a big bubble means they keep the ball while doing it."},
 ]
 
 VIEW_BY_ID = {v["id"]: v for v in VIEWS}

@@ -41,6 +41,7 @@ from src.components.team_kpis import build_kpi_strip, kpi_cards
 from src.data.team_form import recent_form
 from src.components.team_carousel import advance, build_team_carousel, carousel_view, center_team, display_name, team_order
 from src.components.analysis.panel import build_analysis_panel
+from src.components.analysis import panel as analysis_panel
 from src.components.analysis import views as analysis_views
 from src.data.analysis import accessors as analysis_accessors
 from src.data.lineups import LineupRepository, lineup_for_team
@@ -295,7 +296,7 @@ def goal_mouth_drawer_payload(zone_id, index, live, dark):
     selects the AG-grid theme so the shot table matches the app's color scheme."""
     agg = _EMPTY_GM if LIVE is None else LIVE.team_goal_mouth(
         center_team(TEAM_NAMES, index or 0))
-    title = ZONE_LABEL.get(zone_id, zone_id)
+    title = f"Shoot at {ZONE_LABEL.get(zone_id, zone_id)}"
     return title, drawer_body(zone_id, agg, dark=(dark is None or dark))
 
 
@@ -1243,9 +1244,7 @@ def move_analysis_view(_prev, _next, _mprev, _mnext, index):
 
 @callback(
     Output("analysis-graph", "figure"),
-    Output("analysis-title", "children"),
-    Output("analysis-caption", "children"),
-    Output("analysis-caveat", "children"),
+    Output("analysis-info-content", "children"),
     Output("analysis-dots", "children"),
     Output("analysis-race-controls", "style"),
     Output("analysis-modal-graph", "figure"),
@@ -1259,12 +1258,16 @@ def move_analysis_view(_prev, _next, _mprev, _mnext, index):
     Input("color-scheme-toggle", "checked"),
 )
 def render_analysis(view_index, race_metric, frame, carousel_index, _live, dark):
-    fig, title, caption, caveat, dots_children, race_style = analysis_render(
+    fig, title, _caption, caveat, dots_children, race_style = analysis_render(
         view_index, race_metric, carousel_index,
         dark if dark is not None else True, frame)
-    # The expanded modal mirrors the current chart (same figure), title, and
-    # position dots so the in-modal carousel stays in sync with the tile.
-    return (fig, title, caption, caveat, dots_children, race_style,
+    # The caption/caveat copy now lives behind the header info icon: build the
+    # hover-card body for the current view (with any caveat override applied).
+    view = analysis_views.VIEWS[(view_index or 0) % len(analysis_views.VIEWS)]
+    info_children = analysis_panel.info_content(view, caveat)
+    # The header no longer carries the chart title (it lives in the info card);
+    # the expanded modal still mirrors the current chart, title, and dots.
+    return (fig, info_children, dots_children, race_style,
             fig, title, dots_children)
 
 

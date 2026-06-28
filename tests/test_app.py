@@ -460,5 +460,5 @@ def test_goal_mouth_drawer_payload_lists_zone(monkeypatch):
     monkeypatch.setattr(app, "LIVE", _FakeGMLive())
     title, children = app.goal_mouth_drawer_payload(
         "low_centre", 0, {"ok": True}, dark=True)
-    assert "Low Centre" in title
+    assert title == "Shoot at Low Centre"      # "Shoot at <zone>" drawer title
     assert isinstance(children, list) and children
