@@ -168,7 +168,10 @@ _OUTCOME_CELL_STYLE = {
     ],
 }
 _SHOT_COLUMNS = [
-    {"headerName": "Min", "field": "min", "width": 64, "sortable": True},
+    # `min` is a numeric sort key (45+1 -> 45.01) so the column sorts by time;
+    # the original label ("45+1") is shown via the value formatter.
+    {"headerName": "Min", "field": "min", "width": 64, "sortable": True,
+     "valueFormatter": {"function": "params.data.min_label"}},
     {"headerName": "Player", "field": "player", "flex": 1, "minWidth": 110,
      "sortable": True},
     {"headerName": "vs", "field": "opponent", "flex": 1, "minWidth": 90,
@@ -196,9 +199,14 @@ def drawer_body(zone_id: str, agg: dict, dark: bool = True) -> list:
                  size="sm", c="dimmed"),
     ], gap=2)
 
+    def _minute_key(time_str):
+        base, extra = parse_shot_minute(time_str)
+        return base + extra / 100          # 45+1 -> 45.01 (sorts after 45)
+
     rows = [
-        {"min": s["time"], "player": s["player"],
-         "opponent": s.get("opponent", ""), "outcome": s["outcome"]}
+        {"min": _minute_key(s["time"]), "min_label": s["time"],
+         "player": s["player"], "opponent": s.get("opponent", ""),
+         "outcome": s["outcome"]}
         for s in sorted(z["shooters"], key=lambda s: parse_shot_minute(s["time"]))
     ]
     theme = "ag-theme-quartz-dark" if dark else "ag-theme-quartz"

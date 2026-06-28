@@ -120,6 +120,22 @@ def test_drawer_body_renders_ag_grid_of_shots_sorted_with_opponent():
     assert {"min", "player", "opponent", "outcome"} <= fields
 
 
+def test_drawer_min_column_is_numeric_for_correct_sort():
+    # "9'" must sort before "10'" and "45+1" — i.e. numerically, not as strings.
+    agg = aggregate_goal_mouth([
+        ShotRecord(1, "X", "A", "9'", "Goal", "Low Centre", "Z"),
+        ShotRecord(1, "X", "B", "45+1", "Saved", "Low Centre", "Z"),
+        ShotRecord(1, "X", "C", "10'", "Saved", "Low Centre", "Z")])
+    grid = _grid(drawer_body("low_centre", agg))
+    mins = [r["min"] for r in grid.rowData]
+    assert all(isinstance(m, (int, float)) for m in mins)   # numeric sort key
+    assert mins == sorted(mins) == [9, 10, 45.01]
+    # original label preserved for display ("45+1" not "45.01")
+    assert any(r.get("min_label") == "45+1" for r in grid.rowData)
+    col = next(c for c in grid.columnDefs if c["field"] == "min")
+    assert "valueFormatter" in col                          # shows the label
+
+
 def test_drawer_body_outcome_column_carries_outcome_colors():
     agg = aggregate_goal_mouth(
         [ShotRecord(1, "X", "A", "10'", "Goal", "Low Centre", "Brazil")])
