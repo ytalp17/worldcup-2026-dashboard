@@ -64,6 +64,18 @@ def test_heatmap_colorbar_legend_only_when_data():
     assert empty.showscale is False                    # nothing to scale
 
 
+def test_light_theme_goal_frame_is_soft_grey_not_black():
+    fig = build_goal_mouth_figure(_agg(), theme="light")
+    colors = {s.line.color for s in fig.layout.shapes}
+    assert "#1A1B1E" not in colors                 # no harsh near-black posts
+    assert "#ADB5BD" in colors                     # soft grey goal frame
+
+
+def test_dark_theme_goal_frame_stays_light():
+    fig = build_goal_mouth_figure(_agg(), theme="dark")
+    assert any(s.line.color == "#E9ECEF" for s in fig.layout.shapes)
+
+
 def test_no_near_miss_markers_rendered():
     # Close-miss markers were removed by request — only the hit-marker scatter
     # remains (no "near-miss" trace, even when a margin shot is present).

@@ -50,7 +50,8 @@ def build_goal_mouth_figure(agg: dict, theme: str = "dark") -> go.Figure:
     by shot volume with the count in each cell, framed by posts/crossbar + goal
     line, with an off-target tally and a colour-scale legend (colorbar)."""
     dark = theme != "light"
-    fg = "#E9ECEF" if dark else "#1A1B1E"
+    fg = "#E9ECEF" if dark else "#1A1B1E"            # text/labels (stays readable)
+    goal_fg = "#E9ECEF" if dark else "#ADB5BD"       # soft grey goal frame on light
     zones = agg["zones"]
 
     def cell(zid):
@@ -87,14 +88,14 @@ def build_goal_mouth_figure(agg: dict, theme: str = "dark") -> go.Figure:
         hoverinfo="skip", showlegend=False, name="zone-hit",
     ))
 
-    # Posts + crossbar frame and the goal line.
-    frame = dict(type="line", line=dict(color=fg, width=5), layer="above")
+    # Posts + crossbar frame and the goal line (soft grey on light theme).
+    frame = dict(type="line", line=dict(color=goal_fg, width=5), layer="above")
     shapes = [
         {**frame, "x0": _GX0, "y0": _GY0, "x1": _GX0, "y1": _GY1},   # left post
         {**frame, "x0": _GX1, "y0": _GY0, "x1": _GX1, "y1": _GY1},   # right post
         {**frame, "x0": _GX0, "y0": _GY1, "x1": _GX1, "y1": _GY1},   # crossbar
         dict(type="line", x0=_GX0 - 0.5, y0=_GY0, x1=_GX1 + 0.5, y1=_GY0,
-             line=dict(color=fg, width=3), layer="above"),           # goal line
+             line=dict(color=goal_fg, width=3), layer="above"),      # goal line
     ]
 
     # On/off-target counts now live in the card subtitle, so the figure carries
