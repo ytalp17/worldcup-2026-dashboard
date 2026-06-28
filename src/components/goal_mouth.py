@@ -102,20 +102,16 @@ def build_goal_mouth_figure(agg: dict, theme: str = "dark") -> go.Figure:
              line=dict(color=fg, width=3), layer="above"),           # goal line
     ]
 
-    annotations = []
-    off = agg["off_target"]["count"]
-    if off:
-        annotations.append(dict(
-            x=_GX0 - 0.55, y=_GY1 + 0.55, xanchor="left", yanchor="middle",
-            showarrow=False, text=f"Off-target {off}", font=dict(color=fg, size=10)))
-
+    # On/off-target counts now live in the card subtitle, so the figure carries
+    # no annotation — and with the near-miss markers gone the axis ranges hug the
+    # frame so the goal fills the card.
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         margin=dict(l=6, r=6, t=8, b=26), showlegend=False, autosize=True,
-        shapes=shapes, annotations=annotations,
+        shapes=shapes,
         hoverlabel=dict(bgcolor="#23262B" if dark else "#FFFFFF", font_color=fg),
-        xaxis=dict(visible=False, range=[-1.45, 3.45], fixedrange=True),
-        yaxis=dict(visible=False, range=[-1.05, 2.5], fixedrange=True),
+        xaxis=dict(visible=False, range=[-1.05, 3.05], fixedrange=True),
+        yaxis=dict(visible=False, range=[-1.0, 1.95], fixedrange=True),
     )
     return fig
 
@@ -127,7 +123,11 @@ def build_goal_mouth_panel() -> dmc.Box:
     """Shoot map card: header (title only) over a Plotly heatmap goal that fills
     the whole card (its colour-scale legend lives in-figure)."""
     header = dmc.Group(
-        [dmc.Text("Shoot map", fw=700, size="sm")],
+        [
+            dmc.Text("Shoot map", fw=700, size="sm"),
+            # On/off-target tally (filled per team by the figure callback).
+            dmc.Text("", id="goal-mouth-subtitle", size="xs", c="dimmed"),
+        ],
         justify="space-between", align="center", wrap="nowrap",
         className="bento-card__header",
     )

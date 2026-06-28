@@ -445,6 +445,14 @@ def test_goal_mouth_figure_payload_no_live_is_empty(monkeypatch):
     assert isinstance(fig, go.Figure)          # empty-but-valid frame
 
 
+def test_goal_mouth_subtitle_reports_on_and_off_target(monkeypatch):
+    import app
+    monkeypatch.setattr(app, "LIVE", _FakeGMLive())   # 2 on-target, 0 off-target
+    sub = app.goal_mouth_subtitle(0)
+    assert "On-target 2" in sub
+    assert "Off-target 0" in sub
+
+
 
 
 def test_goal_mouth_drawer_payload_lists_zone(monkeypatch):

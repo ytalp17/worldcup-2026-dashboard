@@ -281,6 +281,15 @@ def goal_mouth_figure_payload(index, live, dark):
     return build_goal_mouth_figure(agg, theme=theme)
 
 
+def goal_mouth_subtitle(index):
+    """On/off-target shot tally shown under the Shoot-map title for the
+    carousel-selected team."""
+    agg = _EMPTY_GM if LIVE is None else LIVE.team_goal_mouth(
+        center_team(TEAM_NAMES, index or 0))
+    t = agg["totals"]
+    return f"On-target {t['on_target']} · Off-target {t['off_target']}"
+
+
 def goal_mouth_drawer_payload(zone_id, index, live, dark):
     """(title, children) for the zone drawer. Title doubles the zone name; `dark`
     selects the AG-grid theme so the shot table matches the app's color scheme."""
@@ -965,12 +974,13 @@ def update_kpi_strip(index, _live):
 
 @callback(
     Output("goal-mouth-graph", "figure"),
+    Output("goal-mouth-subtitle", "children"),
     Input("carousel-index", "data"),
     Input("color-scheme-toggle", "checked"),
     Input("live-store", "data"),
 )
 def update_goal_mouth(index, dark, live):
-    return goal_mouth_figure_payload(index, live, dark)
+    return goal_mouth_figure_payload(index, live, dark), goal_mouth_subtitle(index)
 
 
 @callback(

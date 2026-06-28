@@ -136,6 +136,7 @@ def test_panel_has_header_title_and_graph_no_mode_control():
     panel = build_goal_mouth_panel()
     ids = {getattr(n, "id", None) for n in _walk(panel)}
     assert "goal-mouth-graph" in ids
+    assert "goal-mouth-subtitle" in ids          # on/off-target tally lives here
     # Volume/Dominant fill-mode control was removed by request.
     assert "goal-mouth-mode" not in ids
     assert not any(isinstance(n, dmc.SegmentedControl) for n in _walk(panel))
