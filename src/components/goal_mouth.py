@@ -51,7 +51,9 @@ def build_goal_mouth_figure(agg: dict, theme: str = "dark") -> go.Figure:
     line, with an off-target tally and a colour-scale legend (colorbar)."""
     dark = theme != "light"
     fg = "#E9ECEF" if dark else "#1A1B1E"            # text/labels (stays readable)
-    goal_fg = "#E9ECEF" if dark else "#ADB5BD"       # soft grey goal frame on light
+    # Goal frame is the opposite of the gaps: white on the dark card, soft
+    # dark-grey on the light card. (The heatmap cell colours stay theme-agnostic.)
+    goal_fg = "#E9ECEF" if dark else "#495057"
     zones = agg["zones"]
 
     def cell(zid):

@@ -64,16 +64,27 @@ def test_heatmap_colorbar_legend_only_when_data():
     assert empty.showscale is False                    # nothing to scale
 
 
-def test_light_theme_goal_frame_is_soft_grey_not_black():
+def test_light_theme_goal_frame_is_dark_grey_not_black():
+    # Light theme is the opposite of dark: a soft DARK-grey goal frame on the
+    # light card (dark uses a white frame on the dark card).
     fig = build_goal_mouth_figure(_agg(), theme="light")
     colors = {s.line.color for s in fig.layout.shapes}
     assert "#1A1B1E" not in colors                 # no harsh near-black posts
-    assert "#ADB5BD" in colors                     # soft grey goal frame
+    assert "#495057" in colors                     # soft dark-grey goal frame
 
 
-def test_dark_theme_goal_frame_stays_light():
+def test_dark_theme_goal_frame_stays_white():
     fig = build_goal_mouth_figure(_agg(), theme="dark")
     assert any(s.line.color == "#E9ECEF" for s in fig.layout.shapes)
+
+
+def test_heatmap_cell_colors_identical_across_themes():
+    # The cell fill scale + numerals must NOT change with theme (only the goal
+    # frame / label colours adapt).
+    dark = _heatmap(build_goal_mouth_figure(_agg(), theme="dark"))
+    light = _heatmap(build_goal_mouth_figure(_agg(), theme="light"))
+    assert dark.colorscale == light.colorscale
+    assert dark.textfont.color == light.textfont.color == "#FFFFFF"
 
 
 def test_no_near_miss_markers_rendered():
