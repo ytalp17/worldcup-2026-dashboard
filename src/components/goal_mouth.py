@@ -15,7 +15,6 @@ OUTCOME_COLORS = {
     "Post": "#D85A30", "Missed": "#EF9F27",
 }
 NEAR_MISS_COLOR = "#EF9F27"          # the Close* family
-VOLUME_HUE = "#534AB7"               # neutral single hue for volume mode
 # Deterministic dominant-outcome tie-break order.
 _DOMINANT_ORDER = ["Goal", "Saved", "Blocked", "Post", "Missed"]
 
@@ -26,50 +25,17 @@ ZONE_LABEL = {
     "close_right": "Close Right", "close_right_high": "Close Right & High",
 }
 
-# Rectangle geometry: (x0, y0, x1, y1). Inside the posts x∈[0,3], y∈[0,2];
-# rows High (top, y 1-2) / Low (bottom, y 0-1); cols Left/Centre/Right.
-ZONE_BOX = {
-    "high_left": (0, 1, 1, 2), "high_centre": (1, 1, 2, 2), "high_right": (2, 1, 3, 2),
-    "low_left": (0, 0, 1, 1), "low_centre": (1, 0, 2, 1), "low_right": (2, 0, 3, 1),
-    "close_high": (0, 2, 3, 2.6), "close_left": (-0.6, 0, 0, 2),
-    "close_right": (3, 0, 3.6, 2), "close_right_high": (3, 2, 3.6, 2.6),
-}
-
-# Cell centres — used for the invisible hit-marker overlay (see
-# build_goal_mouth_figure) so every zone has a real clickable data point.
-ZONE_CENTER = {z: ((x0 + x1) / 2, (y0 + y1) / 2)
-               for z, (x0, y0, x1, y1) in ZONE_BOX.items()}
-
-
-def _rgba(hex_color: str, alpha: float) -> str:
-    h = hex_color.lstrip("#")
-    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
-    return f"rgba({r},{g},{b},{round(alpha, 3)})"
-
-
-def _diagonal_lines(box, color, step=0.3, width=1):
-    """Parallel slope-1 ('/') line shapes clipped to an axis-aligned box — the
-    one-way diagonal netting for the near-miss outer band (vs the square mesh
-    inside the goal)."""
-    x0, y0, x1, y1 = box
-    shapes = []
-    b = y0 - x1                       # first '/' line touching the bottom-right
-    while b <= y1 - x0 + 1e-9:        # last line touching the top-left
-        xa, xb = max(x0, y0 - b), min(x1, y1 - b)
-        if xb > xa:
-            shapes.append(dict(type="line", x0=xa, y0=xa + b, x1=xb, y1=xb + b,
-                               line=dict(color=color, width=width), layer="above"))
-        b += step
-    return shapes
-
-
-def goal_mouth_readout(agg: dict) -> str:
-    """Compact one-line totals readout shown beside the figure (kept out of the
-    figure so the goal can use the card's full space)."""
-    t = agg["totals"]
-    return (f"On target {t['on_target']} · Near miss {t['near_miss']} · "
-            f"Woodwork {t['woodwork']} · Off target {t['off_target']} · "
-            f"Total {t['total']}")
+# Heatmap geometry: columns Left/Centre/Right -> x 0,1,2; rows Low/High -> y 0,1
+# (y index 0 = Low, the bottom row). The frame encloses the 2x3 cells.
+_COLS = ["left", "centre", "right"]
+_ROWS = ["low", "high"]
+_GX0, _GX1, _GY0, _GY1 = -0.5, 2.5, -0.5, 1.5          # frame extents (cell edges)
+# Near-miss marker positions just outside the frame (only the four that occur).
+_NEAR_POS = {"close_left": (-1.05, 0.5), "close_right": (3.05, 0.5),
+             "close_high": (1.0, 2.05), "close_right_high": (3.05, 2.05)}
+# Volume heatmap ramp (same in both themes; cells stay dark enough that the
+# white numerals read on any value).
+_VOLUME_SCALE = [[0.0, "#1f3a5f"], [1.0, "#1c63d6"]]
 
 
 def _dominant_outcome(outcomes: dict) -> str | None:
@@ -80,27 +46,6 @@ def _dominant_outcome(outcomes: dict) -> str | None:
         if outcomes.get(o, 0) == best:
             return o
     return next(iter(outcomes))
-
-
-def cell_fill_colors(agg: dict, mode: str, theme: str = "dark") -> dict[str, str]:
-    """region id -> rgba fill. Volume: single hue, opacity by count (margins use
-    the near-miss hue). Dominant: grid cells colored by top outcome, margins
-    always the near-miss color."""
-    zones = agg["zones"]
-    max_count = max((z["count"] for z in zones.values()), default=0) or 1
-    out: dict[str, str] = {}
-    for zid, z in zones.items():
-        is_margin = zid not in ON_TARGET
-        if z["count"] == 0:
-            out[zid] = _rgba(NEAR_MISS_COLOR if is_margin else VOLUME_HUE, 0.05)
-            continue
-        if mode == "dominant" and not is_margin:
-            out[zid] = _rgba(OUTCOME_COLORS.get(_dominant_outcome(z["outcomes"]),
-                                                VOLUME_HUE), 0.85)
-        else:
-            hue = NEAR_MISS_COLOR if is_margin else VOLUME_HUE
-            out[zid] = _rgba(hue, 0.15 + 0.85 * (z["count"] / max_count))
-    return out
 
 
 def zone_hover_text(zone_id: str, zinfo: dict) -> str:
@@ -122,93 +67,111 @@ def zone_hover_text(zone_id: str, zinfo: dict) -> str:
 
 def build_goal_mouth_figure(agg: dict, mode: str = "volume",
                             theme: str = "dark") -> go.Figure:
-    """A goal: filled, hoverable, clickable rectangles per zone (grid + present
-    margins) under a net mesh, diagonal outer-band netting, and a posts/crossbar
-    frame. The totals readout lives beside the figure, not inside it."""
+    """A clean heatmap goal: the 2x3 on-target grid shaded by value with the
+    shot count in each cell, a posts/crossbar frame, near-miss markers just
+    outside, an off-target tally, and a colour-scale legend (colorbar)."""
     dark = theme != "light"
-    fills = cell_fill_colors(agg, mode, theme)
     fg = "#E9ECEF" if dark else "#1A1B1E"
-    net = "rgba(255,255,255,0.11)" if dark else "rgba(0,0,0,0.07)"
-    divider = "rgba(255,255,255,0.26)" if dark else "rgba(0,0,0,0.18)"
+    zones = agg["zones"]
 
-    fig = go.Figure()
-    # Draw grid cells always; margins only when present in agg["zones"].
-    # Cell outlines are off — the net mesh + dividers + frame (shapes below) give
-    # the goal its structure; near-miss margins get a faint dotted amber edge.
-    order = [z for z in ON_TARGET] + [z for z in agg["zones"] if z not in ON_TARGET]
-    for zid in order:
-        x0, y0, x1, y1 = ZONE_BOX[zid]
-        is_margin = zid not in ON_TARGET
-        edge = (dict(color=_rgba(NEAR_MISS_COLOR, 0.55), width=1, dash="dot")
-                if is_margin else dict(width=0))
-        fig.add_trace(go.Scatter(
-            x=[x0, x1, x1, x0, x0], y=[y0, y0, y1, y1, y0],
-            fill="toself", fillcolor=fills[zid], mode="lines",
-            line=edge, hoveron="fills",
-            hovertemplate=zone_hover_text(zid, agg["zones"][zid]) + "<extra></extra>",
-            customdata=[zid] * 5, showlegend=False, name=ZONE_LABEL.get(zid, zid),
-        ))
+    def cell(zid):
+        return zones.get(zid, {"count": 0, "outcomes": {}, "shooters": []})
 
-    # Invisible hit-marker overlay: one transparent marker at each zone's centre,
-    # carrying the zone id as customdata. Clicking a fill interior can report a
-    # point with customdata=None in Plotly; a real marker point guarantees the
-    # click lands on a zone id, making the click->drawer interaction reliable.
+    ids = [[f"{r}_{c}" for c in _COLS] for r in _ROWS]      # ids[0] = Low row
+    counts = [[cell(z)["count"] for z in row] for row in ids]
+    text = [["" if not n else str(n) for n in row] for row in counts]
+    hover = [[zone_hover_text(z, cell(z)) for z in row] for row in ids]
+
+    cbar = dict(orientation="h", thickness=9, len=0.6, x=0.5, xanchor="center",
+                y=-0.08, yanchor="top", outlinewidth=0,
+                tickfont=dict(color=fg, size=10))
+
+    if mode == "dominant":
+        present = [o for o in _DOMINANT_ORDER
+                   if any(_dominant_outcome(cell(z)["outcomes"]) == o
+                          for row in ids for z in row)]
+        index = {o: i for i, o in enumerate(present)}
+        z = [[(index[_dominant_outcome(cell(zid)["outcomes"])]
+               if cell(zid)["count"] else None) for zid in row] for row in ids]
+        n = max(len(present), 1)
+        colorscale = ([[0, "#888888"], [1, "#888888"]] if not present else
+                      [pair for i, o in enumerate(present)
+                       for pair in ([i / n, OUTCOME_COLORS[o]],
+                                    [(i + 1) / n, OUTCOME_COLORS[o]])])
+        zmin, zmax = -0.5, n - 0.5
+        # Empty title (set explicitly so a volume->dominant react diff clears the
+        # previous "shots" label); the category names are the legend.
+        cbar.update(tickmode="array", tickvals=list(range(len(present))),
+                    ticktext=present,
+                    title=dict(text="", font=dict(color=fg, size=10), side="top"))
+        showscale = bool(present)
+    else:
+        z = [[(n or None) for n in row] for row in counts]
+        colorscale = _VOLUME_SCALE
+        mx = max((n for row in counts for n in row), default=0)
+        zmin, zmax = 0, max(mx, 1)
+        cbar.update(tickmode="auto", tickvals=None, ticktext=None,
+                    title=dict(text="shots", font=dict(color=fg, size=10), side="top"))
+        showscale = mx > 0
+
+    fig = go.Figure(go.Heatmap(
+        z=z, x=[0, 1, 2], y=[0, 1], customdata=ids,
+        text=text, texttemplate="%{text}", textfont=dict(color="#FFFFFF", size=16),
+        hovertext=hover, hovertemplate="%{hovertext}<extra></extra>",
+        hoverongaps=False, xgap=4, ygap=4,
+        colorscale=colorscale, zmin=zmin, zmax=zmax,
+        showscale=showscale, colorbar=cbar,
+    ))
+
+    # Invisible hit-markers over the six cells -> reliable clicks -> drawer.
     fig.add_trace(go.Scatter(
-        x=[ZONE_CENTER[z][0] for z in order],
-        y=[ZONE_CENTER[z][1] for z in order],
-        customdata=list(order), mode="markers",
-        marker=dict(size=42, color="rgba(0,0,0,0)", line=dict(width=0)),
+        x=[0, 1, 2, 0, 1, 2], y=[0, 0, 0, 1, 1, 1],
+        customdata=[z for row in ids for z in row], mode="markers",
+        marker=dict(size=46, color="rgba(0,0,0,0)", line=dict(width=0)),
         hoverinfo="skip", showlegend=False, name="zone-hit",
     ))
 
-    # --- goal structure (drawn above the fills) -----------------------------
-    # Square net mesh inside the goal mouth (x 0..3, y 0..2); one-way diagonal
-    # netting in the near-miss outer band; 2x3 zone dividers a touch stronger;
-    # a solid posts/crossbar frame; and a goal line grounding the whole thing.
-    shapes = []
-    grid_step = 0.25
-    n_v = int(round(3 / grid_step))
-    n_h = int(round(2 / grid_step))
-    for i in range(1, n_v):
-        x = round(i * grid_step, 4)
-        shapes.append(dict(type="line", x0=x, y0=0, x1=x, y1=2,
-                           line=dict(color=net, width=1), layer="above"))
-    for i in range(1, n_h):
-        y = round(i * grid_step, 4)
-        shapes.append(dict(type="line", x0=0, y0=y, x1=3, y1=y,
-                           line=dict(color=net, width=1), layer="above"))
-    # Diagonal netting for the outer band — only the four margins that can occur
-    # (left/right/top strips + top-right corner; never bottom or top-left).
+    # Near-miss markers just outside the frame (only where they occur), clickable.
+    nx, ny, nt, ncd, nh = [], [], [], [], []
     for m in MARGINS:
-        shapes += _diagonal_lines(ZONE_BOX[m], net)
-    # 2x3 zone dividers (cols at x=1,2; the High/Low split at y=1).
-    div = dict(type="line", line=dict(color=divider, width=1.4), layer="above")
-    shapes += [
-        {**div, "x0": 1, "y0": 0, "x1": 1, "y1": 2},
-        {**div, "x0": 2, "y0": 0, "x1": 2, "y1": 2},
-        {**div, "x0": 0, "y0": 1, "x1": 3, "y1": 1},
-    ]
-    # Posts + crossbar (solid frame) and the goal line.
+        cm = cell(m)
+        if cm["count"]:
+            px, py = _NEAR_POS[m]
+            nx.append(px); ny.append(py); nt.append(str(cm["count"]))
+            ncd.append(m); nh.append(zone_hover_text(m, cm))
+    if nx:
+        fig.add_trace(go.Scatter(
+            x=nx, y=ny, customdata=ncd, mode="markers+text", text=nt,
+            textposition="middle center", textfont=dict(color="#FFFFFF", size=11),
+            marker=dict(size=24, color=NEAR_MISS_COLOR, line=dict(color=fg, width=1)),
+            hovertext=nh, hovertemplate="%{hovertext}<extra></extra>",
+            showlegend=False, name="near-miss",
+        ))
+
+    # Posts + crossbar frame and the goal line.
     frame = dict(type="line", line=dict(color=fg, width=5), layer="above")
-    shapes += [
-        {**frame, "x0": 0, "y0": 0, "x1": 0, "y1": 2},      # left post
-        {**frame, "x0": 3, "y0": 0, "x1": 3, "y1": 2},      # right post
-        {**frame, "x0": 0, "y0": 2, "x1": 3, "y1": 2},      # crossbar
-        dict(type="line", x0=-0.6, y0=0, x1=3.6, y1=0,
-             line=dict(color=fg, width=3), layer="above"),  # goal line
+    shapes = [
+        {**frame, "x0": _GX0, "y0": _GY0, "x1": _GX0, "y1": _GY1},   # left post
+        {**frame, "x0": _GX1, "y0": _GY0, "x1": _GX1, "y1": _GY1},   # right post
+        {**frame, "x0": _GX0, "y0": _GY1, "x1": _GX1, "y1": _GY1},   # crossbar
+        dict(type="line", x0=_GX0 - 0.5, y0=_GY0, x1=_GX1 + 0.5, y1=_GY0,
+             line=dict(color=fg, width=3), layer="above"),           # goal line
     ]
 
-    # Ranges hug the goal + margins (no reserved readout strip), and the graph
-    # autosizes responsively to the card; the totals readout lives beside the
-    # figure (see build_goal_mouth_panel) so the goal fills the space.
+    annotations = []
+    off = agg["off_target"]["count"]
+    if off:
+        annotations.append(dict(
+            x=_GX0 - 0.55, y=_GY1 + 0.55, xanchor="left", yanchor="middle",
+            showarrow=False, text=f"Off-target {off}", font=dict(color=fg, size=10)))
+
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=6, r=6, t=6, b=6), showlegend=False, autosize=True,
-        shapes=shapes,
+        margin=dict(l=6, r=6, t=8, b=26), showlegend=False, autosize=True,
+        shapes=shapes, annotations=annotations,
         hoverlabel=dict(bgcolor="#23262B" if dark else "#FFFFFF", font_color=fg),
-        xaxis=dict(visible=False, range=[-0.8, 3.8], fixedrange=True),
-        yaxis=dict(visible=False, range=[-0.3, 2.8], fixedrange=True,
-                   scaleanchor="x", scaleratio=1),
+        xaxis=dict(visible=False, range=[-1.45, 3.45], fixedrange=True),
+        yaxis=dict(visible=False, range=[-1.05, 2.5], fixedrange=True),
     )
     return fig
 
@@ -217,8 +180,8 @@ _GRAPH_CONFIG = {"displayModeBar": False, "responsive": True}
 
 
 def build_goal_mouth_panel() -> dmc.Box:
-    """Shoot map card: header (title + fill-mode control) over a Plotly graph
-    that fills the card, with a one-line legend + totals readout footer."""
+    """Shoot map card: header (title + fill-mode control) over a Plotly heatmap
+    goal that fills the whole card (its colour-scale legend lives in-figure)."""
     header = dmc.Group(
         [
             dmc.Text("Shoot map", fw=700, size="sm"),
@@ -237,16 +200,7 @@ def build_goal_mouth_panel() -> dmc.Box:
                     "off_target": 0, "other": 0, "total": 0}}),
         config=_GRAPH_CONFIG, style={"width": "100%", "flex": "1 1 auto",
                                      "minHeight": 0})
-    footer = dmc.Group(
-        [
-            dmc.Text("inside the posts = on target · outer band = near miss",
-                     size="xs", c="dimmed", style={"flex": 1, "minWidth": 0}),
-            dmc.Text("", id="goal-mouth-readout", size="xs", c="dimmed",
-                     ta="right", style={"whiteSpace": "nowrap"}),
-        ],
-        justify="space-between", align="center", wrap="wrap", gap="xs",
-    )
-    body = dmc.Box([graph, footer], className="goal-mouth-panel__body")
+    body = dmc.Box([graph], className="goal-mouth-panel__body")
     return dmc.Box([header, body], className="goal-mouth-panel")
 
 

@@ -5,9 +5,12 @@ import dash_mantine_components as dmc
 from src.data.live.shots import ShotRecord
 from src.data.live.goal_mouth import aggregate_goal_mouth
 from src.components.goal_mouth import (
-    OUTCOME_COLORS, ZONE_LABEL, cell_fill_colors, zone_hover_text,
-    build_goal_mouth_figure, drawer_body, goal_mouth_readout,
+    OUTCOME_COLORS, ZONE_LABEL, zone_hover_text,
+    build_goal_mouth_figure, drawer_body,
 )
+
+_SIX = {"high_left", "high_centre", "high_right",
+        "low_left", "low_centre", "low_right"}
 
 
 def _agg():
@@ -18,23 +21,15 @@ def _agg():
     return aggregate_goal_mouth(recs)
 
 
+def _heatmap(fig):
+    return next(t for t in fig.data if t.type == "heatmap")
+
+
 def test_outcome_colors_enum():
     assert OUTCOME_COLORS["Goal"] == "#1D9E75"
     assert OUTCOME_COLORS["Saved"] == "#378ADD"
     assert OUTCOME_COLORS["Blocked"] == "#888780"
     assert OUTCOME_COLORS["Post"] == "#D85A30"
-
-
-def test_dominant_mode_colors_cell_by_top_outcome():
-    colors = cell_fill_colors(_agg(), mode="dominant")
-    # low_centre has Goal+Saved (tie broken deterministically); a non-empty cell
-    # gets a color, an empty cell stays faint/transparent-ish.
-    assert colors["low_centre"] != colors["high_left"]
-
-
-def test_volume_mode_single_hue_varies_by_count():
-    colors = cell_fill_colors(_agg(), mode="volume")
-    assert colors["low_centre"] != colors["high_right"]   # count 2 vs 0
 
 
 def test_hover_text_has_breakdown_and_click_prompt():
@@ -52,56 +47,40 @@ def test_hover_text_no_click_prompt_when_few():
     assert "click to see all" not in txt
 
 
-def test_figure_has_six_grid_traces_plus_present_margins():
+def test_heatmap_covers_six_grid_cells_with_counts():
     fig = build_goal_mouth_figure(_agg())
     assert isinstance(fig, go.Figure)
-    zids = [t.customdata[0] for t in fig.data if t.customdata is not None]
-    assert set(z for z in zids if z in ZONE_LABEL) >= set(
-        ["high_left", "high_centre", "high_right",
-         "low_left", "low_centre", "low_right", "close_left"])
-    assert "close_high" not in zids                # absent margin not drawn
+    hm = _heatmap(fig)
+    flat = [zid for row in hm.customdata for zid in row]
+    assert set(flat) == _SIX                           # 2x3 grid of zone ids
+    texts = [t for row in hm.text for t in row]
+    assert "2" in texts                                # low_centre count shown
 
 
-def test_empty_figure_still_has_six_grid_cells():
-    fig = build_goal_mouth_figure(aggregate_goal_mouth([]))
-    six = {"high_left", "high_centre", "high_right",
-           "low_left", "low_centre", "low_right"}
-    # Each grid cell is drawn as its own fill trace (customdata=[zid]*5).
-    fill_zids = {t.customdata[0] for t in fig.data
-                 if t.customdata is not None and t.mode == "lines"}
-    assert fill_zids == six
+def test_heatmap_colorbar_legend_only_when_data():
+    assert _heatmap(build_goal_mouth_figure(_agg())).showscale is True
+    empty = _heatmap(build_goal_mouth_figure(aggregate_goal_mouth([])))
+    assert empty.showscale is False                    # nothing to scale
 
 
-def test_outer_band_has_one_way_diagonal_netting():
-    # The near-miss outer band uses slope-1 ('/') diagonal lines; the inner net,
-    # dividers, frame and goal line are all strictly horizontal/vertical.
+def test_near_miss_markers_only_for_present_margins():
+    fig = build_goal_mouth_figure(_agg())              # only CloseLeft present
+    near = next((t for t in fig.data if t.name == "near-miss"), None)
+    assert near is not None
+    assert set(near.customdata) == {"close_left"}
+
+
+def test_dominant_mode_uses_categorical_outcome_colorbar():
+    hm = _heatmap(build_goal_mouth_figure(_agg(), mode="dominant"))
+    assert hm.colorbar.ticktext
+    assert set(hm.colorbar.ticktext) <= set(OUTCOME_COLORS)
+
+
+def test_clickable_hit_markers_cover_the_grid():
     fig = build_goal_mouth_figure(_agg())
-    diagonals = [s for s in fig.layout.shapes if s.x0 != s.x1 and s.y0 != s.y1]
-    assert diagonals, "expected diagonal netting shapes in the outer band"
-    # all diagonals are slope +1 ('/'), i.e. equal run and rise
-    for s in diagonals:
-        assert abs((s.x1 - s.x0) - (s.y1 - s.y0)) < 1e-6
-
-
-def test_readout_summarizes_totals():
-    txt = goal_mouth_readout(_agg())
-    assert "On target" in txt and "Near miss" in txt and "Total" in txt
-    assert str(_agg()["totals"]["total"]) in txt
-
-
-def test_figure_has_clickable_hit_markers_for_every_zone():
-    # A transparent markers trace gives every zone a real clickable data point,
-    # so clicks land on a point (customdata) rather than only on fill interiors
-    # (which Plotly can report with customdata=None).
-    agg = _agg()                      # 6 grid cells + close_left margin present
-    fig = build_goal_mouth_figure(agg)
-    marker_traces = [t for t in fig.data if t.mode == "markers"]
-    assert len(marker_traces) == 1
-    hit = marker_traces[0]
-    # one hit point per present zone, each carrying its zone id as customdata
-    assert set(hit.customdata) == set(agg["zones"])
-    # invisible: fully transparent fill, no marker outline
-    assert "rgba" in str(hit.marker.color) and str(hit.marker.color).endswith("0)")
+    hit = next(t for t in fig.data if t.name == "zone-hit")
+    assert set(hit.customdata) == _SIX
+    assert str(hit.marker.color).endswith("0)")        # transparent / invisible
 
 
 def test_drawer_body_lists_shots_sorted_with_color():
@@ -147,9 +126,6 @@ def test_panel_has_header_title_mode_control_and_graph():
     assert not any(isinstance(t, str) and "where each team's shots finished" in t
                    for t in texts)
     assert not any(isinstance(t, str) and "placement" in t.lower() for t in texts)
-    # the totals readout element is present (filled by the callback)
-    ids = {getattr(n, "id", None) for n in _walk(panel)}
-    assert "goal-mouth-readout" in ids
     graph = next(n for n in _walk(panel) if isinstance(n, dcc.Graph))
     assert graph.config.get("displayModeBar") is False
 

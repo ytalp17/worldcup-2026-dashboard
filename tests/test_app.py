@@ -445,12 +445,6 @@ def test_goal_mouth_figure_payload_no_live_is_empty(monkeypatch):
     assert isinstance(fig, go.Figure)          # empty-but-valid frame
 
 
-def test_goal_mouth_payload_returns_figure_and_readout(monkeypatch):
-    import app
-    monkeypatch.setattr(app, "LIVE", _FakeGMLive())
-    fig, readout = app.goal_mouth_payload(0, {"ok": True}, dark=True, mode="Volume")
-    assert isinstance(fig, go.Figure)
-    assert isinstance(readout, str) and "Total" in readout
 
 
 def test_goal_mouth_drawer_payload_lists_zone(monkeypatch):
