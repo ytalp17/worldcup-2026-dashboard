@@ -716,6 +716,16 @@ body,
     padding-right: 6px !important;
 }
 
+/* The grid runs with a transparent --ag-background-color so rows show the
+   frosted drawer through. AG-Grid derives the checkbox tick/dash colour (a
+   masked shape) from that same variable, which left the checkmark invisible on
+   the filled blue box. Paint the tick — and the header's indeterminate dash —
+   explicitly so the selection is readable in both themes. */
+.journey-grid .ag-checkbox-input-wrapper.ag-checked::after,
+.journey-grid .ag-checkbox-input-wrapper.ag-indeterminate::after {
+    background-color: #fff;
+}
+
 /* Selected rows are tinted in each team's own flow colour via the getRowStyle
    function (journeyRowStyle in dashAgGridFunctions.js), not a static class. */
 
