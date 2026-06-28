@@ -7,7 +7,7 @@ import dash_mantine_components as dmc
 import plotly.graph_objects as go
 from dash import dcc
 
-from src.data.live.goal_mouth_zones import ON_TARGET, parse_shot_minute
+from src.data.live.goal_mouth_zones import MARGINS, ON_TARGET, parse_shot_minute
 
 # --- color enum (consistent everywhere; pair with text labels, never alone) ---
 OUTCOME_COLORS = {
@@ -45,6 +45,31 @@ def _rgba(hex_color: str, alpha: float) -> str:
     h = hex_color.lstrip("#")
     r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
     return f"rgba({r},{g},{b},{round(alpha, 3)})"
+
+
+def _diagonal_lines(box, color, step=0.3, width=1):
+    """Parallel slope-1 ('/') line shapes clipped to an axis-aligned box — the
+    one-way diagonal netting for the near-miss outer band (vs the square mesh
+    inside the goal)."""
+    x0, y0, x1, y1 = box
+    shapes = []
+    b = y0 - x1                       # first '/' line touching the bottom-right
+    while b <= y1 - x0 + 1e-9:        # last line touching the top-left
+        xa, xb = max(x0, y0 - b), min(x1, y1 - b)
+        if xb > xa:
+            shapes.append(dict(type="line", x0=xa, y0=xa + b, x1=xb, y1=xb + b,
+                               line=dict(color=color, width=width), layer="above"))
+        b += step
+    return shapes
+
+
+def goal_mouth_readout(agg: dict) -> str:
+    """Compact one-line totals readout shown beside the figure (kept out of the
+    figure so the goal can use the card's full space)."""
+    t = agg["totals"]
+    return (f"On target {t['on_target']} · Near miss {t['near_miss']} · "
+            f"Woodwork {t['woodwork']} · Off target {t['off_target']} · "
+            f"Total {t['total']}")
 
 
 def _dominant_outcome(outcomes: dict) -> str | None:
@@ -97,8 +122,9 @@ def zone_hover_text(zone_id: str, zinfo: dict) -> str:
 
 def build_goal_mouth_figure(agg: dict, mode: str = "volume",
                             theme: str = "dark") -> go.Figure:
-    """A goal frame: filled, hoverable, clickable rectangles per zone (grid +
-    present margins), posts/crossbar lines, and a side readout."""
+    """A goal: filled, hoverable, clickable rectangles per zone (grid + present
+    margins) under a net mesh, diagonal outer-band netting, and a posts/crossbar
+    frame. The totals readout lives beside the figure, not inside it."""
     dark = theme != "light"
     fills = cell_fill_colors(agg, mode, theme)
     fg = "#E9ECEF" if dark else "#1A1B1E"
@@ -136,9 +162,9 @@ def build_goal_mouth_figure(agg: dict, mode: str = "volume",
     ))
 
     # --- goal structure (drawn above the fills) -----------------------------
-    # A square net mesh fills the goal mouth (x 0..3, y 0..2); the 2x3 zone
-    # dividers are a touch stronger; the posts/crossbar are a solid frame; and a
-    # goal line grounds the whole thing (extending under the near-miss margins).
+    # Square net mesh inside the goal mouth (x 0..3, y 0..2); one-way diagonal
+    # netting in the near-miss outer band; 2x3 zone dividers a touch stronger;
+    # a solid posts/crossbar frame; and a goal line grounding the whole thing.
     shapes = []
     grid_step = 0.25
     n_v = int(round(3 / grid_step))
@@ -151,6 +177,10 @@ def build_goal_mouth_figure(agg: dict, mode: str = "volume",
         y = round(i * grid_step, 4)
         shapes.append(dict(type="line", x0=0, y0=y, x1=3, y1=y,
                            line=dict(color=net, width=1), layer="above"))
+    # Diagonal netting for the outer band — only the four margins that can occur
+    # (left/right/top strips + top-right corner; never bottom or top-left).
+    for m in MARGINS:
+        shapes += _diagonal_lines(ZONE_BOX[m], net)
     # 2x3 zone dividers (cols at x=1,2; the High/Low split at y=1).
     div = dict(type="line", line=dict(color=divider, width=1.4), layer="above")
     shapes += [
@@ -168,20 +198,15 @@ def build_goal_mouth_figure(agg: dict, mode: str = "volume",
              line=dict(color=fg, width=3), layer="above"),  # goal line
     ]
 
-    t = agg["totals"]
-    readout = (f"On target {t['on_target']}<br>Near miss {t['near_miss']}<br>"
-               f"Woodwork {t['woodwork']}<br>Off target {t['off_target']}<br>"
-               f"<b>Total {t['total']}</b>")
-    annotations = [dict(
-        xref="paper", yref="paper", x=1.0, y=1.0, xanchor="right", yanchor="top",
-        align="right", showarrow=False, font=dict(color=fg, size=11), text=readout)]
-
+    # Ranges hug the goal + margins (no reserved readout strip), and the graph
+    # autosizes responsively to the card; the totals readout lives beside the
+    # figure (see build_goal_mouth_panel) so the goal fills the space.
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=8, r=8, t=8, b=8), showlegend=False, autosize=True,
-        shapes=shapes, annotations=annotations,
+        margin=dict(l=6, r=6, t=6, b=6), showlegend=False, autosize=True,
+        shapes=shapes,
         hoverlabel=dict(bgcolor="#23262B" if dark else "#FFFFFF", font_color=fg),
-        xaxis=dict(visible=False, range=[-0.9, 5.4], fixedrange=True),
+        xaxis=dict(visible=False, range=[-0.8, 3.8], fixedrange=True),
         yaxis=dict(visible=False, range=[-0.3, 2.8], fixedrange=True,
                    scaleanchor="x", scaleratio=1),
     )
@@ -192,11 +217,11 @@ _GRAPH_CONFIG = {"displayModeBar": False, "responsive": True}
 
 
 def build_goal_mouth_panel() -> dmc.Box:
-    """Goal-mouth map card: header (title + fill-mode control) over a Plotly
-    graph, with a one-line legend caption."""
+    """Shoot map card: header (title + fill-mode control) over a Plotly graph
+    that fills the card, with a one-line legend + totals readout footer."""
     header = dmc.Group(
         [
-            dmc.Text("Goal-mouth map", fw=700, size="sm"),
+            dmc.Text("Shoot map", fw=700, size="sm"),
             dmc.SegmentedControl(id="goal-mouth-mode", value="Volume",
                                  data=["Volume", "Dominant"], size="xs"),
         ],
@@ -212,9 +237,16 @@ def build_goal_mouth_panel() -> dmc.Box:
                     "off_target": 0, "other": 0, "total": 0}}),
         config=_GRAPH_CONFIG, style={"width": "100%", "flex": "1 1 auto",
                                      "minHeight": 0})
-    caption = dmc.Text("inside the posts = on target · outer band = near miss",
-                       size="xs", c="dimmed")
-    body = dmc.Box([graph, caption], className="goal-mouth-panel__body")
+    footer = dmc.Group(
+        [
+            dmc.Text("inside the posts = on target · outer band = near miss",
+                     size="xs", c="dimmed", style={"flex": 1, "minWidth": 0}),
+            dmc.Text("", id="goal-mouth-readout", size="xs", c="dimmed",
+                     ta="right", style={"whiteSpace": "nowrap"}),
+        ],
+        justify="space-between", align="center", wrap="wrap", gap="xs",
+    )
+    body = dmc.Box([graph, footer], className="goal-mouth-panel__body")
     return dmc.Box([header, body], className="goal-mouth-panel")
 
 

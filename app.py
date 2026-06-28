@@ -56,7 +56,8 @@ from src.data.team_continents import (
     manager_nationality_for,
 )
 from src.components.goal_mouth import (
-    build_goal_mouth_figure, build_goal_mouth_panel, drawer_body, ZONE_LABEL,
+    build_goal_mouth_figure, build_goal_mouth_panel, drawer_body,
+    goal_mouth_readout, ZONE_LABEL,
 )
 from src.data.live.client import HighlightlyClient
 from src.data.live.reconcile import build_stadium_index, canonical_team
@@ -270,17 +271,22 @@ _EMPTY_GM = {
 }
 
 
-def goal_mouth_figure_payload(index, live, dark, mode):
-    """Figure for the carousel-selected team. `live` is the trigger only; data
-    comes from the shot store via LIVE."""
+def goal_mouth_payload(index, live, dark, mode):
+    """(figure, readout) for the carousel-selected team. `live` is the trigger
+    only; data comes from the shot store via LIVE."""
     if LIVE is None:
         agg = _EMPTY_GM
     else:
-        team = center_team(TEAM_NAMES, index or 0)
-        agg = LIVE.team_goal_mouth(team)
+        agg = LIVE.team_goal_mouth(center_team(TEAM_NAMES, index or 0))
     theme = "dark" if (dark is None or dark) else "light"
     fig_mode = "dominant" if mode == "Dominant" else "volume"
-    return build_goal_mouth_figure(agg, mode=fig_mode, theme=theme)
+    return (build_goal_mouth_figure(agg, mode=fig_mode, theme=theme),
+            goal_mouth_readout(agg))
+
+
+def goal_mouth_figure_payload(index, live, dark, mode):
+    """Figure only (the readout is the second element of goal_mouth_payload)."""
+    return goal_mouth_payload(index, live, dark, mode)[0]
 
 
 def goal_mouth_drawer_payload(zone_id, index, live):
@@ -966,13 +972,14 @@ def update_kpi_strip(index, _live):
 
 @callback(
     Output("goal-mouth-graph", "figure"),
+    Output("goal-mouth-readout", "children"),
     Input("carousel-index", "data"),
     Input("goal-mouth-mode", "value"),
     Input("color-scheme-toggle", "checked"),
     Input("live-store", "data"),
 )
 def update_goal_mouth(index, mode, dark, live):
-    return goal_mouth_figure_payload(index, live, dark, mode)
+    return goal_mouth_payload(index, live, dark, mode)
 
 
 @callback(

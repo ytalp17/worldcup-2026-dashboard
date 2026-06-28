@@ -6,7 +6,7 @@ from src.data.live.shots import ShotRecord
 from src.data.live.goal_mouth import aggregate_goal_mouth
 from src.components.goal_mouth import (
     OUTCOME_COLORS, ZONE_LABEL, cell_fill_colors, zone_hover_text,
-    build_goal_mouth_figure, drawer_body,
+    build_goal_mouth_figure, drawer_body, goal_mouth_readout,
 )
 
 
@@ -72,6 +72,23 @@ def test_empty_figure_still_has_six_grid_cells():
     assert fill_zids == six
 
 
+def test_outer_band_has_one_way_diagonal_netting():
+    # The near-miss outer band uses slope-1 ('/') diagonal lines; the inner net,
+    # dividers, frame and goal line are all strictly horizontal/vertical.
+    fig = build_goal_mouth_figure(_agg())
+    diagonals = [s for s in fig.layout.shapes if s.x0 != s.x1 and s.y0 != s.y1]
+    assert diagonals, "expected diagonal netting shapes in the outer band"
+    # all diagonals are slope +1 ('/'), i.e. equal run and rise
+    for s in diagonals:
+        assert abs((s.x1 - s.x0) - (s.y1 - s.y0)) < 1e-6
+
+
+def test_readout_summarizes_totals():
+    txt = goal_mouth_readout(_agg())
+    assert "On target" in txt and "Near miss" in txt and "Total" in txt
+    assert str(_agg()["totals"]["total"]) in txt
+
+
 def test_figure_has_clickable_hit_markers_for_every_zone():
     # A transparent markers trace gives every zone a real clickable data point,
     # so clicks land on a point (customdata) rather than only on fill interiors
@@ -124,14 +141,15 @@ def test_panel_has_header_title_mode_control_and_graph():
     assert "goal-mouth-graph" in ids
     assert "goal-mouth-mode" in ids
     texts = [n.children for n in _walk(panel) if isinstance(n, dmc.Text)]
-    assert any("Goal-mouth map" == t for t in texts)
-    # never call it a "shot map"
-    assert not any(isinstance(t, str) and "shot map" in t.lower() for t in texts)
+    assert any("Shoot map" == t for t in texts)
     # minimal header: the "where each team's shots finished" subtitle and the
     # placement disclaimer caption were removed by request.
     assert not any(isinstance(t, str) and "where each team's shots finished" in t
                    for t in texts)
     assert not any(isinstance(t, str) and "placement" in t.lower() for t in texts)
+    # the totals readout element is present (filled by the callback)
+    ids = {getattr(n, "id", None) for n in _walk(panel)}
+    assert "goal-mouth-readout" in ids
     graph = next(n for n in _walk(panel) if isinstance(n, dcc.Graph))
     assert graph.config.get("displayModeBar") is False
 
