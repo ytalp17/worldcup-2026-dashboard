@@ -460,6 +460,24 @@ body,
     overflow: hidden;
 }
 
+/* --- shot grid (lives in the frosted Shoot-map zone drawer) --- */
+/* Transparent like the other drawer grids so the frosted backdrop shows through
+   and cell text uses the theme's own colour (the quartz-dark theme would
+   otherwise paint an opaque panel that clashes with the frosted drawer). */
+.goal-mouth-grid {
+    --ag-background-color: transparent;
+    --ag-odd-row-background-color: transparent;
+    --ag-header-background-color: transparent;
+    --ag-borders: none;
+    --ag-row-border-width: 0;
+    --ag-font-size: 13px;
+}
+.goal-mouth-grid .ag-cell,
+.goal-mouth-grid .ag-header-cell {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
 .leaders-grid {
     flex: 1 1 auto;
     min-height: 0;      /* allow the flex child to shrink so the grid scrolls */

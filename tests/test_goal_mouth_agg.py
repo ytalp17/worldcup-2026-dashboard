@@ -4,7 +4,7 @@ from src.data.live.goal_mouth import aggregate_goal_mouth
 
 
 def _r(target, outcome="Saved", time="10'", player="P", stage="group"):
-    return ShotRecord(1, "England", player, time, outcome, target, stage)
+    return ShotRecord(1, "England", player, time, outcome, target, stage=stage)
 
 
 def test_empty_gives_valid_empty_structure():

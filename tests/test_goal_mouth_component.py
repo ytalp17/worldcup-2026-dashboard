@@ -14,10 +14,10 @@ _SIX = {"high_left", "high_centre", "high_right",
 
 
 def _agg():
-    recs = [ShotRecord(1, "X", "A", "10'", "Goal", "Low Centre"),
-            ShotRecord(1, "X", "B", "20'", "Saved", "Low Centre"),
-            ShotRecord(1, "X", "C", "30'", "Missed", "CloseLeft"),
-            ShotRecord(1, "X", "D", "40'", "Missed", None)]
+    recs = [ShotRecord(1, "X", "A", "10'", "Goal", "Low Centre", "Spain"),
+            ShotRecord(1, "X", "B", "20'", "Saved", "Low Centre", "Spain"),
+            ShotRecord(1, "X", "C", "30'", "Missed", "CloseLeft", "Spain"),
+            ShotRecord(1, "X", "D", "40'", "Missed", None, "Spain")]
     return aggregate_goal_mouth(recs)
 
 
@@ -63,17 +63,11 @@ def test_heatmap_colorbar_legend_only_when_data():
     assert empty.showscale is False                    # nothing to scale
 
 
-def test_near_miss_markers_only_for_present_margins():
-    fig = build_goal_mouth_figure(_agg())              # only CloseLeft present
-    near = next((t for t in fig.data if t.name == "near-miss"), None)
-    assert near is not None
-    assert set(near.customdata) == {"close_left"}
-
-
-def test_dominant_mode_uses_categorical_outcome_colorbar():
-    hm = _heatmap(build_goal_mouth_figure(_agg(), mode="dominant"))
-    assert hm.colorbar.ticktext
-    assert set(hm.colorbar.ticktext) <= set(OUTCOME_COLORS)
+def test_no_near_miss_markers_rendered():
+    # Close-miss markers were removed by request — only the hit-marker scatter
+    # remains (no "near-miss" trace, even when a margin shot is present).
+    fig = build_goal_mouth_figure(_agg())              # CloseLeft present in agg
+    assert not any(t.name == "near-miss" for t in fig.data)
 
 
 def test_clickable_hit_markers_cover_the_grid():
@@ -83,16 +77,40 @@ def test_clickable_hit_markers_cover_the_grid():
     assert str(hit.marker.color).endswith("0)")        # transparent / invisible
 
 
-def test_drawer_body_lists_shots_sorted_with_color():
+def _grid(body):
+    import dash_ag_grid as dag
+    return next(n for n in _walk(body[0]) if isinstance(n, dag.AgGrid))
+
+
+def test_drawer_body_renders_ag_grid_of_shots_sorted_with_opponent():
     agg = aggregate_goal_mouth([
-        ShotRecord(1, "X", "Late", "80'", "Goal", "Low Centre"),
-        ShotRecord(1, "X", "Early", "10'", "Saved", "Low Centre")])
+        ShotRecord(1, "X", "Late", "80'", "Goal", "Low Centre", "Brazil"),
+        ShotRecord(1, "X", "Early", "10'", "Saved", "Low Centre", "Brazil")])
     body = drawer_body("low_centre", agg)
     assert isinstance(body, list) and body
-    # flatten text content to confirm order + presence
-    blob = str([c.to_plotly_json() for c in body])
-    assert blob.index("Early") < blob.index("Late")
-    assert "Low Centre" in blob
+    grid = _grid(body)
+    # time-sorted rows carrying the opponent ("vs <team>") of each shot
+    assert [r["player"] for r in grid.rowData] == ["Early", "Late"]
+    assert all(r["opponent"] == "Brazil" for r in grid.rowData)
+    fields = {c["field"] for c in grid.columnDefs}
+    assert {"min", "player", "opponent", "outcome"} <= fields
+
+
+def test_drawer_body_outcome_column_carries_outcome_colors():
+    agg = aggregate_goal_mouth(
+        [ShotRecord(1, "X", "A", "10'", "Goal", "Low Centre", "Brazil")])
+    grid = _grid(drawer_body("low_centre", agg))
+    outcome_col = next(c for c in grid.columnDefs if c["field"] == "outcome")
+    blob = str(outcome_col.get("cellStyle"))
+    assert OUTCOME_COLORS["Goal"] in blob          # colors live in the column def
+
+
+def test_drawer_body_grid_follows_theme():
+    agg = aggregate_goal_mouth(
+        [ShotRecord(1, "X", "A", "10'", "Goal", "Low Centre", "Brazil")])
+    assert "ag-theme-quartz-dark" in _grid(drawer_body("low_centre", agg, True)).className
+    assert "ag-theme-quartz " in _grid(
+        drawer_body("low_centre", agg, False)).className + " "
 
 
 # ---------------------------------------------------------------------------
@@ -114,11 +132,13 @@ def _walk(node):
         yield from _walk(children)
 
 
-def test_panel_has_header_title_mode_control_and_graph():
+def test_panel_has_header_title_and_graph_no_mode_control():
     panel = build_goal_mouth_panel()
     ids = {getattr(n, "id", None) for n in _walk(panel)}
     assert "goal-mouth-graph" in ids
-    assert "goal-mouth-mode" in ids
+    # Volume/Dominant fill-mode control was removed by request.
+    assert "goal-mouth-mode" not in ids
+    assert not any(isinstance(n, dmc.SegmentedControl) for n in _walk(panel))
     texts = [n.children for n in _walk(panel) if isinstance(n, dmc.Text)]
     assert any("Shoot map" == t for t in texts)
     # minimal header: the "where each team's shots finished" subtitle and the

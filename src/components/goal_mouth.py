@@ -3,20 +3,18 @@
 panel and left-drawer constructors. Plotly + dash-mantine-components only."""
 from __future__ import annotations
 
+import dash_ag_grid as dag
 import dash_mantine_components as dmc
 import plotly.graph_objects as go
 from dash import dcc
 
-from src.data.live.goal_mouth_zones import MARGINS, ON_TARGET, parse_shot_minute
+from src.data.live.goal_mouth_zones import ON_TARGET, parse_shot_minute
 
 # --- color enum (consistent everywhere; pair with text labels, never alone) ---
 OUTCOME_COLORS = {
     "Goal": "#1D9E75", "Saved": "#378ADD", "Blocked": "#888780",
     "Post": "#D85A30", "Missed": "#EF9F27",
 }
-NEAR_MISS_COLOR = "#EF9F27"          # the Close* family
-# Deterministic dominant-outcome tie-break order.
-_DOMINANT_ORDER = ["Goal", "Saved", "Blocked", "Post", "Missed"]
 
 ZONE_LABEL = {
     "high_left": "High Left", "high_centre": "High Centre", "high_right": "High Right",
@@ -30,22 +28,9 @@ ZONE_LABEL = {
 _COLS = ["left", "centre", "right"]
 _ROWS = ["low", "high"]
 _GX0, _GX1, _GY0, _GY1 = -0.5, 2.5, -0.5, 1.5          # frame extents (cell edges)
-# Near-miss marker positions just outside the frame (only the four that occur).
-_NEAR_POS = {"close_left": (-1.05, 0.5), "close_right": (3.05, 0.5),
-             "close_high": (1.0, 2.05), "close_right_high": (3.05, 2.05)}
 # Volume heatmap ramp (same in both themes; cells stay dark enough that the
 # white numerals read on any value).
 _VOLUME_SCALE = [[0.0, "#1f3a5f"], [1.0, "#1c63d6"]]
-
-
-def _dominant_outcome(outcomes: dict) -> str | None:
-    if not outcomes:
-        return None
-    best = max(outcomes.values())
-    for o in _DOMINANT_ORDER:                       # deterministic tie-break
-        if outcomes.get(o, 0) == best:
-            return o
-    return next(iter(outcomes))
 
 
 def zone_hover_text(zone_id: str, zinfo: dict) -> str:
@@ -65,11 +50,10 @@ def zone_hover_text(zone_id: str, zinfo: dict) -> str:
     return "<br>".join(lines)
 
 
-def build_goal_mouth_figure(agg: dict, mode: str = "volume",
-                            theme: str = "dark") -> go.Figure:
-    """A clean heatmap goal: the 2x3 on-target grid shaded by value with the
-    shot count in each cell, a posts/crossbar frame, near-miss markers just
-    outside, an off-target tally, and a colour-scale legend (colorbar)."""
+def build_goal_mouth_figure(agg: dict, theme: str = "dark") -> go.Figure:
+    """A clean heatmap goal: the 2x3 on-target grid is a Plotly heatmap shaded
+    by shot volume with the count in each cell, framed by posts/crossbar + goal
+    line, with an off-target tally and a colour-scale legend (colorbar)."""
     dark = theme != "light"
     fg = "#E9ECEF" if dark else "#1A1B1E"
     zones = agg["zones"]
@@ -84,42 +68,19 @@ def build_goal_mouth_figure(agg: dict, mode: str = "volume",
 
     cbar = dict(orientation="h", thickness=9, len=0.6, x=0.5, xanchor="center",
                 y=-0.08, yanchor="top", outlinewidth=0,
-                tickfont=dict(color=fg, size=10))
-
-    if mode == "dominant":
-        present = [o for o in _DOMINANT_ORDER
-                   if any(_dominant_outcome(cell(z)["outcomes"]) == o
-                          for row in ids for z in row)]
-        index = {o: i for i, o in enumerate(present)}
-        z = [[(index[_dominant_outcome(cell(zid)["outcomes"])]
-               if cell(zid)["count"] else None) for zid in row] for row in ids]
-        n = max(len(present), 1)
-        colorscale = ([[0, "#888888"], [1, "#888888"]] if not present else
-                      [pair for i, o in enumerate(present)
-                       for pair in ([i / n, OUTCOME_COLORS[o]],
-                                    [(i + 1) / n, OUTCOME_COLORS[o]])])
-        zmin, zmax = -0.5, n - 0.5
-        # Empty title (set explicitly so a volume->dominant react diff clears the
-        # previous "shots" label); the category names are the legend.
-        cbar.update(tickmode="array", tickvals=list(range(len(present))),
-                    ticktext=present,
-                    title=dict(text="", font=dict(color=fg, size=10), side="top"))
-        showscale = bool(present)
-    else:
-        z = [[(n or None) for n in row] for row in counts]
-        colorscale = _VOLUME_SCALE
-        mx = max((n for row in counts for n in row), default=0)
-        zmin, zmax = 0, max(mx, 1)
-        cbar.update(tickmode="auto", tickvals=None, ticktext=None,
-                    title=dict(text="shots", font=dict(color=fg, size=10), side="top"))
-        showscale = mx > 0
+                tickfont=dict(color=fg, size=10),
+                title=dict(text="shots", font=dict(color=fg, size=10), side="top"))
+    z = [[(n or None) for n in row] for row in counts]
+    mx = max((n for row in counts for n in row), default=0)
+    zmin, zmax = 0, max(mx, 1)
+    showscale = mx > 0
 
     fig = go.Figure(go.Heatmap(
         z=z, x=[0, 1, 2], y=[0, 1], customdata=ids,
         text=text, texttemplate="%{text}", textfont=dict(color="#FFFFFF", size=16),
         hovertext=hover, hovertemplate="%{hovertext}<extra></extra>",
         hoverongaps=False, xgap=4, ygap=4,
-        colorscale=colorscale, zmin=zmin, zmax=zmax,
+        colorscale=_VOLUME_SCALE, zmin=zmin, zmax=zmax,
         showscale=showscale, colorbar=cbar,
     ))
 
@@ -130,23 +91,6 @@ def build_goal_mouth_figure(agg: dict, mode: str = "volume",
         marker=dict(size=46, color="rgba(0,0,0,0)", line=dict(width=0)),
         hoverinfo="skip", showlegend=False, name="zone-hit",
     ))
-
-    # Near-miss markers just outside the frame (only where they occur), clickable.
-    nx, ny, nt, ncd, nh = [], [], [], [], []
-    for m in MARGINS:
-        cm = cell(m)
-        if cm["count"]:
-            px, py = _NEAR_POS[m]
-            nx.append(px); ny.append(py); nt.append(str(cm["count"]))
-            ncd.append(m); nh.append(zone_hover_text(m, cm))
-    if nx:
-        fig.add_trace(go.Scatter(
-            x=nx, y=ny, customdata=ncd, mode="markers+text", text=nt,
-            textposition="middle center", textfont=dict(color="#FFFFFF", size=11),
-            marker=dict(size=24, color=NEAR_MISS_COLOR, line=dict(color=fg, width=1)),
-            hovertext=nh, hovertemplate="%{hovertext}<extra></extra>",
-            showlegend=False, name="near-miss",
-        ))
 
     # Posts + crossbar frame and the goal line.
     frame = dict(type="line", line=dict(color=fg, width=5), layer="above")
@@ -180,14 +124,10 @@ _GRAPH_CONFIG = {"displayModeBar": False, "responsive": True}
 
 
 def build_goal_mouth_panel() -> dmc.Box:
-    """Shoot map card: header (title + fill-mode control) over a Plotly heatmap
-    goal that fills the whole card (its colour-scale legend lives in-figure)."""
+    """Shoot map card: header (title only) over a Plotly heatmap goal that fills
+    the whole card (its colour-scale legend lives in-figure)."""
     header = dmc.Group(
-        [
-            dmc.Text("Shoot map", fw=700, size="sm"),
-            dmc.SegmentedControl(id="goal-mouth-mode", value="Volume",
-                                 data=["Volume", "Dominant"], size="xs"),
-        ],
+        [dmc.Text("Shoot map", fw=700, size="sm")],
         justify="space-between", align="center", wrap="nowrap",
         className="bento-card__header",
     )
@@ -220,9 +160,34 @@ def build_goal_mouth_drawer() -> dmc.Drawer:
     )
 
 
-def drawer_body(zone_id: str, agg: dict) -> list:
-    """Self-contained left-drawer contents for one zone: summary header + a
-    scrollable, time-sorted shot list (minute · shooter · outcome)."""
+# Outcome column colours sourced from the shared enum (single source of truth),
+# applied per cell via dash-ag-grid styleConditions.
+_OUTCOME_CELL_STYLE = {
+    "styleConditions": [
+        {"condition": f"params.value == '{o}'",
+         "style": {"color": c, "fontWeight": 600}}
+        for o, c in OUTCOME_COLORS.items()
+    ],
+}
+_SHOT_COLUMNS = [
+    {"headerName": "Min", "field": "min", "width": 64, "sortable": True},
+    {"headerName": "Player", "field": "player", "flex": 1, "minWidth": 110,
+     "sortable": True},
+    {"headerName": "vs", "field": "opponent", "flex": 1, "minWidth": 90,
+     "sortable": True},
+    {"headerName": "Outcome", "field": "outcome", "width": 104, "sortable": True,
+     "cellStyle": _OUTCOME_CELL_STYLE},
+]
+_SHOT_GRID_OPTIONS = {
+    "suppressCellFocus": True, "rowHeight": 34, "headerHeight": 34,
+    "overlayNoRowsTemplate": "No shots in this zone",
+}
+
+
+def drawer_body(zone_id: str, agg: dict, dark: bool = True) -> list:
+    """Self-contained left-drawer contents for one zone: a summary header over an
+    AG grid of the zone's shots (minute · shooter · opponent "vs <team>" ·
+    outcome), time-sorted. `dark` selects the AG theme to match the app."""
     z = agg["zones"].get(zone_id, {"count": 0, "outcomes": {}, "shooters": []})
     label = ZONE_LABEL.get(zone_id, zone_id)
     breakdown = ", ".join(f"{c} {o}" for o, c in
@@ -234,13 +199,17 @@ def drawer_body(zone_id: str, agg: dict) -> list:
     ], gap=2)
 
     rows = [
-        dmc.Group([
-            dmc.Text(s["time"], size="sm", w=52, c="dimmed"),
-            dmc.Text(s["player"], size="sm", style={"flex": 1, "minWidth": 0}),
-            dmc.Text(s["outcome"], size="sm", fw=600,
-                     c=OUTCOME_COLORS.get(s["outcome"], "gray")),
-        ], gap="xs", wrap="nowrap")
+        {"min": s["time"], "player": s["player"],
+         "opponent": s.get("opponent", ""), "outcome": s["outcome"]}
         for s in sorted(z["shooters"], key=lambda s: parse_shot_minute(s["time"]))
     ]
-    body = dmc.ScrollArea(dmc.Stack(rows, gap=4), style={"height": "70vh"})
-    return [dmc.Stack([header, body], gap="sm")]
+    theme = "ag-theme-quartz-dark" if dark else "ag-theme-quartz"
+    grid = dag.AgGrid(
+        id="goal-mouth-shot-grid",
+        columnDefs=_SHOT_COLUMNS,
+        rowData=rows,
+        className=f"{theme} goal-mouth-grid",
+        dashGridOptions=_SHOT_GRID_OPTIONS,
+        style={"height": "70vh", "width": "100%"},
+    )
+    return [dmc.Stack([header, grid], gap="sm")]

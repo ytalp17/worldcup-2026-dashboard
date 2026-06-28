@@ -10,7 +10,7 @@ from pathlib import Path
 from src.data.live.shots import ShotRecord
 
 FIELDS = ["match_id", "team", "state", "stage",
-          "player", "time", "outcome", "goal_target"]
+          "player", "time", "outcome", "goal_target", "opponent"]
 
 
 def load(path) -> dict[int, list[ShotRecord]]:
@@ -26,6 +26,7 @@ def load(path) -> dict[int, list[ShotRecord]]:
                 match_id=mid, team=row["team"], player=row.get("player", ""),
                 time=row.get("time", ""), outcome=row.get("outcome", ""),
                 goal_target=(gt if gt else None),
+                opponent=row.get("opponent", "") or "",
                 stage=row.get("stage") or "group"))
     return out
 
@@ -64,5 +65,6 @@ def upsert(path, match_id: int, state: str, rows, stage: str = "group") -> None:
                 "stage": stage, "player": s.player, "time": s.time,
                 "outcome": s.outcome,
                 "goal_target": "" if s.goal_target is None else s.goal_target,
+                "opponent": s.opponent,
             })
     os.replace(tmp, p)

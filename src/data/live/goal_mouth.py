@@ -39,7 +39,8 @@ def aggregate_goal_mouth(records, group_only: bool = False) -> dict:
                                         {"count": 0, "outcomes": {}, "shooters": []})
         _bump(bucket, r.outcome)
         bucket["shooters"].append(
-            {"time": r.time, "player": r.player, "outcome": r.outcome})
+            {"time": r.time, "player": r.player, "outcome": r.outcome,
+             "opponent": getattr(r, "opponent", "")})
 
     for bucket in list(zones.values()) + list(margins.values()):
         bucket["shooters"].sort(key=lambda s: parse_shot_minute(s["time"]))

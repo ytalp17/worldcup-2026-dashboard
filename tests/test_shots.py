@@ -22,8 +22,11 @@ def test_parses_both_sides_with_team_names():
     eng = [r for r in rows if r.team == "England"]
     assert len(eng) == 2
     assert rows[0] == ShotRecord(42, "England", "K. Bowie", "15'",
-                                 "Blocked", "Low Centre")
+                                 "Blocked", "Low Centre", "Wales")
     assert any(r.goal_target is None and r.team == "England" for r in rows)
+    # each side's opponent is the other side's name ("vs <team>")
+    assert all(r.opponent == "Wales" for r in rows if r.team == "England")
+    assert all(r.opponent == "England" for r in rows if r.team == "Wales")
 
 
 def test_accepts_one_element_list_detail():

@@ -433,7 +433,7 @@ class _FakeGMLive:
 def test_goal_mouth_figure_payload_builds_figure(monkeypatch):
     import app
     monkeypatch.setattr(app, "LIVE", _FakeGMLive())
-    fig = app.goal_mouth_figure_payload(0, {"ok": True}, dark=True, mode="Volume")
+    fig = app.goal_mouth_figure_payload(0, {"ok": True}, dark=True)
     assert isinstance(fig, go.Figure)
     assert app.LIVE.calls and isinstance(app.LIVE.calls[0][0], str)
 
@@ -441,7 +441,7 @@ def test_goal_mouth_figure_payload_builds_figure(monkeypatch):
 def test_goal_mouth_figure_payload_no_live_is_empty(monkeypatch):
     import app
     monkeypatch.setattr(app, "LIVE", None)
-    fig = app.goal_mouth_figure_payload(0, None, dark=True, mode="Volume")
+    fig = app.goal_mouth_figure_payload(0, None, dark=True)
     assert isinstance(fig, go.Figure)          # empty-but-valid frame
 
 
@@ -450,6 +450,7 @@ def test_goal_mouth_figure_payload_no_live_is_empty(monkeypatch):
 def test_goal_mouth_drawer_payload_lists_zone(monkeypatch):
     import app
     monkeypatch.setattr(app, "LIVE", _FakeGMLive())
-    title, children = app.goal_mouth_drawer_payload("low_centre", 0, {"ok": True})
+    title, children = app.goal_mouth_drawer_payload(
+        "low_centre", 0, {"ok": True}, dark=True)
     assert "Low Centre" in title
     assert isinstance(children, list) and children

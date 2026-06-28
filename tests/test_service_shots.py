@@ -36,6 +36,8 @@ def test_update_then_aggregate_for_team(tmp_path):
     assert agg["zones"]["low_centre"]["count"] == 1
     assert agg["off_target"]["count"] == 1
     assert agg["totals"]["total"] == 2          # England's two shots only
+    # opponent ("vs <team>") survives the parse -> store -> aggregate round-trip
+    assert agg["zones"]["low_centre"]["shooters"][0]["opponent"] == "Wales"
 
 
 def test_finished_and_stored_is_skipped(tmp_path):

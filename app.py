@@ -270,7 +270,7 @@ _EMPTY_GM = {
 }
 
 
-def goal_mouth_figure_payload(index, live, dark, mode):
+def goal_mouth_figure_payload(index, live, dark):
     """Figure for the carousel-selected team. `live` is the trigger only; data
     comes from the shot store via LIVE."""
     if LIVE is None:
@@ -278,16 +278,16 @@ def goal_mouth_figure_payload(index, live, dark, mode):
     else:
         agg = LIVE.team_goal_mouth(center_team(TEAM_NAMES, index or 0))
     theme = "dark" if (dark is None or dark) else "light"
-    fig_mode = "dominant" if mode == "Dominant" else "volume"
-    return build_goal_mouth_figure(agg, mode=fig_mode, theme=theme)
+    return build_goal_mouth_figure(agg, theme=theme)
 
 
-def goal_mouth_drawer_payload(zone_id, index, live):
-    """(title, children) for the zone drawer. Title doubles the zone name."""
+def goal_mouth_drawer_payload(zone_id, index, live, dark):
+    """(title, children) for the zone drawer. Title doubles the zone name; `dark`
+    selects the AG-grid theme so the shot table matches the app's color scheme."""
     agg = _EMPTY_GM if LIVE is None else LIVE.team_goal_mouth(
         center_team(TEAM_NAMES, index or 0))
     title = ZONE_LABEL.get(zone_id, zone_id)
-    return title, drawer_body(zone_id, agg)
+    return title, drawer_body(zone_id, agg, dark=(dark is None or dark))
 
 
 def team_stats_payload(index):
@@ -966,12 +966,11 @@ def update_kpi_strip(index, _live):
 @callback(
     Output("goal-mouth-graph", "figure"),
     Input("carousel-index", "data"),
-    Input("goal-mouth-mode", "value"),
     Input("color-scheme-toggle", "checked"),
     Input("live-store", "data"),
 )
-def update_goal_mouth(index, mode, dark, live):
-    return goal_mouth_figure_payload(index, live, dark, mode)
+def update_goal_mouth(index, dark, live):
+    return goal_mouth_figure_payload(index, live, dark)
 
 
 @callback(
@@ -981,14 +980,23 @@ def update_goal_mouth(index, mode, dark, live):
     Output("goal-mouth-drawer", "children"),
     Input("goal-mouth-graph", "clickData"),
     Input("carousel-index", "data"),
+    Input("color-scheme-toggle", "checked"),
     State("goal-mouth-zone", "data"),
     State("live-store", "data"),
     prevent_initial_call=True,
 )
-def open_goal_mouth_zone(click, index, current_zone, live):
+def open_goal_mouth_zone(click, index, dark, current_zone, live):
+    trig = ctx.triggered_id
     # Team change closes any open zone drawer.
-    if ctx.triggered_id == "carousel-index":
+    if trig == "carousel-index":
         return None, False, no_update, no_update
+    # Theme toggle: re-render the open drawer's grid in the new AG theme (keep it
+    # open and on the same zone); do nothing if no zone is selected.
+    if trig == "color-scheme-toggle":
+        if not current_zone:
+            return no_update, no_update, no_update, no_update
+        title, children = goal_mouth_drawer_payload(current_zone, index, live, dark)
+        return no_update, no_update, title, children
     if not click or not click.get("points"):
         return no_update, no_update, no_update, no_update
     zid = click["points"][0].get("customdata")
@@ -998,7 +1006,7 @@ def open_goal_mouth_zone(click, index, current_zone, live):
         return no_update, no_update, no_update, no_update
     if zid == current_zone:             # re-click same zone -> close
         return None, False, no_update, no_update
-    title, children = goal_mouth_drawer_payload(zid, index, live)
+    title, children = goal_mouth_drawer_payload(zid, index, live, dark)
     return zid, True, title, children
 
 

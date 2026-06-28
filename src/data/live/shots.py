@@ -14,6 +14,7 @@ class ShotRecord:
     time: str
     outcome: str
     goal_target: str | None
+    opponent: str = ""
     stage: str = "group"
 
 
@@ -27,12 +28,17 @@ def parse_shots(match_id: int, detail) -> list[ShotRecord]:
     obj = _detail_obj(detail)
     if not isinstance(obj, dict):
         return []
+    # Both teams come from the same detail object, so each side's opponent is
+    # simply the other side's name ("vs <team>" in the shot drawer).
+    names = {side: str(t.get("name") or "") if isinstance(t := obj.get(side), dict)
+             else "" for side in ("homeTeam", "awayTeam")}
+    opponent = {"homeTeam": names["awayTeam"], "awayTeam": names["homeTeam"]}
     rows: list[ShotRecord] = []
     for side in ("homeTeam", "awayTeam"):
         team_obj = obj.get(side)
         if not isinstance(team_obj, dict):
             continue
-        team = str(team_obj.get("name") or "")
+        team = names[side]
         shots = team_obj.get("shots")
         if not isinstance(shots, list):
             continue
@@ -47,5 +53,6 @@ def parse_shots(match_id: int, detail) -> list[ShotRecord]:
                 time=str(shot.get("time") or ""),
                 outcome=str(shot.get("outcome") or ""),
                 goal_target=gt if gt is None else str(gt),
+                opponent=opponent[side],
             ))
     return rows
