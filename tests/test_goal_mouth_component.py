@@ -127,8 +127,11 @@ def test_panel_has_header_title_mode_control_and_graph():
     assert any("Goal-mouth map" == t for t in texts)
     # never call it a "shot map"
     assert not any(isinstance(t, str) and "shot map" in t.lower() for t in texts)
-    # honest-limitation note present
-    assert any(isinstance(t, str) and "placement" in t.lower() for t in texts)
+    # minimal header: the "where each team's shots finished" subtitle and the
+    # placement disclaimer caption were removed by request.
+    assert not any(isinstance(t, str) and "where each team's shots finished" in t
+                   for t in texts)
+    assert not any(isinstance(t, str) and "placement" in t.lower() for t in texts)
     graph = next(n for n in _walk(panel) if isinstance(n, dcc.Graph))
     assert graph.config.get("displayModeBar") is False
 
