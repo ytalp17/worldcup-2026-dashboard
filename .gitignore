@@ -5,6 +5,7 @@ __pycache__/
 venv/
 .venv/
 logs/
+scratchpad/
 .superpowers/
 .env
 *.env
